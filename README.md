@@ -23,11 +23,6 @@ O **Flash View** foi escolhido como proposta de sistema por oferecer uma forma m
 
 Com uma interface simples e informações centralizadas, o sistema permite que os funcionários encontrem os produtos com mais facilidade e tenham uma visão rápida do estoque e de seus principais dados. Dessa forma, o **Flash View** contribui para tornar o processo de gerenciamento mais eficiente, reduzindo tarefas manuais e possíveis erros no cadastro das informações.
 
-!1000111582.png
-
-!1000111581.png
-
-!1000111580.png
 
 # Integrantes
 
