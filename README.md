@@ -29,20 +29,14 @@ Com uma interface simples e informações centralizadas, o sistema permite que o
 - Eduardo Nunes
 - Heros Henrique
 - Jonas Adriano
-- Ronald  Willy
+- Ronald Willy
 
 # Divisão de temas
 
-Cada pessoa do grupo vai ter uma área para desenvolver, aplicar e entender 100% do que tá fazendo para apresentar no dia de mostrar o projeto.
+Cada pessoa do grupo tem uma área própria para desenvolver, aplicar e apresentar no dia de demonstração do projeto.
 
 Iremos criar um repositório no Github para o projeto, onde cada um terá sua própria pasta para concluir sua parte e depois juntar tudo em uma pasta Principal (Main).
 
-Caso tenham duvidas em desenvolver o código:
-
-- Peçam ajuda aos outros membros do grupo
-- Ultilização moderada de IA
-- Sempre tenham uma cópia de sua pasta salva além do nosso repositório
-- Peçam conselhos ao nosso orientador (pelo menos até falarmos com Marcilio ou Italo) sobre como vc pode melhorar ou algum erro de código
 
 | Área | Aplicação | Responsável |
 | --- | --- | --- |
@@ -63,19 +57,22 @@ Caso tenham duvidas em desenvolver o código:
     - Estatísticas rápidas.
     - Carregar Imagem dos blocos e chapas
     - Criação de um código para o bloco ou chapa
+
 2. **Gerenciamento de Blocos** 
     - Cadastrar bloco.
     - Editar.
     - Excluir.
     - Listar.
     - Pesquisar por código, tipo ou material.
+
 3. **Gerenciamento de Chapas**
     - Cadastrar chapa.
     - Editar.
     - Excluir.
     - Listar.
     - Relacionar a um bloco (caso a chapa seja produzida a partir dele).
-    1. **Filtros**
+
+4.  **Filtros**
     - Material (granito, mármore etc.).
     - Cor
     - Espessura
