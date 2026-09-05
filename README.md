@@ -1,6 +1,7 @@
 # Contexto
 
-Este projeto é uma proposta da empresa **Ingá Granitos do Nordeste** 
+Este projeto é uma proposta da empresa
+ **Ingá Granitos do Nordeste** 
 
 Seu trabalho acontece em setores privados de pedreiras que contém pedras retiradas e formadas como blocos ou chapas. Com isso, eles focam extração e comercialização de blocos brutos e formação de chapas de granito através desse processo:
 
