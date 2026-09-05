@@ -399,6 +399,50 @@ http://localhost:3000
 docker compose down
 ```
 
+### Passo 1: Como o desenvolvedor deve trabalhar no VS Code
+
+Antes de começar a alterar o código ou enviar commits, o colaborador deve garantir que está na branch correta:
+
+1. **Verificar em qual branch está no terminal:**Bash
+    
+    ```
+    git branch
+    ```
+    
+    *(A branch atual estará marcada com um asterisco `*` em verde).*
+    
+2. **Alternar para a branch desejada:**
+    - Se for trabalhar no **Backend**:Bash
+        
+        ```
+        git checkout back
+        ```
+        
+    - Se for trabalhar no **Frontend**:Bash
+        
+        ```
+        git checkout front
+        ```
+        
+    - Se for trabalhar no **Banco de dados**:Bash
+        
+        ```
+        git checkout banco-de-dados
+        ```
+        
+3. **Fazer o commit e publicar (push) na branch correta:**
+Após alterar os arquivos no VS Code:Bash
+    
+    ```
+    git add .
+    git commit -m "feat: minha nova alteracao"
+    git push origin back   # (ou front / banco-de-dados)
+    ```
+    
+
+> **Dica no VS Code:** No canto inferior esquerdo do VS Code, você pode ver o nome da branch atual. Clicando nela, você também pode trocar de branch rapidamente.
+>
+
 # **Licença**
 
 Este projeto foi desenvolvido para fins acadêmicos.
