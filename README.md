@@ -30,7 +30,6 @@ Com uma interface simples e informações centralizadas, o sistema permite que o
 - Eduardo Nunes
 - Heros Henrique
 - Jonas Adriano
-- Ronald Willy
 
 # Divisão de temas
 
