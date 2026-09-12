@@ -320,7 +320,6 @@ database/
 ├── usuario
 ├── bloco
 ├── chapa
-└── imagem
 ```
 
 # Estrutura geral do projeto
