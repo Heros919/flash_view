@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash View - Dashboard</title>
+    <!-- Apenas Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container mt-5">
+
+    <h1>Dashboard</h1>
+    <hr>
+
+    <!-- Cards de Resumo (serão preenchidos pelo JS) -->
+    <div class="row text-center mb-5">
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h5>Total de Blocos</h5>
+                <h2 id="total-blocos">--</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h5>Total de Chapas</h5>
+                <h2 id="total-chapas">--</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h5>Disponíveis</h5>
+                <h2 id="total-disponiveis">--</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h5>Vendidas</h5>
+                <h2 id="total-vendidas">--</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Últimos Cadastrados -->
+    <h3>Últimos Itens Cadastrados</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Tipo</th>
+                <th>Data</th>
+            </tr>
+        </thead>
+        <tbody id="tabela-ultimos">
+            <tr><td colspan="3">Carregando...</td></tr>
+        </tbody>
+    </table>
+
+    <!-- JavaScript de Integração -->
+    <script>
+        const API_URL = 'http://localhost:3000';
+
+        async function carregarDashboard() {
+            try {
+                // 1. Buscar Resumo
+                const resResumo = await fetch(`${API_URL}/dashboard/resumo`);
+                const resumo = await resResumo.json();
+
+                // Preencher os cards
+                document.getElementById('total-blocos').textContent = resumo.totalBlocos || 0;
+                document.getElementById('total-chapas').textContent = resumo.totalChapas || 0;
+                document.getElementById('total-disponiveis').textContent = resumo.chapasDisponiveis || 0;
+                document.getElementById('total-vendidas').textContent = resumo.chapasVendidas || 0;
+
+                // 2. Buscar Últimos Itens
+                const resUltimos = await fetch(`${API_URL}/dashboard/ultimos`);
+                const ultimos = await resUltimos.json();
+                
+                const tbody = document.getElementById('tabela-ultimos');
+                tbody.innerHTML = '';
+                
+                ultimos.forEach(item => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${item.codigo}</td>
+                            <td>${item.tipo}</td>
+                            <td>${new Date(item.dataCadastro).toLocaleDateString('pt-BR')}</td>
+                        </tr>
+                    `;
+                });
+
+            } catch (error) {
+                console.error('Erro ao carregar dashboard:', error);
+                alert('Erro ao conectar com o servidor.');
+            }
+        }
+
+        // Executa ao carregar a página
+        carregarDashboard();
+    </script>
+</body>
+</html>
