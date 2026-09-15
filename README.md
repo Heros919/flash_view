@@ -243,10 +243,10 @@ DELETE /chapas/:id
 
 ```jsx
 GET    /usuarios
-GET    /usuarios/:id
+GET    /usuarios/:cpf
 POST   /usuarios
-PATCH  /usuarios/:id
-DELETE /usuarios/:id
+PATCH  /usuarios/:cpf
+DELETE /usuarios/:cpf
 ```
 
 ### 5. Dashboard
