@@ -86,7 +86,7 @@ Iremos criar um repositório no Github para o projeto, onde cada um terá sua pr
 ### Usuário
 
 ```
-id
+CPF
 nome
 email
 senha
