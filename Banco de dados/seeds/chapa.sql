@@ -1,0 +1,41 @@
+INSERT INTO chapa (
+    id,
+    codigo,
+    blocoid,
+    espessura,
+    altura,
+    largura,
+    acabamento,
+    status
+)
+VALUES
+(
+    '1',
+    'CH-000001',
+    '1',
+    2.00,
+    2.50,
+    1.20,
+    'Polido',
+    'DISPONIVEL'
+),
+(
+    '2',
+    'CH-000002',
+    '1',
+    2.00,
+    2.50,
+    1.20,
+    'Escovado',
+    'RESERVADO'
+),
+(
+    '3',
+    'CH-000003',
+    '2',
+    2.00,
+    2.60,
+    1.30,
+    'Polido',
+    'VENDIDO'
+);
