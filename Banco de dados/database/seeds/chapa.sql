@@ -18,7 +18,19 @@ VALUES
     1.20,
     'Polido',
     'DISPONIVEL'
-),
+);
+
+INSERT INTO chapa (
+    id,
+    codigo,
+    blocoid,
+    espessura,
+    altura,
+    largura,
+    acabamento,
+    status
+)
+VALUES
 (
     '2',
     'CH-000002',
@@ -28,7 +40,19 @@ VALUES
     1.20,
     'Escovado',
     'RESERVADO'
-),
+);
+
+INSERT INTO chapa (
+    id,
+    codigo,
+    blocoid,
+    espessura,
+    altura,
+    largura,
+    acabamento,
+    status
+)
+VALUES
 (
     '3',
     'CH-000003',

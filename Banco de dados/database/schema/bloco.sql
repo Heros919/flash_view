@@ -1,6 +1,5 @@
 CREATE TABLE bloco (
     id VARCHAR(100) PRIMARY KEY,
-    -- Código gerado pelo sistema
     codigo VARCHAR(50) NOT NULL UNIQUE,
     numero INTEGER NOT NULL,
     material VARCHAR(150),
@@ -9,6 +8,10 @@ CREATE TABLE bloco (
     largura NUMERIC(10,2),
     comprimento NUMERIC(10,2),
     peso NUMERIC(10,2),
+    volume NUMERIC(12,3)
+        GENERATED ALWAYS AS (
+            altura * largura * comprimento
+        ) STORED,
     mes INTEGER NOT NULL,
     ano INTEGER NOT NULL,
     frente VARCHAR(50) NOT NULL,
@@ -24,13 +27,13 @@ CREATE TABLE bloco (
         CHECK (ano >= 2000),
 
     CONSTRAINT chk_bloco_altura
-        CHECK (altura IS NULL OR altura > 0),
+    CHECK (altura > 0),
 
-    CONSTRAINT chk_bloco_largura
-        CHECK (largura IS NULL OR largura > 0),
+CONSTRAINT chk_bloco_largura
+    CHECK (largura > 0),
 
-    CONSTRAINT chk_bloco_comprimento
-        CHECK (comprimento IS NULL OR comprimento > 0),
+CONSTRAINT chk_bloco_comprimento
+    CHECK (comprimento > 0),
 
     CONSTRAINT chk_bloco_peso
         CHECK (peso IS NULL OR peso > 0),

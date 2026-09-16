@@ -12,3 +12,5 @@ ON bloco(ano);
 
 CREATE INDEX idx_bloco_mes
 ON bloco(mes);
+
+

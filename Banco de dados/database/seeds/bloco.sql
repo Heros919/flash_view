@@ -12,8 +12,7 @@ INSERT INTO bloco (
     ano,
     frente
 )
-VALUES
-(
+VALUES (
     '1',
     'BL-ZQQIJ',
     1,
@@ -26,8 +25,23 @@ VALUES
     1,
     2026,
     'D'
-),
-(
+);
+
+INSERT INTO bloco (
+    id,
+    codigo,
+    numero,
+    material,
+    cor,
+    altura,
+    largura,
+    comprimento,
+    peso,
+    mes,
+    ano,
+    frente
+)
+VALUES (
     '2',
     'BL-TQQIA',
     20,
@@ -40,8 +54,23 @@ VALUES
     1,
     2026,
     'A'
-),
-(
+);
+
+INSERT INTO bloco (
+    id,
+    codigo,
+    numero,
+    material,
+    cor,
+    altura,
+    largura,
+    comprimento,
+    peso,
+    mes,
+    ano,
+    frente
+)
+VALUES (
     '3',
     'BL-QTIIV',
     12,
