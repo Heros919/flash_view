@@ -6,7 +6,7 @@ INSERT INTO usuario (
 )
 VALUES (
     '1',
-    'Administrador',
-    'admin@flashview.com',
-    'hashed_password_1'
+    'Funcionario',
+    'func@flashview.com',
+    'password-1'
 );
