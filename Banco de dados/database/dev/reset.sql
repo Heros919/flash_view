@@ -4,3 +4,5 @@ DROP TABLE IF EXISTS usuario;
 
 DROP TABLE IF EXISTS midia;
 
+drop table if EXISTS administrador;
+
