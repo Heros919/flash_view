@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./cadastro.css">
+    <link rel="stylesheet" href="./css/login.css">
     <title>Flash View</title>
-    <link rel="icon" href="flash.ico" type="image/x-icon">
+    <link rel="icon" href="assets/logo.ico" type="image/x-icon">
 
 </head>
 
@@ -14,21 +14,66 @@
 
     <div class="container">
         <h1>Flash View</h1>
-        <form class="formulario" onsubmit="window.location.href='central.html'; return false;">
-            <label for="nome">Nome:</label>
-            <input type="text" id="nome" name="nome" required>
+        <form class="formulario">
+            <p>
+                <label for="nome">Nome:</label>
+                <input type="text" id="nome" name="nome" required>
+            </p>
 
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
+            <p>
+                <label for="senha">Senha:</label>
+                <input type="password" id="senha" name="senha" required>
+            </p>
 
-            <label for="senha">Senha:</label>
-            <input type="password" id="senha" name="senha" required>
-
-            <button type="submit">
-                Cadastrar
-            </button>
+            <button type="submit">Login</button>
+            <p>Não tem uma conta?: <a href="cadastro-usuario.html">Cadastre-se</a></p>
         </form>
     </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000';
+
+        const form = document.querySelector('.formulario');
+        const mensagem = document.getElementById('mensagem');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Impede o recarregamento da página
+
+            // 1. Coleta os valores dos inputs
+            const usuario = {
+                nome: document.getElementById('nome').value,
+                senha: document.getElementById('senha').value,
+            };
+
+            try {
+                // 2. Envia para o back-end via POST
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(usuario),
+                });
+
+                // 3. Verifica a resposta
+                if (!response.ok) {
+                    throw new Error('Erro ao fazer login');
+                }
+
+                const data = await response.json();
+                console.log('Login bem-sucedido:', data);
+
+                // Redireciona para a dashboard ou outra página
+                window.location.href = 'cadastro-usuario.html';
+            } catch (error) {
+                // Se der erro, mostra na tela
+                console.error('Erro:', error);
+                mensagem.textContent = `Erro: ${error.message}`;
+                mensagem.style.color = 'red';
+            }
+        });
+
+    </script>
 </body>
 
 </html>

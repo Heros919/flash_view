@@ -14,7 +14,13 @@
 
     <div class="container">
         <h1>Flash View</h1>
+        <h3>Cadastro de Usuário</h3>
         <form id="form-usuario" class="formulario">
+
+            <p>
+                <label for="cpf">CPF:</label>
+                <input type="text" id="cpf" name="cpf" required>
+            </p>
             <p>
                 <label for="nome">Nome:</label>
                 <input type="text" id="nome" name="nome" required>
@@ -31,6 +37,7 @@
             </p>
 
             <button type="submit">Cadastrar</button>
+            <p>Ja tem uma conta?: <a href="login.html">Faça seu Login</a></p>
         </form>
     </div>
     <script>
@@ -86,7 +93,7 @@
         } catch (error) {
             // Se der erro, mostra na tela
             console.error('Erro:', error);
-            mensagem.textContent = `Erro: ${error.message}`;
+            mensagem.textContent = `Erro: ${error.message}'erro inesperado, recarregue a página e tente novamente.'`;
             mensagem.style.color = 'red';
         }
     });

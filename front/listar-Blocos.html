@@ -1,35 +1,43 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flash View - Blocos</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body class="container mt-5">
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="">
         <h1>Lista de Blocos</h1>
-        <!-- Botão que leva para a página de cadastro -->
-        <a href="cadastro-bloco.html" class="btn btn-primary">Novo Bloco</a>
+        <h2>Quantidade total de blocos: <span id="quantidade-blocos">0</span></h2>
+        <a href="cadastro-bloco.html" class="">Novo Bloco</a>
+            <table id="tabela-blocos" class="">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Material</th>
+                        <th>Cor</th>
+                        <th>Dimensões (C x L x A)</th>
+                        <th>Peso (kg)</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-blocos">
+                    <tr>
+                        <td colspan="6">Carregando...</td>
+                    </tr>
+                </tbody>
+            </table>
     </div>
-    <hr>
 
-    <table class="table table-bordered table-hover">
-        <thead class="table-dark">
-            <tr>
-                <th>Código</th>
-                <th>Material</th>
-                <th>Cor</th>
-                <th>Dimensões (cm)</th>
-                <th>Peso</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody id="tabela-blocos">
-            <tr><td colspan="6">Carregando...</td></tr>
-        </tbody>
-    </table>
+
+
+
+
+
 
     <script>
         const API_URL = 'http://localhost:3000';
@@ -56,7 +64,7 @@
                             <td>${bloco.codigo}</td>
                             <td>${bloco.material}</td>
                             <td>${bloco.cor}</td>
-                            <td>${dimensoes}</td>
+                            <td>${bloco.dimensoes}</td>
                             <td>${bloco.peso} kg</td>
                             <td>
                                 <button class="btn btn-sm btn-danger" onclick="excluirBloco(${bloco.id})">Excluir</button>
@@ -94,4 +102,5 @@
         carregarBlocos();
     </script>
 </body>
+
 </html>
