@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import {
-  Usuario,
-  UsuaioAutenticado,
-  UsuarioService
-} from 'src/usuario/usuario.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { UsuarioAutenticado, UsuarioService } from '../usuario/usuario.service';
+
+// Usado para gastar o mesmo tempo quando o e-mail não existe (evita enumeração de usuários)
+const HASH_FALSO = bcrypt.hashSync('senha-falsa', 10);
 
 @Injectable()
 export class AuthService {
@@ -17,31 +16,23 @@ export class AuthService {
   async validarUsuario(
     email: string,
     senha: string
-  ): Promise<UsuaioAutenticado | null> {
-    const usuario = this.usuarioService.buscarporemail(email);
+  ): Promise<UsuarioAutenticado | null> {
+    const usuario = this.usuarioService.buscarPorEmail(email);
+    const senhaValida = await bcrypt.compare(
+      senha,
+      usuario?.senhaHash ?? HASH_FALSO
+    );
 
-    if (!usuario || !usuario.ativo) {
-      return null;
-    }
-
-    const senhaValida = await bcrypt.compare(senha, usuario.senha);
-
-    if (!senhaValida) {
-      return null;
-    }
-
-    const { senha: _senha, ...principal } = usuario;
-    return principal;
+    if (!usuario || !usuario.ativo || !senhaValida) return null;
+    return this.usuarioService.semSenha(usuario);
   }
 
-  login(usuario: UsuaioAutenticado) {
+  login(usuario: UsuarioAutenticado) {
     const payload = {
-      sub: usuario.id,
+      sub: usuario.cpf,
       email: usuario.email,
       papel: usuario.papel
     };
-    return {
-      acesso: this.jwtService.sign(payload)
-    };
+    return { acesso: this.jwtService.sign(payload) };
   }
 }

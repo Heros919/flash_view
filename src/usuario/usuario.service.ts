@@ -1,48 +1,69 @@
 import { Injectable } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 
-export type Papel = 'Funcionario' | 'Financeiro' | 'Adiministrador';
+export enum Papel {
+  Funcionario = 'FUNCIONARIO',
+  Financeiro = 'FINANCEIRO',
+  Administrador = 'ADMINISTRADOR'
+}
 
 export type Usuario = {
-  id: number;
+  cpf: number;
   nome: string;
   email: string;
-  senha: string;
+  senhaHash: string;
   ativo: boolean;
-  papel: string;
+  papel: Papel;
 };
 
-export type UsuaioAutenticado = Omit<Usuario, 'senha'>;
+export type UsuarioAutenticado = Omit<Usuario, 'senhaHash'>;
 
 @Injectable()
 export class UsuarioService {
-  private readonly usuario: Usuario[] = [
+  // Temporário: enquanto não há banco. Em produção o hash vem do banco.
+  private readonly usuarios: Usuario[] = [
     {
-      id: 1,
+      cpf: 1,
       nome: 'Henrique Luiz Dantas',
       email: 'henrique@empresa.com',
-      senha: '123456',
+      senhaHash: bcrypt.hashSync('123456', 10),
       ativo: true,
-      papel: 'Adiministrador'
+      papel: Papel.Administrador
     },
     {
-      id: 2,
+      cpf: 2,
       nome: 'Claudio Araujo Casta',
       email: 'caraujo@empresa.com',
-      senha: '123456',
+      senhaHash: bcrypt.hashSync('123456', 10),
       ativo: true,
-      papel: 'Financeiro'
+      papel: Papel.Financeiro
     },
     {
-      id: 3,
+      cpf: 3,
       nome: 'Luiz Conzaga Garcia',
       email: 'conzaga@empresa.com',
-      senha: '123456',
+      senhaHash: bcrypt.hashSync('123456', 10),
       ativo: true,
-      papel: 'Funcionario'
+      papel: Papel.Funcionario
     }
   ];
 
-  buscarporemail(email: string): Usuario | undefined {
-    return this.usuario.find((u) => u.email === email);
+  buscarPorEmail(email: string): Usuario | undefined {
+    const alvo = email.trim().toLowerCase();
+    return this.usuarios.find((u) => u.email.toLowerCase() === alvo);
+  }
+
+  buscarPorId(cpf: number): Usuario | undefined {
+    return this.usuarios.find((u) => u.cpf === cpf);
+  }
+
+  semSenha(usuario: Usuario): UsuarioAutenticado {
+    return {
+      cpf: usuario.cpf,
+      nome: usuario.nome,
+      email: usuario.email,
+      ativo: usuario.ativo,
+      papel: usuario.papel
+    };
   }
 }
