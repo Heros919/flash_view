@@ -47,4 +47,7 @@ export class BlocosService {
     this.blocos.push(novoBloco);
     return novoBloco;
   }
+  listas() {
+    return this.blocos;
+  }
 }
