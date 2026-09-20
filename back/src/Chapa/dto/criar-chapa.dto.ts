@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsDate, IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
+import { IsDate, IsNotEmpty, IsNumber, IsString, Min, IsIn } from 'class-validator';
 
 export class CreateChapas {
   @IsString()
@@ -34,7 +34,9 @@ export class CreateChapas {
   @Type(() => Date)
   dataCadastro!: Date;
   
-  @IsNotEmpty()
-  @IsString()
-  status!: string;
+
+@IsNotEmpty()
+@IsIn(['Vendido', 'Disponível', 'Reservado'])
+status!: string;
+
 }

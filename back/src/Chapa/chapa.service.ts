@@ -10,6 +10,7 @@ type Chapa = {
   acabamento: number;
   peso: number;
   dataCadastro: Date;
+  status?: string;
 };
 @Injectable()
 export class ChapasService {
@@ -23,7 +24,8 @@ export class ChapasService {
       largura: 10,
       acabamento: 1,
       peso: 5,
-      dataCadastro: new Date('2023-01-01')
+      dataCadastro: new Date('2023-01-01'),
+      status: 'Disponível'
     },
     {
       id: 2,
@@ -34,7 +36,8 @@ export class ChapasService {
       largura: 7,
       acabamento: 2,
       peso: 3,
-      dataCadastro: new Date('2023-02-15')
+      dataCadastro: new Date('2023-02-15'),
+      status: 'Vendido'
     }
   ];
   criarChapa(dados: CreateChapas): Chapa {

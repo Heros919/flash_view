@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsDate, IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
+import { IsDate, IsNotEmpty, IsNumber, IsString, Min, IsIn } from 'class-validator';
 
 export class CreateBlocos {
   @IsString()
@@ -35,6 +35,7 @@ export class CreateBlocos {
   dataCadastro!: Date;
 
   @IsNotEmpty()
-  @IsString()
+  @IsIn(['Vendido', 'Disponível', 'Reservado'])
   status!: string;
+  
 }

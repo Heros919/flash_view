@@ -10,6 +10,7 @@ type Bloco = {
   comprimento: number;
   peso: number;
   dataCadastro: Date;
+  status?: string;
 };
 @Injectable()
 export class BlocosService {
@@ -23,7 +24,8 @@ export class BlocosService {
       largura: 10,
       comprimento: 30,
       peso: 5,
-      dataCadastro: new Date('2023-01-01')
+      dataCadastro: new Date('2023-01-01'),
+      status: 'Reservado'
     },
     {
       id: 2,
@@ -34,7 +36,8 @@ export class BlocosService {
       largura: 7,
       comprimento: 25,
       peso: 3,
-      dataCadastro: new Date('2023-02-15')
+      dataCadastro: new Date('2023-02-15'),
+      status: 'Vendido'
     }
   ];
   criarBloco(dados: CreateBlocos): Bloco {
