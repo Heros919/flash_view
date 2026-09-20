@@ -3,7 +3,7 @@ import {
   Usuario,
   UsuarioAutenticado,
   UsuarioService
-} from 'src/usuario/usuario.service';
+} from '../usuario/usuario.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 

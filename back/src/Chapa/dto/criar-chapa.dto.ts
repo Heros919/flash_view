@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsDate, IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
 
-export class CreateBlocos {
+export class CreateChapas {
   @IsString()
   @IsNotEmpty()
   codigo!: string;
@@ -24,7 +24,7 @@ export class CreateBlocos {
 
   @IsNumber()
   @Min(0)
-  comprimento!: number;
+  acabamento!: number;
 
   @IsNumber()
   @Min(0)
@@ -33,7 +33,7 @@ export class CreateBlocos {
   @IsDate()
   @Type(() => Date)
   dataCadastro!: Date;
-
+  
   @IsNotEmpty()
   @IsString()
   status!: string;
