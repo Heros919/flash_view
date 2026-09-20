@@ -11,7 +11,7 @@ export type Usuario = {
   papel: string;
 };
 
-export type UsuaioAutenticado = Omit<Usuario, 'senha'>;
+export type UsuarioAutenticado = Omit<Usuario, 'senha'>;
 
 @Injectable()
 export class UsuarioService {

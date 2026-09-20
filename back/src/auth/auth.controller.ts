@@ -7,12 +7,12 @@ import {
   HttpCode,
   HttpStatus
 } from '@nestjs/common';
-import { UsuaioAutenticado } from 'src/usuario/usuario.service';
+import { UsuarioAutenticado } from 'src/usuario/usuario.service';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guard/jwt-auth.guard';
 import { LocalAuthGuard } from './guard/local-auth.guard';
 type RequisicaoAutenticada = {
-  user: UsuaioAutenticado;
+  user: UsuarioAutenticado;
 };
 
 @Controller('auth')

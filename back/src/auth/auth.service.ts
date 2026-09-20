@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {
   Usuario,
-  UsuaioAutenticado,
+  UsuarioAutenticado,
   UsuarioService
 } from 'src/usuario/usuario.service';
 import { JwtService } from '@nestjs/jwt';
@@ -17,7 +17,7 @@ export class AuthService {
   async validarUsuario(
     email: string,
     senha: string
-  ): Promise<UsuaioAutenticado | null> {
+  ): Promise<UsuarioAutenticado | null> {
     const usuario = this.usuarioService.buscarporemail(email);
 
     if (!usuario || !usuario.ativo) {
@@ -34,7 +34,7 @@ export class AuthService {
     return principal;
   }
 
-  login(usuario: UsuaioAutenticado) {
+  login(usuario: UsuarioAutenticado) {
     const payload = {
       sub: usuario.id,
       email: usuario.email,
