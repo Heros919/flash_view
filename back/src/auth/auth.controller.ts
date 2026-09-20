@@ -7,7 +7,7 @@ import {
   HttpCode,
   HttpStatus
 } from '@nestjs/common';
-import { UsuarioAutenticado } from 'src/usuario/usuario.service';
+import { UsuarioAutenticado } from '../usuario/usuario.service';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guard/jwt-auth.guard';
 import { LocalAuthGuard } from './guard/local-auth.guard';
