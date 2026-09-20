@@ -104,6 +104,8 @@ largura
 comprimento
 peso
 dataCadastro
+status
+
 ```
 
 ### Chapa
