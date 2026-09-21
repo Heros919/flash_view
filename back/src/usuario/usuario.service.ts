@@ -20,7 +20,7 @@ export class UsuarioService {
       id: 1,
       nome: 'Henrique Luiz Dantas',
       email: 'henrique@empresa.com',
-      senha: '123456',
+      senha: '$2b$12$1TxO6MRn5RPcoL3AvNGrb.if.HubmYVzI204/nNeXd0zd98N5OEv2',
       ativo: true,
       papel: 'Adiministrador'
     },

@@ -5,7 +5,7 @@ import {
   UsuarioService
 } from '../usuario/usuario.service';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class AuthService {
@@ -18,15 +18,22 @@ export class AuthService {
     email: string,
     senha: string
   ): Promise<UsuarioAutenticado | null> {
-    const usuario = this.usuarioService.buscarporemail(email);
+    console.log('--- TESTE DE AUTENTICAÇÃO ---');
+    console.log('Email recebido:', email);
+
+    const usuario = await this.usuarioService.buscarporemail(email);
+    console.log('Usuário retornado:', usuario);
 
     if (!usuario || !usuario.ativo) {
+      console.log('Falha: Usuário não existe ou está inativo');
       return null;
     }
 
     const senhaValida = await bcrypt.compare(senha, usuario.senha);
+    console.log('Senha válida?:', senhaValida);
 
     if (!senhaValida) {
+      console.log('Falha: Senha incorreta');
       return null;
     }
 
@@ -34,6 +41,7 @@ export class AuthService {
     return principal;
   }
 
+  
   login(usuario: UsuarioAutenticado) {
     const payload = {
       sub: usuario.id,
