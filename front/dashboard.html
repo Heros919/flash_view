@@ -28,7 +28,10 @@
                 </nav>
             </div>
 
-            <button id="btn-sair" type="button" class="btn btn-danger">Sair</button>
+            <div>
+                <div id="nome-usuario" class="fw-semibold text-light mb-2">Usuário</div>
+                <button id="btn-sair" type="button" class="btn btn-danger w-100">Sair</button>
+            </div>
         </aside>
 
         <main class="flex-grow-1 p-4 p-md-5">
@@ -210,8 +213,13 @@
             }
         }
 
+        const nomeUsuario = document.getElementById('nome-usuario');
+        const nomeSalvo = localStorage.getItem('usuarioNome') || 'Usuário';
+        nomeUsuario.textContent = nomeSalvo;
+
         document.getElementById('btn-sair').addEventListener('click', () => {
             if (confirm('Deseja sair da sua conta?')) {
+                localStorage.removeItem('usuarioNome');
                 window.location.href = 'login.html';
             }
         });
