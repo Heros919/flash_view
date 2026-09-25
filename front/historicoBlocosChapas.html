@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash View - Histórico</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <a href="dashboard.html" aria-label="Voltar para dashboard" class="d-inline-flex align-items-center">
+                <img src="assets/logo.ico" alt="Flash View" style="width: 48px; height: 48px; object-fit: contain;">
+            </a>
+            <div>
+                <h1>Histórico de Blocos e Chapas</h1>
+                <h2 class="h4">Visualização consolidada</h2>
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="cadastro-bloco.html" class="btn btn-primary">Novo Bloco</a>
+            <a href="cadastro-chapa.html" class="btn btn-success">Nova Chapa</a>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label for="filtro-geral" class="form-label">Buscar</label>
+                    <input id="filtro-geral" type="text" class="form-control" placeholder="Código ou texto">
+                </div>
+                <div class="col-md-3">
+                    <label for="filtro-tipo" class="form-label">Tipo</label>
+                    <select id="filtro-tipo" class="form-select">
+                        <option value="todos">Todos</option>
+                        <option value="Bloco">Bloco</option>
+                        <option value="Chapa">Chapa</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="filtro-material" class="form-label">Material</label>
+                    <select id="filtro-material" class="form-select">
+                        <option value="todos">Todos</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="filtro-cor" class="form-label">Cor</label>
+                    <select id="filtro-cor" class="form-select">
+                        <option value="todos">Todas</option>
+                    </select>
+                </div>
+                <div class="col-12 mt-2">
+                    <button id="limpar-filtro" type="button" class="btn btn-outline-secondary">Limpar filtros</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Tipo</th>
+                    <th>Código</th>
+                    <th>Bloco Origem</th>
+                    <th>Material</th>
+                    <th>Cor</th>
+                    <th>Dimensões (C x L x A)</th>
+                    <th>Peso (kg)</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tbody-historico">
+                <tr>
+                    <td colspan="8">Carregando...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000';
+        const filtroInput = document.getElementById('filtro-geral');
+        const filtroTipo = document.getElementById('filtro-tipo');
+        const filtroMaterial = document.getElementById('filtro-material');
+        const filtroCor = document.getElementById('filtro-cor');
+        const limparFiltroBtn = document.getElementById('limpar-filtro');
+
+        const registrosExemplo = [
+            {
+                tipo: 'Bloco',
+                codigo: 'BL-001',
+                blocoOrigem: '—',
+                material: 'Granito',
+                cor: 'Cinza',
+                dimensoes: '300 x 200 x 80',
+                peso: 120,
+                id: 1,
+                endpoint: 'blocos'
+            },
+            {
+                tipo: 'Bloco',
+                codigo: 'BL-002',
+                blocoOrigem: '—',
+                material: 'Mármore',
+                cor: 'Bege',
+                dimensoes: '280 x 180 x 70',
+                peso: 95,
+                id: 2,
+                endpoint: 'blocos'
+            },
+            {
+                tipo: 'Chapa',
+                codigo: 'CH-101',
+                blocoOrigem: 'BL-001',
+                material: 'Granito',
+                cor: 'Cinza',
+                dimensoes: '120 x 80 x 2',
+                peso: 18,
+                id: 1,
+                endpoint: 'chapas'
+            },
+            {
+                tipo: 'Chapa',
+                codigo: 'CH-102',
+                blocoOrigem: 'BL-002',
+                material: 'Mármore',
+                cor: 'Bege',
+                dimensoes: '150 x 90 x 2',
+                peso: 22,
+                id: 2,
+                endpoint: 'chapas'
+            },
+            {
+                tipo: 'Bloco',
+                codigo: 'BL-003',
+                blocoOrigem: '—',
+                material: 'Basalto',
+                cor: 'Preto',
+                dimensoes: '350 x 220 x 90',
+                peso: 145,
+                id: 3,
+                endpoint: 'blocos'
+            },
+            {
+                tipo: 'Chapa',
+                codigo: 'CH-103',
+                blocoOrigem: 'BL-003',
+                material: 'Basalto',
+                cor: 'Preto',
+                dimensoes: '180 x 100 x 2',
+                peso: 28,
+                id: 3,
+                endpoint: 'chapas'
+            }
+        ];
+
+        function getValor(obj, chaves) {
+            for (const chave of chaves) {
+                const valor = obj?.[chave];
+                if (valor !== undefined && valor !== null && valor !== '') return valor;
+            }
+            return '—';
+        }
+
+        function montarDimensoes(item) {
+            const comprimento = getValor(item, ['comprimento', 'comprimentoCm', 'comprimento_cm']);
+            const largura = getValor(item, ['largura', 'larguraCm', 'largura_cm']);
+            const altura = getValor(item, ['altura', 'alturaCm', 'altura_cm']);
+
+            if (comprimento === '—' && largura === '—' && altura === '—') {
+                return '—';
+            }
+
+            return `${comprimento} x ${largura} x ${altura}`;
+        }
+
+        function obterCodigoBloco(chapa) {
+            const codigoBloco = getValor(chapa, [
+                'codigoBlocoProveniente',
+                'codigoBloco',
+                'blocoCodigo',
+                'codigo_bloco',
+                'blocoCodigoProveniente'
+            ]);
+
+            if (codigoBloco !== '—' && chapa?.bloco) {
+                return getValor(chapa.bloco, ['codigo', 'codigoBloco']) || codigoBloco;
+            }
+
+            return codigoBloco;
+        }
+
+        function popularFiltros(registros) {
+            const materiais = [...new Set(registros.map(item => item.material).filter(Boolean))].sort();
+            const cores = [...new Set(registros.map(item => item.cor).filter(Boolean))].sort();
+
+            const montarOpcoes = (select, valores, placeholder) => {
+                const valorAtual = select.value;
+                select.innerHTML = `<option value="todos">${placeholder}</option>`;
+                valores.forEach(valor => {
+                    const option = document.createElement('option');
+                    option.value = valor;
+                    option.textContent = valor;
+                    select.appendChild(option);
+                });
+                if (valores.includes(valorAtual)) {
+                    select.value = valorAtual;
+                } else {
+                    select.value = 'todos';
+                }
+            };
+
+            montarOpcoes(filtroMaterial, materiais, 'Todos os materiais');
+            montarOpcoes(filtroCor, cores, 'Todas as cores');
+        }
+
+        function filtrarRegistros(registros) {
+            const termo = (filtroInput?.value ?? '').trim().toLowerCase();
+            const tipoSelecionado = (filtroTipo?.value ?? 'todos').toLowerCase();
+            const materialSelecionado = (filtroMaterial?.value ?? 'todos').toLowerCase();
+            const corSelecionada = (filtroCor?.value ?? 'todos').toLowerCase();
+
+            return registros.filter(item => {
+                const tipo = String(item.tipo || '').toLowerCase();
+                const codigo = String(item.codigo || '').toLowerCase();
+                const blocoOrigem = String(item.blocoOrigem || '').toLowerCase();
+                const material = String(item.material || '').toLowerCase();
+                const cor = String(item.cor || '').toLowerCase();
+
+                const passaTipo = tipoSelecionado === 'todos' || tipo === tipoSelecionado;
+                const passaMaterial = materialSelecionado === 'todos' || material === materialSelecionado;
+                const passaCor = corSelecionada === 'todos' || cor === corSelecionada;
+                const textoMatch = !termo || [tipo, codigo, blocoOrigem, material, cor].some(valor => valor.includes(termo));
+
+                return passaTipo && passaMaterial && passaCor && textoMatch;
+            });
+        }
+
+        async function buscarBlocos() {
+            try {
+                const response = await fetch(`${API_URL}/blocos`);
+                if (!response.ok) throw new Error('Erro ao buscar blocos');
+                const dados = await response.json();
+                return Array.isArray(dados) ? dados : (dados?.data ?? []);
+            } catch (error) {
+                console.error('Erro ao buscar blocos:', error);
+                return [];
+            }
+        }
+
+        async function buscarChapas() {
+            try {
+                const response = await fetch(`${API_URL}/chapas`);
+                if (!response.ok) throw new Error('Erro ao buscar chapas');
+                const dados = await response.json();
+                return Array.isArray(dados) ? dados : (dados?.data ?? []);
+            } catch (error) {
+                console.error('Erro ao buscar chapas:', error);
+                return [];
+            }
+        }
+
+        async function carregarHistorico() {
+            const tbody = document.getElementById('tbody-historico');
+            tbody.innerHTML = '<tr><td colspan="8">Carregando...</td></tr>';
+
+            const [blocos, chapas] = await Promise.all([buscarBlocos(), buscarChapas()]);
+
+            const registros = [
+                ...blocos.map(bloco => ({
+                    tipo: 'Bloco',
+                    codigo: getValor(bloco, ['codigo', 'codigoBloco', 'id']),
+                    blocoOrigem: '—',
+                    material: getValor(bloco, ['material']),
+                    cor: getValor(bloco, ['cor']),
+                    dimensoes: montarDimensoes(bloco),
+                    peso: getValor(bloco, ['peso']),
+                    id: bloco.id ?? bloco._id,
+                    endpoint: 'blocos'
+                })),
+                ...chapas.map(chapa => ({
+                    tipo: 'Chapa',
+                    codigo: getValor(chapa, ['codigo', 'codigoChapa', 'id']),
+                    blocoOrigem: obterCodigoBloco(chapa),
+                    material: getValor(chapa, ['material']),
+                    cor: getValor(chapa, ['cor']),
+                    dimensoes: montarDimensoes(chapa),
+                    peso: getValor(chapa, ['peso']),
+                    id: chapa.id ?? chapa._id,
+                    endpoint: 'chapas'
+                }))
+            ];
+
+            const registrosParaExibir = registros.length > 0 ? registros : registrosExemplo;
+            popularFiltros(registrosParaExibir);
+            const registrosFiltrados = filtrarRegistros(registrosParaExibir);
+            tbody.innerHTML = '';
+
+            if (registrosFiltrados.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center">Nenhum registro encontrado.</td></tr>';
+                return;
+            }
+
+            registrosFiltrados.forEach(item => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><span class="badge ${item.tipo === 'Bloco' ? 'bg-primary' : 'bg-success'}">${item.tipo}</span></td>
+                        <td>${item.codigo}</td>
+                        <td>${item.blocoOrigem}</td>
+                        <td>${item.material}</td>
+                        <td>${item.cor}</td>
+                        <td>${item.dimensoes}</td>
+                        <td>${item.peso} kg</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning me-1" onclick="editarRegistro('${item.endpoint}', ${item.id}, '${item.tipo}')">Editar</button>
+                            <button class="btn btn-sm btn-danger" onclick="excluirRegistro('${item.endpoint}', ${item.id})">Excluir</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function editarRegistro(endpoint, id, tipo) {
+            const pagina = tipo === 'Bloco' ? 'editar-bloco.html' : 'editar-chapa.html';
+            window.location.href = `${pagina}?id=${id}`;
+        }
+
+        async function excluirRegistro(endpoint, id) {
+            if (!id || !confirm(`Deseja realmente excluir este registro?`)) return;
+
+            try {
+                const response = await fetch(`${API_URL}/${endpoint}/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert('Registro excluído com sucesso!');
+                    carregarHistorico();
+                } else {
+                    alert('Erro ao excluir o registro.');
+                }
+            } catch (error) {
+                console.error('Erro ao excluir registro:', error);
+                alert('Erro de conexão com o servidor.');
+            }
+        }
+
+        filtroInput?.addEventListener('input', carregarHistorico);
+        filtroTipo?.addEventListener('change', carregarHistorico);
+        filtroMaterial?.addEventListener('change', carregarHistorico);
+        filtroCor?.addEventListener('change', carregarHistorico);
+
+        limparFiltroBtn?.addEventListener('click', () => {
+            filtroInput.value = '';
+            filtroTipo.value = 'todos';
+            filtroMaterial.value = 'todos';
+            filtroCor.value = 'todos';
+            carregarHistorico();
+        });
+
+        carregarHistorico();
+    </script>
+</body>
+
+</html>

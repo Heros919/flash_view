@@ -65,7 +65,8 @@
 
                 // Redireciona para a dashboard ou outra página
                 window.location.href = 'cadastro-usuario.html';
-            } catch (error) {
+            }
+            catch (error) {
                 // Se der erro, mostra na tela
                 console.error('Erro:', error);
                 mensagem.textContent = `Erro: ${error.message}`;

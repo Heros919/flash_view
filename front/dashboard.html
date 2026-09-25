@@ -10,19 +10,41 @@
 </head>
 
 <body class="bg-light">
-    <div class="container py-5">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+    <div class="d-flex min-vh-100">
+        <aside class="bg-dark text-white d-flex flex-column justify-content-between p-3" style="width: 260px; min-height: 100vh;">
             <div>
-                <span class="text-uppercase text-primary fw-semibold small">Flash View</span>
-                <h1 class="display-6 fw-bold mb-0">Dashboard</h1>
-            </div>
-            <div class="d-flex gap-2 mt-3 mt-md-0">
-                <a href="cadastro-blocos.html" class="btn btn-primary">Cadastrar Bloco</a>
-                <a href="cadastro-chapas.html" class="btn btn-outline-primary">Cadastrar Chapa</a>
-            </div>
-        </div>
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <a href="dashboard.html" aria-label="Voltar para dashboard" class="d-inline-flex align-items-center">
+                        <img src="assets/logo.ico" alt="Flash View" style="width: 42px; height: 42px; object-fit: contain;">
+                    </a>
+                    <span class="fw-bold">Flash View</span>
+                </div>
 
-        <div class="row g-4 mb-4">
+                <nav class="d-grid gap-2">
+                    <a href="dashboard.html" class="btn btn-outline-light text-start">Dashboard</a>
+                    <a href="historicoBlocosChapas.html" class="btn btn-outline-light text-start">Histórico</a>
+                    <a href="cadastro-bloco.html" class="btn btn-outline-light text-start">Cadastrar Bloco</a>
+                    <a href="cadastro-chapa.html" class="btn btn-outline-light text-start">Cadastrar Chapa</a>
+                </nav>
+            </div>
+
+            <button id="btn-sair" type="button" class="btn btn-danger">Sair</button>
+        </aside>
+
+        <main class="flex-grow-1 p-4 p-md-5">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+                <div>
+                    <span class="text-uppercase text-primary fw-semibold small">Flash View</span>
+                    <h1 class="display-6 fw-bold mb-0">Dashboard</h1>
+                </div>
+                <div class="d-flex gap-2 mt-3 mt-md-0">
+                    <a href="historicoBlocosChapas.html" class="btn btn-primary">Entrar no Histórico</a>
+                    <a href="cadastro-bloco.html" class="btn btn-primary">Cadastrar Bloco</a>
+                    <a href="cadastro-chapa.html" class="btn btn-outline-primary">Cadastrar Chapa</a>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
             <div class="col-md-6 col-lg-4">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body">
@@ -94,34 +116,35 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white border-0 pt-4 pb-3">
-                <h3 class="mb-0">Últimos Itens Cadastrados</h3>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Código</th>
-                                <th>Tipo</th>
-                                <th>Data</th>
-                                <th>Cor</th>
-                                <th>Dimensões</th>
-                                <th>Disponibilidade</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabela-ultimos">
-                            <tr>
-                                <td colspan="6" class="text-center text-muted py-4">Carregando...</td>
-                            </tr>
-                        </tbody>
-                    </table>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-4 pb-3">
+                    <h3 class="mb-0">Últimos Itens Cadastrados</h3>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Tipo</th>
+                                    <th>Data</th>
+                                    <th>Cor</th>
+                                    <th>Dimensões</th>
+                                    <th>Disponibilidade</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-ultimos">
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-4">Carregando...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 
     <script>
@@ -186,6 +209,12 @@
                 document.getElementById('tabela-ultimos').innerHTML = '<tr><td colspan="6" class="text-center text-danger py-4">Erro ao conectar com o servidor.</td></tr>';
             }
         }
+
+        document.getElementById('btn-sair').addEventListener('click', () => {
+            if (confirm('Deseja sair da sua conta?')) {
+                window.location.href = 'login.html';
+            }
+        });
 
         carregarDashboard();
     </script>
