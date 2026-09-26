@@ -4,9 +4,14 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { BlocosModule } from './Bloco/bloco.module';
-
+import { ChapasModule } from './chapas/chapas.module';
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, BlocosModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    AuthModule,
+    BlocosModule,
+    ChapasModule
+  ],
   controllers: [AppController],
   providers: [AppService]
 })

@@ -34,7 +34,7 @@ export class UsuarioService {
       cpf: 2,
       nome: 'Claudio Araujo Casta',
       email: 'caraujo@empresa.com',
-      senhaHash: bcrypt.hashSync('123456', 10),
+      senhaHash: '$2b$12$1TxO6MRn5RPcoL3AvNGrb.if.HubmYVzI204/nNeXd0zd98N5OEv2',
       ativo: true,
       papel: Papel.Financeiro
     },
@@ -42,7 +42,7 @@ export class UsuarioService {
       cpf: 3,
       nome: 'Luiz Conzaga Garcia',
       email: 'conzaga@empresa.com',
-      senhaHash: bcrypt.hashSync('123456', 10),
+      senhaHash: '$2b$12$1TxO6MRn5RPcoL3AvNGrb.if.HubmYVzI204/nNeXd0zd98N5OEv2',
       ativo: true,
       papel: Papel.Funcionario
     }
