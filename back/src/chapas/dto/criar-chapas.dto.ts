@@ -1,5 +1,5 @@
 // create-chapas.dto.ts
-import { IsString, IsNumber, IsEnum } from 'class-validator';
+import { IsString, IsNumber, IsEnum, IsNotEmpty } from 'class-validator';
 
 export enum StatusChapas {
   DISPONIVEL = 'disponivel',
@@ -25,6 +25,10 @@ export class CreatChapas {
 
   @IsString()
   acabamento!: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  preco!: number;
 
   @IsEnum(StatusChapas)
   status!: StatusChapas;
