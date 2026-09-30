@@ -1,5 +1,7 @@
 INSERT INTO chapa (
     id,
+    cliente_id,
+    funcionario_id,
     codigo,
     blocoid,
     espessura,
@@ -10,6 +12,8 @@ INSERT INTO chapa (
 )
 VALUES
 (
+    '1',
+    (SELECT cliente_id FROM funcionario WHERE id = '1'),
     '1',
     'CH-000001',
     '1',
@@ -18,21 +22,11 @@ VALUES
     1.20,
     'Polido',
     'DISPONIVEL'
-);
-
-INSERT INTO chapa (
-    id,
-    codigo,
-    blocoid,
-    espessura,
-    altura,
-    largura,
-    acabamento,
-    status
-)
-VALUES
+),
 (
     '2',
+    (SELECT cliente_id FROM funcionario WHERE id = '1'),
+    '1',
     'CH-000002',
     '1',
     2.00,
@@ -40,21 +34,11 @@ VALUES
     1.20,
     'Escovado',
     'RESERVADO'
-);
-
-INSERT INTO chapa (
-    id,
-    codigo,
-    blocoid,
-    espessura,
-    altura,
-    largura,
-    acabamento,
-    status
-)
-VALUES
+),
 (
     '3',
+    (SELECT cliente_id FROM funcionario WHERE id = '1'),
+    '1',
     'CH-000003',
     '2',
     2.00,

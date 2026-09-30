@@ -1,0 +1,4 @@
+CREATE TABLE tipo_produto (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(50) NOT NULL UNIQUE
+);

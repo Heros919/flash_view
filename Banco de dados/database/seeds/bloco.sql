@@ -1,5 +1,7 @@
 INSERT INTO bloco (
     id,
+    cliente_id,
+    funcionario_id,
     codigo,
     numero,
     material,
@@ -12,7 +14,10 @@ INSERT INTO bloco (
     ano,
     frente
 )
-VALUES (
+VALUES
+(
+    '1',
+    (SELECT cliente_id FROM funcionario WHERE id = '1'),
     '1',
     'BL-ZQQIJ',
     1,
@@ -25,24 +30,11 @@ VALUES (
     1,
     2026,
     'D'
-);
-
-INSERT INTO bloco (
-    id,
-    codigo,
-    numero,
-    material,
-    cor,
-    altura,
-    largura,
-    comprimento,
-    peso,
-    mes,
-    ano,
-    frente
-)
-VALUES (
+),
+(
     '2',
+    (SELECT cliente_id FROM funcionario WHERE id = '1'),
+    '1',
     'BL-TQQIA',
     20,
     'Granito',
@@ -54,24 +46,11 @@ VALUES (
     1,
     2026,
     'A'
-);
-
-INSERT INTO bloco (
-    id,
-    codigo,
-    numero,
-    material,
-    cor,
-    altura,
-    largura,
-    comprimento,
-    peso,
-    mes,
-    ano,
-    frente
-)
-VALUES (
+),
+(
     '3',
+    (SELECT cliente_id FROM funcionario WHERE id = '1'),
+    '1',
     'BL-QTIIV',
     12,
     'Mármore',

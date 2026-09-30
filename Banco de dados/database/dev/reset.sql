@@ -1,8 +1,15 @@
-DROP TABLE IF EXISTS chapa;
-DROP TABLE IF EXISTS bloco;
-DROP TABLE IF EXISTS usuario;
+DROP TABLE IF EXISTS venda_item;
+DROP TABLE IF EXISTS venda;
+DROP TABLE IF EXISTS produto_servico;
+DROP TABLE IF EXISTS funcionario;
 
 DROP TABLE IF EXISTS midia;
 
-drop table if EXISTS administrador;
+DROP TABLE IF EXISTS chapa;
+DROP TABLE IF EXISTS bloco;
+
+DROP TABLE IF EXISTS endereco;
+DROP TABLE IF EXISTS cliente;
+
+DROP TABLE IF EXISTS admin;
 

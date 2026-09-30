@@ -1,16 +1,27 @@
 INSERT INTO midia (
-    id,
-    nome,
-    tipo,
-    formato,
-    dados,
-    blocoid
+	id,
+	nome,
+	tipo,
+	formato,
+	dados,
+	blocoid,
+	chapaid
 )
 VALUES (
-    'midia-001',
-    'bloco-25.jpg',
-    'FOTO',
-    'image/jpeg',
-    decode('5465737465', 'hex'),
-    '1'
+	'1',
+	'bloco-1.gif',
+	'FOTO',
+	'image/gif',
+	decode('R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=', 'base64'),
+	'1',
+	NULL
+),
+(
+	'2',
+	'chapa-1.gif',
+	'FOTO',
+	'image/gif',
+	decode('R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=', 'base64'),
+	NULL,
+	'1'
 );
