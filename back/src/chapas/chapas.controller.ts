@@ -1,16 +1,7 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Param,
-  ParseIntPipe
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { ChapasService } from './chapas.service';
 import { Papeis } from '../auth/decorators/roles.decorator';
 import { CreatChapas } from './dto/criar-chapas.dto';
-import { AtualizarPrecoChapaDto } from './dto/atualizar-preco.dto';
 import { AutualizarStatus } from './dto/autera-status.dto';
 import { Papel } from '../usuario/usuario.service';
 
@@ -29,21 +20,10 @@ export class ChapasController {
     return this.chapasservice.listar();
   }
 
-  @Papeis(Papel.Financeiro)
-  @Patch(':id/preco')
-  atualizarPreco(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: AtualizarPrecoChapaDto
-  ) {
-    return this.chapasservice.atualizarPreco(id, dto);
-  }
-
+  // O id da chapa é texto (VARCHAR) no banco, por isso sem ParseIntPipe
   @Papeis(Papel.Financeiro)
   @Patch(':id/status')
-  atualizarStatus(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: AutualizarStatus
-  ) {
+  atualizarStatus(@Param('id') id: string, @Body() dto: AutualizarStatus) {
     return this.chapasservice.atualizarStatus(id, dto);
   }
 }

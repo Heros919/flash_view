@@ -1,35 +1,51 @@
-// create-chapas.dto.ts
-import { IsString, IsNumber, IsEnum, IsNotEmpty } from 'class-validator';
-
-export enum StatusChapas {
-  DISPONIVEL = 'disponivel',
-  RESERVADO = 'reservado',
-  VENDIDO = 'vendido'
-}
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsPositive,
+  IsString,
+  MaxLength
+} from 'class-validator';
+import { StatusChapas } from './autera-status.dto';
 
 export class CreatChapas {
+  // O cliente_id é descoberto a partir do funcionário (ver service)
   @IsString()
+  @IsNotEmpty()
+  funcionarioId!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  blocoId!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(50)
   codigo!: string;
 
-  @IsNumber()
-  blocoId!: number;
+  @IsOptional()
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @IsPositive()
+  espessura?: number;
 
-  @IsNumber()
-  espessura!: number;
+  @IsOptional()
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @IsPositive()
+  altura?: number;
 
-  @IsNumber()
-  altura!: number;
+  @IsOptional()
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @IsPositive()
+  largura?: number;
 
-  @IsNumber()
-  largura!: number;
-
+  @IsOptional()
   @IsString()
-  acabamento!: string;
+  @MaxLength(150)
+  acabamento?: string;
 
-  @IsNumber()
-  @IsNotEmpty()
-  preco!: number;
-
+  // Se não vier, o banco usa DISPONIVEL
+  @IsOptional()
   @IsEnum(StatusChapas)
-  status!: StatusChapas;
+  status?: StatusChapas;
 }

@@ -1,16 +1,17 @@
-// create-chapas.dto.ts
-import { IsString, IsNumber, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, Matches, MaxLength } from 'class-validator';
 
 export class CreatCliente {
   @IsString()
   @IsNotEmpty()
+  @MaxLength(100)
   nome!: string;
 
-  @IsNumber()
-  @IsNotEmpty()
-  cpf!: number;
+  @IsString()
+  @Matches(/^[0-9]{11}$/, { message: 'cpf deve ter 11 dígitos numéricos' })
+  cpf!: string;
 
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  telefone!: number;
+  @MaxLength(20)
+  numero!: string;
 }

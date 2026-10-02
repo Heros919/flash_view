@@ -1,31 +1,33 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
+import { Prisma } from '../generated/prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreatCliente } from './dto/criar-cliente.dto';
-type Cliente = {
-  id: number;
-  nome: string;
-  cpf: number;
-  telefone: number;
-};
+
 @Injectable()
 export class ClienteService {
-  private clientes: Cliente[] = [
-    {
-      id: 1,
-      nome: 'João Morais',
-      cpf: 123456,
-      telefone: 9999999
+  constructor(private readonly prisma: PrismaService) {}
+
+  async criarCliente(dados: CreatCliente) {
+    try {
+      return await this.prisma.cliente.create({
+        data: {
+          nome: dados.nome,
+          cpf: dados.cpf,
+          numero: dados.numero
+        }
+      });
+    } catch (e) {
+      if (
+        e instanceof Prisma.PrismaClientKnownRequestError &&
+        e.code === 'P2002'
+      ) {
+        throw new ConflictException('Já existe um cliente com esse CPF');
+      }
+      throw e;
     }
-  ];
+  }
 
-  criarCliente(dados: CreatCliente): Cliente {
-    const novoId =
-      this.clientes.length > 0
-        ? Math.max(...this.clientes.map((c) => c.id)) + 1
-        : 1;
-
-    const novoCliente: Cliente = { id: novoId, ...dados };
-    this.clientes.push(novoCliente);
-
-    return novoCliente;
+  listar() {
+    return this.prisma.cliente.findMany();
   }
 }

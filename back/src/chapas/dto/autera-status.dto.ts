@@ -1,9 +1,10 @@
 import { IsEnum } from 'class-validator';
 
+// Valores iguais aos do CHECK da tabela chapa no banco
 export enum StatusChapas {
-  DISPONIVEL = 'disponivel',
-  RESERVADO = 'reservado',
-  VENDIDO = 'vendido'
+  DISPONIVEL = 'DISPONIVEL',
+  RESERVADO = 'RESERVADO',
+  VENDIDO = 'VENDIDO'
 }
 
 export class AutualizarStatus {

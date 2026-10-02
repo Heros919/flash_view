@@ -1,53 +1,57 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException
+} from '@nestjs/common';
+import { randomUUID } from 'crypto';
+import { Prisma } from '../generated/prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateBlocos } from './dto/criar-bloco.dto';
-type Bloco = {
-  id: number;
-  codigo: string;
-  material: string;
-  cor: string;
-  altura: number;
-  largura: number;
-  comprimento: number;
-  peso: number;
-  dataCadastro: Date;
-};
+
 @Injectable()
 export class BlocosService {
-  private blocos: Bloco[] = [
-    {
-      id: 1,
-      codigo: 'BL001',
-      material: 'Concreto',
-      cor: 'Cinza',
-      altura: 20,
-      largura: 10,
-      comprimento: 30,
-      peso: 5,
-      dataCadastro: new Date('2023-01-01')
-    },
-    {
-      id: 2,
-      codigo: 'BL002',
-      material: 'Cerâmica',
-      cor: 'Vermelho',
-      altura: 15,
-      largura: 7,
-      comprimento: 25,
-      peso: 3,
-      dataCadastro: new Date('2023-02-15')
-    }
-  ];
-  criarBloco(dados: CreateBlocos): Bloco {
-    const novoId =
-      this.blocos.length > 0
-        ? Math.max(...this.blocos.map((b) => b.id)) + 1
-        : 1;
+  constructor(private readonly prisma: PrismaService) {}
 
-    const novoBloco: Bloco = { id: novoId, ...dados };
-    this.blocos.push(novoBloco);
-    return novoBloco;
+  async criarBloco(dados: CreateBlocos) {
+    const funcionario = await this.prisma.funcionario.findUnique({
+      where: { id: dados.funcionarioId }
+    });
+    if (!funcionario) {
+      throw new NotFoundException('Funcionário não encontrado');
+    }
+
+    try {
+      // volume e datacadastro são preenchidos pelo próprio banco: não enviar
+      return await this.prisma.bloco.create({
+        data: {
+          id: randomUUID(),
+          cliente_id: funcionario.cliente_id,
+          funcionario_id: funcionario.id,
+          codigo: dados.codigo,
+          numero: dados.numero,
+          material: dados.material,
+          cor: dados.cor,
+          altura: dados.altura,
+          largura: dados.largura,
+          comprimento: dados.comprimento,
+          peso: dados.peso,
+          mes: dados.mes,
+          ano: dados.ano,
+          frente: dados.frente
+        }
+      });
+    } catch (e) {
+      if (
+        e instanceof Prisma.PrismaClientKnownRequestError &&
+        e.code === 'P2002'
+      ) {
+        throw new ConflictException('Já existe um bloco com esse código');
+      }
+      throw e;
+    }
   }
+
   listas() {
-    return this.blocos;
+    return this.prisma.bloco.findMany({ orderBy: { datacadastro: 'desc' } });
   }
 }

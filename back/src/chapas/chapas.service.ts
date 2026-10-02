@@ -1,100 +1,77 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException
+} from '@nestjs/common';
+import { randomUUID } from 'crypto';
+import { Prisma } from '../generated/prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreatChapas } from './dto/criar-chapas.dto';
-import { AtualizarPrecoChapaDto } from './dto/atualizar-preco.dto';
 import { AutualizarStatus } from './dto/autera-status.dto';
-type Chapa = {
-  id: number;
-  codigo: string;
-  blocoId: number;
-  espessura: number;
-  altura: number;
-  largura: number;
-  acabamento: string;
-  preco: number;
-  status: 'disponivel' | 'reservado' | 'vendido';
-  dataCadastro: Date;
-};
 
 @Injectable()
 export class ChapasService {
-  private chapas: Chapa[] = [
-    {
-      id: 1,
-      codigo: 'CH-001',
-      blocoId: 101,
-      espessura: 2,
-      altura: 300,
-      largura: 180,
-      acabamento: 'polido',
-      preco: 1500.0,
-      status: 'disponivel',
-      dataCadastro: new Date('2026-01-10')
-    },
-    {
-      id: 2,
-      codigo: 'CH-002',
-      blocoId: 102,
-      espessura: 3,
-      altura: 280,
-      largura: 160,
-      acabamento: 'levigado',
-      preco: 2000.0,
-      status: 'reservado',
-      dataCadastro: new Date('2026-02-05')
-    },
-    {
-      id: 3,
-      codigo: 'CH-003',
-      blocoId: 103,
-      espessura: 2,
-      altura: 320,
-      largura: 190,
-      acabamento: 'flameado',
-      preco: 1800.0,
-      status: 'vendido',
-      dataCadastro: new Date('2026-03-15')
+  constructor(private readonly prisma: PrismaService) {}
+
+  async criarChapas(dados: CreatChapas) {
+    const funcionario = await this.prisma.funcionario.findUnique({
+      where: { id: dados.funcionarioId }
+    });
+    if (!funcionario) {
+      throw new NotFoundException('Funcionário não encontrado');
     }
-  ];
 
-  criarChapas(dados: CreatChapas): Chapa {
-    const novoId =
-      this.chapas.length > 0
-        ? Math.max(...this.chapas.map((c) => c.id)) + 1
-        : 1;
+    const bloco = await this.prisma.bloco.findUnique({
+      where: { id: dados.blocoId }
+    });
+    if (!bloco) {
+      throw new NotFoundException('Bloco não encontrado');
+    }
 
-    const novaChapa: Chapa = {
-      id: novoId,
-      ...dados,
-      dataCadastro: new Date()
-    };
-
-    this.chapas.push(novaChapa);
-
-    return novaChapa;
+    try {
+      return await this.prisma.chapa.create({
+        data: {
+          id: randomUUID(),
+          cliente_id: funcionario.cliente_id,
+          funcionario_id: funcionario.id,
+          blocoid: bloco.id,
+          codigo: dados.codigo,
+          espessura: dados.espessura,
+          altura: dados.altura,
+          largura: dados.largura,
+          acabamento: dados.acabamento,
+          status: dados.status
+        }
+      });
+    } catch (e) {
+      if (
+        e instanceof Prisma.PrismaClientKnownRequestError &&
+        e.code === 'P2002'
+      ) {
+        throw new ConflictException('Já existe uma chapa com esse código');
+      }
+      throw e;
+    }
   }
+
   listar() {
-    return this.chapas;
+    return this.prisma.chapa.findMany({ orderBy: { datacadastro: 'desc' } });
   }
-  atualizarPreco(id: number, dto: AtualizarPrecoChapaDto) {
-    const chapa = this.chapas.find((c) => c.id === id);
 
-    if (!chapa) {
-      throw new NotFoundException('Chapa não encontrada');
+  async atualizarStatus(id: string, dto: AutualizarStatus) {
+    try {
+      return await this.prisma.chapa.update({
+        where: { id },
+        data: { status: dto.status }
+      });
+    } catch (e) {
+      if (
+        e instanceof Prisma.PrismaClientKnownRequestError &&
+        e.code === 'P2025'
+      ) {
+        throw new NotFoundException('Chapa não encontrada');
+      }
+      throw e;
     }
-
-    chapa.preco = dto.preco;
-
-    return chapa;
-  }
-  atualizarStatus(id: number, dto: AutualizarStatus) {
-    const chapa = this.chapas.find((C) => C.id === id);
-
-    if (!chapa) {
-      throw new NotFoundException('Chapa não encontrada');
-    }
-
-    chapa.status = dto.status;
-
-    return chapa;
   }
 }
