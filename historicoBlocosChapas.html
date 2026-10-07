@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash View - Histórico</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+</head>
+
+<body class="container mt-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <a
+                href="dashboard.html"
+                aria-label="Voltar para dashboard"
+                class="d-inline-flex align-items-center"
+            >
+                <img
+                    src="assets/logo.ico"
+                    alt="Flash View"
+                    style="width: 48px; height: 48px; object-fit: contain;"
+                >
+            </a>
+
+            <div>
+                <h1>Histórico de Blocos e Chapas</h1>
+                <h2 class="h4">Visualização consolidada</h2>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a href="cadastro-bloco.html" class="btn btn-primary">
+                Novo Bloco
+            </a>
+
+            <a href="cadastro-chapa.html" class="btn btn-success">
+                Nova Chapa
+            </a>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+
+            <div class="row g-2 align-items-end">
+
+                <div class="col-md-3">
+                    <label for="filtro-geral" class="form-label">
+                        Buscar
+                    </label>
+
+                    <input
+                        id="filtro-geral"
+                        type="text"
+                        class="form-control"
+                        placeholder="Código ou texto"
+                    >
+                </div>
+
+                <div class="col-md-3">
+                    <label for="filtro-tipo" class="form-label">
+                        Tipo
+                    </label>
+
+                    <select id="filtro-tipo" class="form-select">
+                        <option value="todos">Todos</option>
+                        <option value="Bloco">Bloco</option>
+                        <option value="Chapa">Chapa</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label for="filtro-material" class="form-label">
+                        Material
+                    </label>
+
+                    <select id="filtro-material" class="form-select">
+                        <option value="todos">Todos</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label for="filtro-cor" class="form-label">
+                        Cor
+                    </label>
+
+                    <select id="filtro-cor" class="form-select">
+                        <option value="todos">Todas</option>
+                    </select>
+                </div>
+
+                <div class="col-12 mt-2">
+                    <button
+                        id="limpar-filtro"
+                        type="button"
+                        class="btn btn-outline-secondary"
+                    >
+                        Limpar filtros
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="table-responsive">
+
+        <table class="table table-striped table-bordered align-middle">
+
+            <thead class="table-dark">
+                <tr>
+                    <th>Tipo</th>
+                    <th>Código</th>
+                    <th>Bloco Origem</th>
+                    <th>Material</th>
+                    <th>Cor</th>
+                    <th>Dimensões (C x L x A)</th>
+                    <th>Peso (kg)</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+
+            <tbody id="tbody-historico">
+                <tr>
+                    <td colspan="8" class="text-center">
+                        Carregando...
+                    </td>
+                </tr>
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- IMPORTANTE:
+         Este arquivo precisa existir no frontend.
+    -->
+    <script src="js/api.js"></script>
+
+    <script>
+
+        const filtroInput =
+            document.getElementById('filtro-geral');
+
+        const filtroTipo =
+            document.getElementById('filtro-tipo');
+
+        const filtroMaterial =
+            document.getElementById('filtro-material');
+
+        const filtroCor =
+            document.getElementById('filtro-cor');
+
+        const limparFiltroBtn =
+            document.getElementById('limpar-filtro');
+
+
+        function getValor(obj, chaves) {
+
+            for (const chave of chaves) {
+
+                const valor = obj?.[chave];
+
+                if (
+                    valor !== undefined &&
+                    valor !== null &&
+                    valor !== ''
+                ) {
+                    return valor;
+                }
+            }
+
+            return '—';
+        }
+
+
+        function montarDimensoes(item) {
+
+            const comprimento = getValor(
+                item,
+                [
+                    'comprimento',
+                    'comprimentoCm',
+                    'comprimento_cm'
+                ]
+            );
+
+            const largura = getValor(
+                item,
+                [
+                    'largura',
+                    'larguraCm',
+                    'largura_cm'
+                ]
+            );
+
+            const altura = getValor(
+                item,
+                [
+                    'altura',
+                    'alturaCm',
+                    'altura_cm'
+                ]
+            );
+
+            if (
+                comprimento === '—' &&
+                largura === '—' &&
+                altura === '—'
+            ) {
+                return '—';
+            }
+
+            return `${comprimento} x ${largura} x ${altura}`;
+        }
+
+
+        function obterCodigoBloco(chapa) {
+
+            const codigoBloco = getValor(
+                chapa,
+                [
+                    'codigoBlocoProveniente',
+                    'codigoBloco',
+                    'blocoCodigo',
+                    'codigo_bloco',
+                    'blocoCodigoProveniente'
+                ]
+            );
+
+            if (
+                codigoBloco !== '—' &&
+                chapa?.bloco
+            ) {
+                return getValor(
+                    chapa.bloco,
+                    [
+                        'codigo',
+                        'codigoBloco'
+                    ]
+                ) || codigoBloco;
+            }
+
+            return codigoBloco;
+        }
+
+
+        function popularFiltros(registros) {
+
+            const materiais = [
+                ...new Set(
+                    registros
+                        .map(item => item.material)
+                        .filter(Boolean)
+                )
+            ].sort();
+
+            const cores = [
+                ...new Set(
+                    registros
+                        .map(item => item.cor)
+                        .filter(Boolean)
+                )
+            ].sort();
+
+
+            const montarOpcoes = (
+                select,
+                valores,
+                placeholder
+            ) => {
+
+                const valorAtual = select.value;
+
+                select.innerHTML =
+                    `<option value="todos">${placeholder}</option>`;
+
+                valores.forEach(valor => {
+
+                    const option =
+                        document.createElement('option');
+
+                    option.value = valor;
+                    option.textContent = valor;
+
+                    select.appendChild(option);
+                });
+
+                if (valores.includes(valorAtual)) {
+                    select.value = valorAtual;
+                } else {
+                    select.value = 'todos';
+                }
+            };
+
+
+            montarOpcoes(
+                filtroMaterial,
+                materiais,
+                'Todos os materiais'
+            );
+
+            montarOpcoes(
+                filtroCor,
+                cores,
+                'Todas as cores'
+            );
+        }
+
+
+        function filtrarRegistros(registros) {
+
+            const termo =
+                (filtroInput?.value ?? '')
+                    .trim()
+                    .toLowerCase();
+
+            const tipoSelecionado =
+                (filtroTipo?.value ?? 'todos')
+                    .toLowerCase();
+
+            const materialSelecionado =
+                (filtroMaterial?.value ?? 'todos')
+                    .toLowerCase();
+
+            const corSelecionada =
+                (filtroCor?.value ?? 'todos')
+                    .toLowerCase();
+
+
+            return registros.filter(item => {
+
+                const tipo =
+                    String(item.tipo || '')
+                        .toLowerCase();
+
+                const codigo =
+                    String(item.codigo || '')
+                        .toLowerCase();
+
+                const blocoOrigem =
+                    String(item.blocoOrigem || '')
+                        .toLowerCase();
+
+                const material =
+                    String(item.material || '')
+                        .toLowerCase();
+
+                const cor =
+                    String(item.cor || '')
+                        .toLowerCase();
+
+
+                const passaTipo =
+                    tipoSelecionado === 'todos' ||
+                    tipo === tipoSelecionado;
+
+                const passaMaterial =
+                    materialSelecionado === 'todos' ||
+                    material === materialSelecionado;
+
+                const passaCor =
+                    corSelecionada === 'todos' ||
+                    cor === corSelecionada;
+
+                const textoMatch =
+                    !termo ||
+                    [
+                        tipo,
+                        codigo,
+                        blocoOrigem,
+                        material,
+                        cor
+                    ].some(valor =>
+                        valor.includes(termo)
+                    );
+
+
+                return (
+                    passaTipo &&
+                    passaMaterial &&
+                    passaCor &&
+                    textoMatch
+                );
+            });
+        }
+
+
+        async function buscarBlocos() {
+
+            try {
+
+                const dados = await api('/blocos');
+
+                return Array.isArray(dados)
+                    ? dados
+                    : (dados?.data ?? []);
+
+            } catch (error) {
+
+                console.error(
+                    'Erro ao buscar blocos:',
+                    error
+                );
+
+                throw error;
+            }
+        }
+
+
+        async function buscarChapas() {
+
+            try {
+
+                const dados = await api('/chapas');
+
+                return Array.isArray(dados)
+                    ? dados
+                    : (dados?.data ?? []);
+
+            } catch (error) {
+
+                console.error(
+                    'Erro ao buscar chapas:',
+                    error
+                );
+
+                throw error;
+            }
+        }
+
+
+        async function carregarHistorico() {
+
+            const tbody =
+                document.getElementById(
+                    'tbody-historico'
+                );
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center">
+                        Carregando...
+                    </td>
+                </tr>
+            `;
+
+
+            try {
+
+                const [
+                    blocos,
+                    chapas
+                ] = await Promise.all([
+                    buscarBlocos(),
+                    buscarChapas()
+                ]);
+
+
+                const registros = [
+
+                    ...blocos.map(bloco => ({
+
+                        tipo: 'Bloco',
+
+                        codigo: getValor(
+                            bloco,
+                            [
+                                'codigo',
+                                'codigoBloco',
+                                'id'
+                            ]
+                        ),
+
+                        blocoOrigem: '—',
+
+                        material: getValor(
+                            bloco,
+                            ['material']
+                        ),
+
+                        cor: getValor(
+                            bloco,
+                            ['cor']
+                        ),
+
+                        dimensoes:
+                            montarDimensoes(bloco),
+
+                        peso: getValor(
+                            bloco,
+                            ['peso']
+                        ),
+
+                        id:
+                            bloco.id ??
+                            bloco._id,
+
+                        endpoint: 'blocos'
+
+                    })),
+
+                    ...chapas.map(chapa => ({
+
+                        tipo: 'Chapa',
+
+                        codigo: getValor(
+                            chapa,
+                            [
+                                'codigo',
+                                'codigoChapa',
+                                'id'
+                            ]
+                        ),
+
+                        blocoOrigem:
+                            obterCodigoBloco(chapa),
+
+                        material: getValor(
+                            chapa,
+                            ['material']
+                        ),
+
+                        cor: getValor(
+                            chapa,
+                            ['cor']
+                        ),
+
+                        dimensoes:
+                            montarDimensoes(chapa),
+
+                        peso: getValor(
+                            chapa,
+                            ['peso']
+                        ),
+
+                        id:
+                            chapa.id ??
+                            chapa._id,
+
+                        endpoint: 'chapas'
+
+                    }))
+                ];
+
+
+                popularFiltros(registros);
+
+
+                const registrosFiltrados =
+                    filtrarRegistros(registros);
+
+
+                tbody.innerHTML = '';
+
+
+                if (
+                    registrosFiltrados.length === 0
+                ) {
+
+                    tbody.innerHTML = `
+                        <tr>
+                            <td
+                                colspan="8"
+                                class="text-center"
+                            >
+                                Nenhum registro encontrado.
+                            </td>
+                        </tr>
+                    `;
+
+                    return;
+                }
+
+
+                registrosFiltrados.forEach(item => {
+
+                    const tr =
+                        document.createElement('tr');
+
+
+                    const tdTipo =
+                        document.createElement('td');
+
+                    const badge =
+                        document.createElement('span');
+
+                    badge.className =
+                        `badge ${
+                            item.tipo === 'Bloco'
+                                ? 'bg-primary'
+                                : 'bg-success'
+                        }`;
+
+                    badge.textContent =
+                        item.tipo;
+
+                    tdTipo.appendChild(badge);
+
+
+                    const tdCodigo =
+                        document.createElement('td');
+
+                    tdCodigo.textContent =
+                        item.codigo;
+
+
+                    const tdBlocoOrigem =
+                        document.createElement('td');
+
+                    tdBlocoOrigem.textContent =
+                        item.blocoOrigem;
+
+
+                    const tdMaterial =
+                        document.createElement('td');
+
+                    tdMaterial.textContent =
+                        item.material;
+
+
+                    const tdCor =
+                        document.createElement('td');
+
+                    tdCor.textContent =
+                        item.cor;
+
+
+                    const tdDimensoes =
+                        document.createElement('td');
+
+                    tdDimensoes.textContent =
+                        item.dimensoes;
+
+
+                    const tdPeso =
+                        document.createElement('td');
+
+                    tdPeso.textContent =
+                        `${item.peso} kg`;
+
+
+                    const tdAcoes =
+                        document.createElement('td');
+
+
+                    const botaoEditar =
+                        document.createElement('button');
+
+                    botaoEditar.type = 'button';
+
+                    botaoEditar.className =
+                        'btn btn-sm btn-warning me-1';
+
+                    botaoEditar.textContent =
+                        'Editar';
+
+                    botaoEditar.addEventListener(
+                        'click',
+                        () => {
+                            editarRegistro(
+                                item.endpoint,
+                                item.id,
+                                item.tipo
+                            );
+                        }
+                    );
+
+
+                    const botaoExcluir =
+                        document.createElement('button');
+
+                    botaoExcluir.type = 'button';
+
+                    botaoExcluir.className =
+                        'btn btn-sm btn-danger';
+
+                    botaoExcluir.textContent =
+                        'Excluir';
+
+                    botaoExcluir.addEventListener(
+                        'click',
+                        () => {
+                            excluirRegistro(
+                                item.endpoint,
+                                item.id
+                            );
+                        }
+                    );
+
+
+                    tdAcoes.appendChild(
+                        botaoEditar
+                    );
+
+                    tdAcoes.appendChild(
+                        botaoExcluir
+                    );
+
+
+                    tr.appendChild(tdTipo);
+                    tr.appendChild(tdCodigo);
+                    tr.appendChild(tdBlocoOrigem);
+                    tr.appendChild(tdMaterial);
+                    tr.appendChild(tdCor);
+                    tr.appendChild(tdDimensoes);
+                    tr.appendChild(tdPeso);
+                    tr.appendChild(tdAcoes);
+
+
+                    tbody.appendChild(tr);
+                });
+
+
+            } catch (error) {
+
+                console.error(
+                    'Erro ao carregar histórico:',
+                    error
+                );
+
+
+                tbody.innerHTML = `
+                    <tr>
+                        <td
+                            colspan="8"
+                            class="text-center text-danger"
+                        >
+                            Erro ao carregar os registros:
+                            ${error.message}
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+
+        function editarRegistro(
+            endpoint,
+            id,
+            tipo
+        ) {
+
+            if (!id) {
+
+                alert(
+                    'Não foi possível identificar o registro.'
+                );
+
+                return;
+            }
+
+
+            const pagina =
+                tipo === 'Bloco'
+                    ? 'editar-bloco.html'
+                    : 'editar-chapa.html';
+
+
+            const idCodificado =
+                encodeURIComponent(
+                    String(id)
+                );
+
+
+            window.location.href =
+                `${pagina}?id=${idCodificado}`;
+        }
+
+
+        async function excluirRegistro(
+            endpoint,
+            id
+        ) {
+
+            if (!id) {
+
+                alert(
+                    'Não foi possível identificar o registro.'
+                );
+
+                return;
+            }
+
+
+            const confirmou =
+                confirm(
+                    'Deseja realmente excluir este registro?'
+                );
+
+
+            if (!confirmou) {
+                return;
+            }
+
+
+            try {
+
+                await api(
+                    `/${endpoint}/${encodeURIComponent(String(id))}`,
+                    {
+                        method: 'DELETE'
+                    }
+                );
+
+
+                alert(
+                    'Registro excluído com sucesso!'
+                );
+
+
+                await carregarHistorico();
+
+
+            } catch (error) {
+
+                console.error(
+                    'Erro ao excluir registro:',
+                    error
+                );
+
+
+                alert(
+                    `Erro ao excluir o registro: ${error.message}`
+                );
+            }
+        }
+
+
+        filtroInput?.addEventListener(
+            'input',
+            carregarHistorico
+        );
+
+        filtroTipo?.addEventListener(
+            'change',
+            carregarHistorico
+        );
+
+        filtroMaterial?.addEventListener(
+            'change',
+            carregarHistorico
+        );
+
+        filtroCor?.addEventListener(
+            'change',
+            carregarHistorico
+        );
+
+
+        limparFiltroBtn?.addEventListener(
+            'click',
+            () => {
+
+                filtroInput.value = '';
+
+                filtroTipo.value =
+                    'todos';
+
+                filtroMaterial.value =
+                    'todos';
+
+                filtroCor.value =
+                    'todos';
+
+                carregarHistorico();
+            }
+        );
+
+
+        carregarHistorico();
+
+    </script>
+
+</body>
+
+</html>

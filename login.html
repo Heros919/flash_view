@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Flash View - Login</title>
+
+    <link rel="stylesheet" href="css/login.css">
+    
+</head>
+
+<body>
+
+    <main class="login-container">
+
+        <section class="login-card">
+
+            <div class="logo">
+                <h1>Flash View</h1>
+                <p>Acesse sua conta</p>
+            </div>
+
+            <div
+                id="mensagem"
+                class="mensagem">
+            </div>
+
+            <form id="loginForm">
+
+                <div class="form-group">
+
+                    <label for="email">
+                        E-mail
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Digite seu e-mail"
+                        autocomplete="email"
+                        required
+                    >
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="senha">
+                        Senha
+                    </label>
+
+                    <input
+                        type="password"
+                        id="senha"
+                        name="senha"
+                        placeholder="Digite sua senha"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                </div>
+
+                <button
+                    type="submit"
+                    id="btnLogin"
+                    class="btn-login">
+
+                    Entrar
+
+                </button>
+
+            </form>
+
+            <div class="footer">
+                Flash View
+            </div>
+
+        </section>
+
+    </main>
+
+    <!--
+        IMPORTANTE:
+        api.js precisa estar em:
+
+        front/js/api.js
+    -->
+    <script src="js/api.js"></script>
+
+    <script>
+        const form = document.getElementById('loginForm');
+
+        const emailInput = document.getElementById('email');
+
+        const senhaInput = document.getElementById('senha');
+
+        const btnLogin = document.getElementById('btnLogin');
+
+        const mensagem = document.getElementById('mensagem');
+
+
+        function mostrarMensagem(texto, tipo) {
+
+            mensagem.textContent = texto;
+
+            mensagem.className = `mensagem ${tipo}`;
+
+        }
+
+
+        function limparMensagem() {
+
+            mensagem.textContent = '';
+
+            mensagem.className = 'mensagem';
+
+        }
+
+
+        form.addEventListener('submit', async (event) => {
+
+            event.preventDefault();
+
+            limparMensagem();
+
+            const email = emailInput.value.trim();
+
+            const senha = senhaInput.value;
+
+            if (!email || !senha) {
+
+                mostrarMensagem(
+                    'Informe o e-mail e a senha.',
+                    'erro'
+                );
+
+                return;
+            }
+
+
+            btnLogin.disabled = true;
+
+            btnLogin.textContent = 'Entrando...';
+
+
+            try {
+
+                const resposta = await api('/auth/login', {
+
+                    method: 'POST',
+
+                    body: JSON.stringify({
+                        email: email,
+                        senha: senha
+                    })
+
+                });
+
+
+                if (!resposta || !resposta.acesso) {
+
+                    throw new Error(
+                        'O servidor não retornou o token de acesso.'
+                    );
+
+                }
+
+
+                /*
+                 * Salva o JWT.
+                 * O api.js usará esse token
+                 * automaticamente nas próximas requisições.
+                 */
+
+                localStorage.setItem(
+                    'token',
+                    resposta.acesso
+                );
+
+
+                /*
+                 * Salva algumas informações caso
+                 * o backend as retorne.
+                 */
+
+                if (resposta.usuario) {
+
+                    localStorage.setItem(
+                        'usuario',
+                        JSON.stringify(resposta.usuario)
+                    );
+
+                }
+
+
+                mostrarMensagem(
+                    'Login realizado com sucesso!',
+                    'sucesso'
+                );
+
+
+                /*
+                 * Aguarda um pequeno instante
+                 * para mostrar a mensagem.
+                 */
+
+                setTimeout(() => {
+
+                    window.location.href = 'dashboard.html';
+
+                }, 500);
+
+
+            } catch (error) {
+
+                console.error(
+                    'Erro ao fazer login:',
+                    error
+                );
+
+
+                mostrarMensagem(
+                    error.message ||
+                    'E-mail ou senha inválidos.',
+                    'erro'
+                );
+
+
+                btnLogin.disabled = false;
+
+                btnLogin.textContent = 'Entrar';
+
+            }
+
+        });
+    </script>
+
+</body>
+
+</html>
