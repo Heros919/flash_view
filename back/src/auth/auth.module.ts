@@ -1,39 +1,53 @@
 import { Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
-import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
-import { UsuarioModule } from '../usuario/usuario.module';
+import { JwtModule } from '@nestjs/jwt';
+
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './guard/jwt-auth.guard';
-import { RolesGuard } from './guard/roles.guard';
-import { JwtStrategy } from './strategies/jwt.strategy';
+
 import { LocalStrategy } from './strategies/local.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
+
+import { UsuarioModule } from '../usuario/usuario.module';
 
 @Module({
   imports: [
+    ConfigModule,
+
     UsuarioModule,
+
     PassportModule,
+
     JwtModule.registerAsync({
+      imports: [ConfigModule],
+
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        secret: config.getOrThrow<string>('JWT_SECRET'),
+
+      useFactory: (configService: ConfigService) => ({
+        secret:
+          configService.get<string>('JWT_SECRET') ||
+          'flash-view-secret',
+
         signOptions: {
-          expiresIn: Number(config.get('JWT_EXPIRA_SEGUNDOS') ?? 3600)
-        }
-      })
-    })
+          expiresIn: '1d',
+        },
+      }),
+    }),
   ],
-  controllers: [AuthController],
+
+  controllers: [
+    AuthController,
+  ],
+
   providers: [
     AuthService,
     LocalStrategy,
     JwtStrategy,
-    // A ordem importa: primeiro autentica, depois checa o papel
-    { provide: APP_GUARD, useClass: JwtAuthGuard },
-    { provide: APP_GUARD, useClass: RolesGuard }
   ],
-  exports: [AuthService]
+
+  exports: [
+    AuthService,
+  ],
 })
 export class AuthModule {}
