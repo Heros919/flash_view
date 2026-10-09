@@ -15,42 +15,42 @@
     </div>
     <hr>
 
+    <div id="mensagem" class="alert d-none" role="alert"></div>
+
     <form id="form-editar-chapa" class="row g-3">
         <div class="col-md-6">
-            <label class="form-label">Código do bloco proveniente</label>
-            <input type="text" class="form-control" id="codigoBloco" required>
+            <label class="form-label">Bloco proveniente</label>
+            <input type="text" class="form-control" id="blocoOrigem" readonly disabled>
+            <div class="form-text">O bloco de origem não pode ser alterado.</div>
         </div>
 
         <div class="col-md-6">
-            <label class="form-label">Material</label>
-            <input type="text" class="form-control" id="material" required>
+            <label for="codigo" class="form-label">Código da chapa</label>
+            <input type="text" class="form-control" id="codigo" maxlength="50" required>
         </div>
 
         <div class="col-md-6">
-            <label class="form-label">Cor</label>
-            <input type="text" class="form-control" id="cor" required>
+            <label for="acabamento" class="form-label">Acabamento</label>
+            <input type="text" class="form-control" id="acabamento" maxlength="150">
         </div>
+
+        <div class="col-md-6"></div>
 
         <div class="col-md-4">
-            <label class="form-label">Comprimento (cm)</label>
-            <input type="number" class="form-control" id="comprimento" required>
+            <label for="espessura" class="form-label">Espessura</label>
+            <input type="number" class="form-control" id="espessura" min="0.01" step="0.01">
         </div>
         <div class="col-md-4">
-            <label class="form-label">Largura (cm)</label>
-            <input type="number" class="form-control" id="largura" required>
+            <label for="largura" class="form-label">Largura</label>
+            <input type="number" class="form-control" id="largura" min="0.01" step="0.01">
         </div>
         <div class="col-md-4">
-            <label class="form-label">Altura (cm)</label>
-            <input type="number" class="form-control" id="altura" required>
+            <label for="altura" class="form-label">Altura</label>
+            <input type="number" class="form-control" id="altura" min="0.01" step="0.01">
         </div>
 
         <div class="col-md-6">
-            <label class="form-label">Peso (kg)</label>
-            <input type="number" class="form-control" id="peso" required>
-        </div>
-
-        <div class="col-md-6">
-            <label class="form-label">Imagem da chapa</label>
+            <label for="imagem" class="form-label">Imagem da chapa</label>
             <input type="file" class="form-control" id="imagem" accept="image/*">
         </div>
 
@@ -59,45 +59,105 @@
         </div>
 
         <div class="col-12 mt-4">
-            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+            <button type="submit" id="btn-salvar" class="btn btn-primary">Salvar Alterações</button>
             <a href="historicoBlocosChapas.html" class="btn btn-secondary">Voltar</a>
         </div>
     </form>
 
+    <script src="js/api.js"></script>
     <script>
         const API_URL = 'http://localhost:3000';
         const params = new URLSearchParams(window.location.search);
         const chapaId = params.get('id');
 
+        const mensagem = document.getElementById('mensagem');
+        const botaoSalvar = document.getElementById('btn-salvar');
         const previewImagem = document.getElementById('preview-imagem');
         const inputImagem = document.getElementById('imagem');
+
         let imagemSelecionada = null;
         let imagemAtual = '';
+        let urlPreview = null;
+
+        function mostrarMensagem(texto, tipo = 'danger') {
+            mensagem.textContent = texto;
+            mensagem.className = `alert alert-${tipo}`;
+        }
+
+        // Baixa a imagem atual com o token e mostra via blob
+        // (o <img src> direto não envia o cabeçalho Authorization)
+        async function carregarImagemAtual(id) {
+            try {
+                const token = localStorage.getItem('token');
+
+                const resposta = await fetch(
+                    `${API_URL}/chapas/${encodeURIComponent(id)}/imagem`,
+                    { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+                );
+
+                if (!resposta.ok) return ''; // 404 = chapa ainda sem imagem
+
+                const blob = await resposta.blob();
+                return URL.createObjectURL(blob);
+            } catch (error) {
+                console.warn('Não foi possível carregar a imagem atual:', error);
+                return '';
+            }
+        }
 
         inputImagem.addEventListener('change', (event) => {
             const file = event.target.files[0];
+
+            if (urlPreview) {
+                URL.revokeObjectURL(urlPreview);
+                urlPreview = null;
+            }
+
             imagemSelecionada = file || null;
+
             if (!file) {
                 previewImagem.src = imagemAtual;
                 previewImagem.classList.toggle('d-none', !imagemAtual);
                 return;
             }
 
-            const reader = new FileReader();
-            reader.onload = () => {
-                if (typeof reader.result !== 'string') {
-                    alert('Não foi possível carregar a imagem selecionada.');
-                    return;
-                }
+            if (file.size > 10 * 1024 * 1024) {
+                inputImagem.value = '';
+                imagemSelecionada = null;
+                previewImagem.src = imagemAtual;
+                previewImagem.classList.toggle('d-none', !imagemAtual);
+                mostrarMensagem('A imagem deve ter no máximo 10 MB.');
+                return;
+            }
 
-                previewImagem.src = reader.result;
-                previewImagem.classList.remove('d-none');
-            };
-            reader.onerror = () => {
-                alert('Não foi possível carregar a imagem selecionada.');
-            };
-            reader.readAsDataURL(file);
+            urlPreview = URL.createObjectURL(file);
+            previewImagem.src = urlPreview;
+            previewImagem.classList.remove('d-none');
         });
+
+        async function enviarImagemChapa(id, arquivo) {
+            const formData = new FormData();
+            formData.append('imagem', arquivo);
+
+            const token = localStorage.getItem('token');
+
+            const resposta = await fetch(
+                `${API_URL}/chapas/${encodeURIComponent(id)}/imagem`,
+                {
+                    method: 'POST',
+                    headers: token ? { Authorization: `Bearer ${token}` } : {},
+                    body: formData
+                }
+            );
+
+            if (!resposta.ok) {
+                const erro = await resposta.json().catch(() => ({}));
+                const detalhe = Array.isArray(erro.message)
+                    ? erro.message.join(', ')
+                    : erro.message || '';
+                throw new Error(`Falha ao enviar a imagem. ${detalhe}`);
+            }
+        }
 
         async function carregarChapa() {
             if (!chapaId) {
@@ -107,84 +167,80 @@
             }
 
             try {
-                const response = await fetch(`${API_URL}/chapas/${chapaId}`);
-                if (!response.ok) throw new Error('Chapa não encontrada');
+                const chapa = await api(`/chapas/${encodeURIComponent(chapaId)}`);
+                console.log('Chapa carregada:', chapa);
 
-                const chapa = await response.json();
+                const bloco = chapa.bloco || {};
 
-                document.getElementById('codigoBloco').value = chapa.codigoBlocoProveniente || chapa.codigoBloco || chapa.blocoCodigo || '';
-                document.getElementById('material').value = chapa.material || '';
-                document.getElementById('cor').value = chapa.cor || '';
-                document.getElementById('comprimento').value = chapa.comprimento || '';
-                document.getElementById('largura').value = chapa.largura || '';
-                document.getElementById('altura').value = chapa.altura || '';
-                document.getElementById('peso').value = chapa.peso || '';
+                document.getElementById('blocoOrigem').value =
+                    [bloco.codigo, bloco.material, bloco.cor].filter(Boolean).join(' — ') || '—';
 
-                if (chapa.imagem) {
-                    imagemAtual = chapa.imagem;
-                    previewImagem.src = chapa.imagem;
+                document.getElementById('codigo').value = chapa.codigo ?? '';
+                document.getElementById('acabamento').value = chapa.acabamento ?? '';
+                document.getElementById('espessura').value = chapa.espessura ?? '';
+                document.getElementById('largura').value = chapa.largura ?? '';
+                document.getElementById('altura').value = chapa.altura ?? '';
+
+                imagemAtual = await carregarImagemAtual(chapaId);
+
+                if (imagemAtual) {
+                    previewImagem.src = imagemAtual;
                     previewImagem.classList.remove('d-none');
                 }
             } catch (error) {
                 console.error('Erro ao carregar chapa:', error);
-                alert('Erro ao carregar os dados da chapa.');
+                alert('Erro ao carregar os dados da chapa: ' + error.message);
                 window.location.href = 'historicoBlocosChapas.html';
             }
+        }
+
+        function numeroOpcional(id) {
+            const valor = document.getElementById(id).value;
+            return valor === '' ? undefined : Number(valor);
         }
 
         document.getElementById('form-editar-chapa').addEventListener('submit', async (event) => {
             event.preventDefault();
 
+            // Só os campos que o backend aceita no PATCH (ele recusa campos desconhecidos)
             const chapaAtualizada = {
-                codigoBlocoProveniente: document.getElementById('codigoBloco').value,
-                material: document.getElementById('material').value,
-                cor: document.getElementById('cor').value,
-                comprimento: parseFloat(document.getElementById('comprimento').value),
-                largura: parseFloat(document.getElementById('largura').value),
-                altura: parseFloat(document.getElementById('altura').value),
-                peso: parseFloat(document.getElementById('peso').value),
-                imagem: imagemAtual
+                codigo: document.getElementById('codigo').value.trim(),
+                acabamento: document.getElementById('acabamento').value.trim()
             };
 
+            const espessura = numeroOpcional('espessura');
+            const altura = numeroOpcional('altura');
+            const largura = numeroOpcional('largura');
+
+            if (espessura !== undefined) chapaAtualizada.espessura = espessura;
+            if (altura !== undefined) chapaAtualizada.altura = altura;
+            if (largura !== undefined) chapaAtualizada.largura = largura;
+
+            botaoSalvar.disabled = true;
+            botaoSalvar.textContent = 'Salvando...';
+
             try {
-                if (imagemSelecionada) {
-                    chapaAtualizada.imagem = await new Promise((resolve, reject) => {
-                        const reader = new FileReader();
-
-                        reader.onload = () => {
-                            if (typeof reader.result === 'string') {
-                                resolve(reader.result);
-                            } else {
-                                reject(new Error('Não foi possível carregar a imagem selecionada.'));
-                            }
-                        };
-
-                        reader.onerror = () => {
-                            reject(new Error('Não foi possível carregar a imagem selecionada.'));
-                        };
-
-                        reader.readAsDataURL(imagemSelecionada);
-                    });
-                }
-
-                const response = await fetch(`${API_URL}/chapas/${chapaId}`, {
+                await api(`/chapas/${encodeURIComponent(chapaId)}`, {
                     method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
                     body: JSON.stringify(chapaAtualizada)
                 });
 
-                if (response.ok) {
-                    alert('Chapa atualizada com sucesso!');
-                    window.location.href = 'historicoBlocosChapas.html';
-                } else {
-                    const erro = await response.json().catch(() => ({}));
-                    alert('Erro ao atualizar chapa: ' + (erro.message || 'Verifique os dados.'));
+                // Imagem só é enviada se o usuário escolheu um arquivo novo
+                if (imagemSelecionada) {
+                    botaoSalvar.textContent = 'Enviando imagem...';
+                    await enviarImagemChapa(chapaId, imagemSelecionada);
                 }
+
+                mostrarMensagem('Chapa atualizada com sucesso!', 'success');
+
+                setTimeout(() => {
+                    window.location.href = 'historicoBlocosChapas.html';
+                }, 1000);
             } catch (error) {
                 console.error('Erro ao atualizar chapa:', error);
-                alert('Erro de conexão com o servidor.');
+                mostrarMensagem('Erro ao atualizar chapa: ' + error.message);
+                botaoSalvar.disabled = false;
+                botaoSalvar.textContent = 'Salvar Alterações';
             }
         });
 

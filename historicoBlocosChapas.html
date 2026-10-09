@@ -223,6 +223,11 @@
 
         function obterCodigoBloco(chapa) {
 
+            // A API devolve o bloco de origem em chapa.bloco
+            if (chapa?.bloco?.codigo) {
+                return chapa.bloco.codigo;
+            }
+
             const codigoBloco = getValor(
                 chapa,
                 [
@@ -522,13 +527,14 @@
                         blocoOrigem:
                             obterCodigoBloco(chapa),
 
+                        // Chapa não tem material/cor próprios: vêm do bloco de origem
                         material: getValor(
-                            chapa,
+                            chapa.bloco ?? chapa,
                             ['material']
                         ),
 
                         cor: getValor(
-                            chapa,
+                            chapa.bloco ?? chapa,
                             ['cor']
                         ),
 
@@ -643,7 +649,9 @@
                         document.createElement('td');
 
                     tdPeso.textContent =
-                        `${item.peso} kg`;
+                        item.peso === '—'
+                            ? '—'
+                            : `${item.peso} kg`;
 
 
                     const tdAcoes =

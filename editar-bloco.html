@@ -295,6 +295,63 @@
         let imagemSelecionada = null;
         let imagemAtual = '';
 
+        // Ajuste se o seu backend roda em outra porta/endereço
+        const API_URL = 'http://localhost:3000';
+
+        // O GET /blocos/:id não devolve a imagem: ela fica na tabela de mídia e é
+        // servida por GET /blocos/:id/imagem. Baixamos com o token e mostramos via blob.
+        async function carregarImagemAtual(id) {
+            try {
+                const token = localStorage.getItem('token');
+
+                const resposta = await fetch(
+                    `${API_URL}/blocos/${encodeURIComponent(id)}/imagem`,
+                    { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+                );
+
+                if (!resposta.ok) return ''; // 404 = bloco ainda sem imagem
+
+                const blob = await resposta.blob();
+                return URL.createObjectURL(blob);
+            } catch (error) {
+                console.warn('Não foi possível carregar a imagem atual:', error);
+                return '';
+            }
+        }
+
+        // Envia a imagem como arquivo (multipart), igual ao cadastro de bloco.
+        // Nunca em base64 dentro do JSON, que estoura o limite do servidor.
+        async function enviarImagemBloco(id, arquivo) {
+            const formData = new FormData();
+            formData.append('imagem', arquivo);
+
+            const token = localStorage.getItem('token');
+
+            const resposta = await fetch(
+                `${API_URL}/blocos/${encodeURIComponent(id)}/imagem`,
+                {
+                    method: 'POST',
+                    headers: token
+                        ? { Authorization: `Bearer ${token}` }
+                        : {},
+                    body: formData
+                }
+            );
+
+            if (!resposta.ok) {
+                let detalhe = '';
+                try {
+                    const erro = await resposta.json();
+                    detalhe = Array.isArray(erro.message)
+                        ? erro.message.join(', ')
+                        : erro.message || erro.error || '';
+                } catch {
+                    detalhe = await resposta.text().catch(() => '');
+                }
+                throw new Error(`Falha ao enviar a imagem. ${detalhe}`);
+            }
+        }
+
 
         inputImagem.addEventListener('change', () => {
 
@@ -442,9 +499,10 @@
                     bloco.frente
                 );
 
-                if (bloco.imagem) {
-                    imagemAtual = bloco.imagem;
-                    previewImagem.src = bloco.imagem;
+                imagemAtual = await carregarImagemAtual(blocoId);
+
+                if (imagemAtual) {
+                    previewImagem.src = imagemAtual;
                     previewImagem.classList.remove('d-none');
                 }
 
@@ -634,33 +692,20 @@
                     btnSalvar.textContent =
                         'Salvando...';
 
-                    if (imagemSelecionada) {
-                        dados.imagem = await new Promise((resolve, reject) => {
-                            const leitor = new FileReader();
-
-                            leitor.onload = () => {
-                                if (typeof leitor.result === 'string') {
-                                    resolve(leitor.result);
-                                } else {
-                                    reject(new Error('Não foi possível carregar a imagem selecionada.'));
-                                }
-                            };
-
-                            leitor.onerror = () => {
-                                reject(new Error('Não foi possível carregar a imagem selecionada.'));
-                            };
-
-                            leitor.readAsDataURL(imagemSelecionada);
-                        });
+                    if (Object.keys(dados).length > 0) {
+                        await api(
+                            `/blocos/${encodeURIComponent(blocoId)}`,
+                            {
+                                method: 'PATCH',
+                                body: JSON.stringify(dados)
+                            }
+                        );
                     }
 
-                    await api(
-                        `/blocos/${encodeURIComponent(blocoId)}`,
-                        {
-                            method: 'PATCH',
-                            body: JSON.stringify(dados)
-                        }
-                    );
+                    if (imagemSelecionada) {
+                        btnSalvar.textContent = 'Enviando imagem...';
+                        await enviarImagemBloco(blocoId, imagemSelecionada);
+                    }
 
 
                     mostrarMensagem(
