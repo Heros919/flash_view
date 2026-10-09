@@ -10,6 +10,7 @@ import { CreatChapas } from './dto/criar-chapas.dto';
 import { AutualizarStatus } from './dto/autera-status.dto';
 import { AtualizarChapaDto } from './dto/atualizar-chapa.dto';
 import type { ArquivoImagem } from '../common/upload-imagem.options';
+import { erroAoGravarImagem } from '../common/erro-imagem';
 
 const incluirBlocoEMidia = {
   bloco: {
@@ -135,7 +136,25 @@ export class ChapasService {
     }
   }
 
-  // ===== IMAGEM DA CHAPA =====
+  async excluirChapa(id: string) {
+    try {
+      await this.prisma.chapa.delete({ where: { id } });
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        if (e.code === 'P2025') {
+          throw new NotFoundException('Chapa não encontrada');
+        }
+        if (e.code === 'P2003') {
+          throw new ConflictException(
+            'Não é possível excluir: a chapa está vinculada a outros registros.'
+          );
+        }
+      }
+      throw e;
+    }
+
+    return { id, mensagem: 'Chapa excluída com sucesso' };
+  }
 
   async buscarImagem(id: string) {
     const chapa = await this.prisma.chapa.findUnique({ where: { id } });
@@ -160,27 +179,31 @@ export class ChapasService {
       throw new NotFoundException('Chapa não encontrada');
     }
 
-    const [, midia] = await this.prisma.$transaction([
-      this.prisma.midia.deleteMany({ where: { chapaid: id } }),
-      this.prisma.midia.create({
-        data: {
-          id: randomUUID(),
-          nome: arquivo.originalname,
-          tipo: 'IMAGEM',
-          formato: arquivo.mimetype,
-          dados: new Uint8Array(arquivo.buffer),
-          chapaid: id
-        },
-        select: {
-          id: true,
-          nome: true,
-          tipo: true,
-          formato: true,
-          chapaid: true
-        }
-      })
-    ]);
+    try {
+      const [, midia] = await this.prisma.$transaction([
+        this.prisma.midia.deleteMany({ where: { chapaid: id } }),
+        this.prisma.midia.create({
+          data: {
+            id: randomUUID(),
+            nome: arquivo.originalname,
+            tipo: 'FOTO',
+            formato: arquivo.mimetype,
+            dados: new Uint8Array(arquivo.buffer),
+            chapaid: id
+          },
+          select: {
+            id: true,
+            nome: true,
+            tipo: true,
+            formato: true,
+            chapaid: true
+          }
+        })
+      ]);
 
-    return midia;
+      return midia;
+    } catch (e) {
+      return erroAoGravarImagem(e);
+    }
   }
 }

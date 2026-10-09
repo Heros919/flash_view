@@ -7,7 +7,6 @@ import {
   MaxLength,
 } from 'class-validator';
 
-// O status continua sendo alterado por PATCH /chapas/:id/status (Financeiro).
 export class AtualizarChapaDto {
   @IsOptional()
   @IsString()

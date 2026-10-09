@@ -13,14 +13,13 @@ import { CreateBlocos } from './dto/criar-bloco.dto';
 import { AtualizarBlocoDto } from './dto/atualizar-bloco.dto';
 
 import type { ArquivoImagem } from '../common/upload-imagem.options';
+import { erroAoGravarImagem } from '../common/erro-imagem';
+
 
 @Injectable()
 export class BlocosService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // ==========================================================
-  // CRIAR BLOCO
-  // ==========================================================
 
   async criarBloco(dados: CreateBlocos) {
     const funcionario = await this.prisma.funcionario.findUnique({
@@ -64,9 +63,6 @@ export class BlocosService {
     }
   }
 
-  // ==========================================================
-  // LISTAR BLOCOS
-  // ==========================================================
 
   async listas() {
     return this.prisma.bloco.findMany({
@@ -74,7 +70,6 @@ export class BlocosService {
         datacadastro: 'desc',
       },
 
-      // Só o id da mídia (sem os bytes) para o front saber se há imagem.
       include: {
         midia: {
           select: { id: true },
@@ -84,9 +79,7 @@ export class BlocosService {
     });
   }
 
-  // ==========================================================
-  // BUSCAR BLOCO POR ID
-  // ==========================================================
+
 
   async buscarPorId(id: string) {
     const bloco = await this.prisma.bloco.findUnique({
@@ -102,9 +95,7 @@ export class BlocosService {
     return bloco;
   }
 
-  // ==========================================================
-  // ATUALIZAR BLOCO
-  // ==========================================================
+
 
   async atualizarBloco(id: string, dados: AtualizarBlocoDto) {
     const bloco = await this.prisma.bloco.findUnique({
@@ -151,9 +142,159 @@ export class BlocosService {
     }
   }
 
-  // ==========================================================
-  // BUSCAR IMAGEM DO BLOCO
-  // ==========================================================
+
+  async excluirBloco(id: string) {
+    const bloco = await this.prisma.bloco.findUnique({
+      where: {
+        id,
+      },
+
+      include: {
+        _count: {
+          select: { chapa: true },
+        },
+      },
+    });
+
+    if (!bloco) {
+      throw new NotFoundException('Bloco não encontrado');
+    }
+
+    // A chapa referencia o bloco sem cascade: precisa excluir as chapas antes.
+    if (bloco._count.chapa > 0) {
+      throw new ConflictException(
+        `Não é possível excluir o bloco ${bloco.codigo}: ele possui ${bloco._count.chapa} chapa(s) cadastrada(s). Exclua as chapas primeiro.`,
+      );
+    }
+
+    try {
+      // As imagens (tabela midia) são apagadas junto, via ON DELETE CASCADE.
+      await this.prisma.bloco.delete({
+        where: {
+          id,
+        },
+      });
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        if (e.code === 'P2025') {
+          throw new NotFoundException('Bloco não encontrado');
+        }
+
+        if (e.code === 'P2003') {
+          throw new ConflictException(
+            'Não é possível excluir: o bloco está vinculado a outros registros.',
+          );
+        }
+      }
+
+      throw e;
+    }
+
+    return {
+      id,
+      mensagem: 'Bloco excluído com sucesso',
+    };
+  }
+
+
+  async listarImagens(id: string) {
+    const bloco = await this.prisma.bloco.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!bloco) {
+      throw new NotFoundException('Bloco não encontrado');
+    }
+
+    return this.prisma.midia.findMany({
+      where: {
+        blocoid: id,
+      },
+
+      orderBy: [{ datacadastro: 'asc' }, { nome: 'asc' }],
+
+      select: {
+        id: true,
+        nome: true,
+        tipo: true,
+        formato: true,
+      },
+    });
+  }
+
+  async buscarImagemPorId(id: string, midiaId: string) {
+    const midia = await this.prisma.midia.findFirst({
+      where: {
+        id: midiaId,
+        blocoid: id,
+      },
+    });
+
+    if (!midia) {
+      throw new NotFoundException('Imagem não encontrada');
+    }
+
+    return midia;
+  }
+
+  async adicionarImagens(id: string, arquivos: ArquivoImagem[]) {
+    const bloco = await this.prisma.bloco.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!bloco) {
+      throw new NotFoundException('Bloco não encontrado');
+    }
+
+    try {
+      return await this.prisma.$transaction(
+        arquivos.map((arquivo) =>
+          this.prisma.midia.create({
+            data: {
+              id: randomUUID(),
+              nome: arquivo.originalname,
+              tipo: 'FOTO',
+              formato: arquivo.mimetype,
+              dados: new Uint8Array(arquivo.buffer),
+              blocoid: id,
+            },
+
+            select: {
+              id: true,
+              nome: true,
+              tipo: true,
+              formato: true,
+              blocoid: true,
+            },
+          }),
+        ),
+      );
+    } catch (e) {
+      return erroAoGravarImagem(e);
+    }
+  }
+
+  async excluirImagem(id: string, midiaId: string) {
+    const resultado = await this.prisma.midia.deleteMany({
+      where: {
+        id: midiaId,
+        blocoid: id,
+      },
+    });
+
+    if (resultado.count === 0) {
+      throw new NotFoundException('Imagem não encontrada');
+    }
+
+    return {
+      id: midiaId,
+      mensagem: 'Imagem excluída com sucesso',
+    };
+  }
 
   async buscarImagem(id: string) {
     const bloco = await this.prisma.bloco.findUnique({
@@ -183,9 +324,6 @@ export class BlocosService {
     return midia;
   }
 
-  // ==========================================================
-  // SALVAR / SUBSTITUIR IMAGEM
-  // ==========================================================
 
   async salvarImagem(id: string, arquivo: ArquivoImagem) {
     const bloco = await this.prisma.bloco.findUnique({
@@ -198,35 +336,38 @@ export class BlocosService {
       throw new NotFoundException('Bloco não encontrado');
     }
 
-    // Troca a imagem anterior pela nova de forma atômica.
-    // O select evita devolver o campo "dados" (bytes) na resposta JSON.
-    const [, midia] = await this.prisma.$transaction([
-      this.prisma.midia.deleteMany({
-        where: {
-          blocoid: id,
-        },
-      }),
 
-      this.prisma.midia.create({
-        data: {
-          id: randomUUID(),
-          nome: arquivo.originalname,
-          tipo: 'IMAGEM',
-          formato: arquivo.mimetype,
-          dados: new Uint8Array(arquivo.buffer),
-          blocoid: id,
-        },
+    try {
+      const [, midia] = await this.prisma.$transaction([
+        this.prisma.midia.deleteMany({
+          where: {
+            blocoid: id,
+          },
+        }),
 
-        select: {
-          id: true,
-          nome: true,
-          tipo: true,
-          formato: true,
-          blocoid: true,
-        },
-      }),
-    ]);
+        this.prisma.midia.create({
+          data: {
+            id: randomUUID(),
+            nome: arquivo.originalname,
+            tipo: 'FOTO',
+            formato: arquivo.mimetype,
+            dados: new Uint8Array(arquivo.buffer),
+            blocoid: id,
+          },
 
-    return midia;
+          select: {
+            id: true,
+            nome: true,
+            tipo: true,
+            formato: true,
+            blocoid: true,
+          },
+        }),
+      ]);
+
+      return midia;
+    } catch (e) {
+      return erroAoGravarImagem(e);
+    }
   }
 }

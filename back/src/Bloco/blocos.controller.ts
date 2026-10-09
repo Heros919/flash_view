@@ -2,16 +2,18 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
   Post,
   StreamableFile,
   UploadedFile,
+  UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
 
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 
 import { BlocosService } from './blocos.service';
 
@@ -23,6 +25,8 @@ import { AtualizarBlocoDto } from './dto/atualizar-bloco.dto';
 
 import {
   CAMPO_IMAGEM,
+  CAMPO_IMAGENS,
+  MAX_IMAGENS,
   opcoesUploadImagem,
 } from '../common/upload-imagem.options';
 import type { ArquivoImagem } from '../common/upload-imagem.options';
@@ -42,7 +46,6 @@ export class BlocosController {
     return this.blocosService.listas();
   }
 
-  // Precisa vir ANTES de ':id'
   @Get(':id/imagem')
   async imagem(@Param('id') id: string) {
     const midia = await this.blocosService.buscarImagem(id);
@@ -51,6 +54,51 @@ export class BlocosController {
       type: midia.formato,
       disposition: `inline; filename="${encodeURIComponent(midia.nome)}"`,
     });
+  }
+
+  @Get(':id/imagens')
+  listarImagens(@Param('id') id: string) {
+    return this.blocosService.listarImagens(id);
+  }
+
+  @Get(':id/imagens/:midiaId')
+  async imagemPorId(
+    @Param('id') id: string,
+    @Param('midiaId') midiaId: string,
+  ) {
+    const midia = await this.blocosService.buscarImagemPorId(id, midiaId);
+
+    return new StreamableFile(Buffer.from(midia.dados), {
+      type: midia.formato,
+      disposition: `inline; filename="${encodeURIComponent(midia.nome)}"`,
+    });
+  }
+
+  @Papeis(Papel.Funcionario)
+  @Post(':id/imagens')
+  @UseInterceptors(
+    FilesInterceptor(CAMPO_IMAGENS, MAX_IMAGENS, opcoesUploadImagem),
+  )
+  async enviarImagens(
+    @Param('id') id: string,
+    @UploadedFiles() arquivos: ArquivoImagem[],
+  ) {
+    if (!arquivos || arquivos.length === 0) {
+      throw new BadRequestException(
+        `Nenhuma imagem foi enviada (campo "${CAMPO_IMAGENS}").`,
+      );
+    }
+
+    return this.blocosService.adicionarImagens(id, arquivos);
+  }
+
+  @Papeis(Papel.Funcionario)
+  @Delete(':id/imagens/:midiaId')
+  excluirImagem(
+    @Param('id') id: string,
+    @Param('midiaId') midiaId: string,
+  ) {
+    return this.blocosService.excluirImagem(id, midiaId);
   }
 
   @Get(':id')
@@ -62,6 +110,13 @@ export class BlocosController {
   @Patch(':id')
   atualizar(@Param('id') id: string, @Body() body: AtualizarBlocoDto) {
     return this.blocosService.atualizarBloco(id, body);
+  }
+
+  // Exclui o bloco (e a imagem dele). Retorna JSON para o front conseguir ler a resposta.
+  @Papeis(Papel.Funcionario)
+  @Delete(':id')
+  excluir(@Param('id') id: string) {
+    return this.blocosService.excluirBloco(id);
   }
 
   @Papeis(Papel.Funcionario)

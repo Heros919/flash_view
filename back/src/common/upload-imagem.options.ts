@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 
-// Tipo mínimo do arquivo enviado pelo multer (não depende de @types/multer).
+
 export interface ArquivoImagem {
   originalname: string;
   mimetype: string;
@@ -8,6 +8,8 @@ export interface ArquivoImagem {
 }
 
 export const CAMPO_IMAGEM = 'imagem';
+export const CAMPO_IMAGENS = 'imagens';
+export const MAX_IMAGENS = 5;
 
 export const opcoesUploadImagem = {
   limits: {

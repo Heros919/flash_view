@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -22,50 +23,55 @@ import {
   opcoesUploadImagem
 } from '../common/upload-imagem.options';
 import type { ArquivoImagem } from '../common/upload-imagem.options';
-
+ 
 @Controller('chapas')
 export class ChapasController {
   constructor(private readonly chapasservice: ChapasService) {}
-
+ 
   @Papeis(Papel.Funcionario)
   @Post()
   criar(@Body() body: CreatChapas) {
     return this.chapasservice.criarChapas(body);
   }
-
+ 
   @Get()
   listar() {
     return this.chapasservice.listar();
   }
-
-  // Precisa vir ANTES de ':id'
+ 
+ 
   @Get(':id/imagem')
   async imagem(@Param('id') id: string) {
     const midia = await this.chapasservice.buscarImagem(id);
-
+ 
     return new StreamableFile(Buffer.from(midia.dados), {
       type: midia.formato,
       disposition: `inline; filename="${encodeURIComponent(midia.nome)}"`
     });
   }
-
+ 
   @Get(':id')
   buscarPorId(@Param('id') id: string) {
     return this.chapasservice.buscarPorId(id);
   }
-
+ 
   @Papeis(Papel.Funcionario)
   @Patch(':id')
   atualizar(@Param('id') id: string, @Body() body: AtualizarChapaDto) {
     return this.chapasservice.atualizarChapa(id, body);
   }
-
+ 
   @Papeis(Papel.Financeiro)
   @Patch(':id/status')
   atualizarStatus(@Param('id') id: string, @Body() dto: AutualizarStatus) {
     return this.chapasservice.atualizarStatus(id, dto);
   }
-
+ @Papeis(Papel.Funcionario)
+  @Delete(':id')
+  excluir(@Param('id') id: string) {
+    return this.chapasservice.excluirChapa(id);
+  }
+ 
   @Papeis(Papel.Funcionario)
   @Post(':id/imagem')
   @UseInterceptors(FileInterceptor(CAMPO_IMAGEM, opcoesUploadImagem))
@@ -78,7 +84,7 @@ export class ChapasController {
         `Nenhuma imagem foi enviada (campo "${CAMPO_IMAGEM}").`
       );
     }
-
+ 
     return this.chapasservice.salvarImagem(id, arquivo);
   }
 }
