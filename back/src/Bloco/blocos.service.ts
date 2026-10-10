@@ -18,7 +18,7 @@ import { erroAoGravarImagem } from '../common/erro-imagem';
 
 @Injectable()
 export class BlocosService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
 
   async criarBloco(dados: CreateBlocos) {

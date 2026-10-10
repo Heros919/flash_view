@@ -2,30 +2,39 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Post,
   Req,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
-
+import { UsuarioAutenticado } from '../usuario/usuario.service';
 import { AuthService } from './auth.service';
-import { LocalAuthGuard } from './guard/local-auth.guard';
-import { JwtAuthGuard } from './guard/jwt-auth.guard';
 import { Public } from './decorators/public.decorator';
+import { LocalAuthGuard } from './guard/local-auth.guard';
+
+type RequisicaoAutenticada = { user: UsuarioAutenticado };
 
 @Controller('auth')
 export class AuthController {
+  usuarioService: any;
   constructor(private readonly authService: AuthService) {}
 
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Req() req: any) {
-    return this.authService.login(req.user);
+  @HttpCode(HttpStatus.OK)
+  login(@Req() request: RequisicaoAutenticada) {
+    return this.authService.login(request.user);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get('perfil')
-  async perfil(@Req() req: any) {
-    return req.user;
+  perfil(@Req() request: RequisicaoAutenticada) {
+    return request.user;
+  }
+  @Public()
+  @Post('register')
+  register(@Body() dados: { cpf: number; nome: string; email: string; senha: string }) {
+    return this.usuarioService.criar(dados);
   }
 }

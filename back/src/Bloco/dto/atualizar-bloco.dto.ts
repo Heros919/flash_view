@@ -1,28 +1,40 @@
 import {
   IsEnum,
   IsInt,
+  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsPositive,
   IsString,
   Max,
   MaxLength,
-  Min,
+  Min
 } from 'class-validator';
 
-import { FrenteBloco } from './criar-bloco.dto';
+export enum FrenteBloco {
+  A = 'A',
+  B = 'B',
+  C = 'C',
+  D = 'D',
+  BARRAGEM = 'BARRAGEM',
+  BARREIRO = 'BARREIRO'
+}
 
-export class AtualizarBlocoDto {
-  @IsOptional()
+export class CreateBlocos {
+  // O cliente_id é descoberto a partir do funcionário (ver service)
   @IsString()
-  @MaxLength(50)
-  codigo?: string;
+  @IsNotEmpty()
+  funcionarioId!: string;
 
-  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(50)
+  codigo!: string;
+
   @IsInt()
   @Min(0)
   @Max(99)
-  numero?: number;
+  numero!: number;
 
   @IsOptional()
   @IsString()
@@ -34,38 +46,32 @@ export class AtualizarBlocoDto {
   @MaxLength(160)
   cor?: string;
 
-  @IsOptional()
   @IsNumber({ maxDecimalPlaces: 2 })
   @IsPositive()
-  altura?: number;
+  altura!: number;
 
-  @IsOptional()
   @IsNumber({ maxDecimalPlaces: 2 })
   @IsPositive()
-  largura?: number;
+  largura!: number;
 
-  @IsOptional()
   @IsNumber({ maxDecimalPlaces: 2 })
   @IsPositive()
-  comprimento?: number;
+  comprimento!: number;
 
   @IsOptional()
   @IsNumber({ maxDecimalPlaces: 2 })
   @IsPositive()
   peso?: number;
 
-  @IsOptional()
   @IsInt()
   @Min(1)
   @Max(12)
-  mes?: number;
+  mes!: number;
 
-  @IsOptional()
   @IsInt()
   @Min(2000)
-  ano?: number;
+  ano!: number;
 
-  @IsOptional()
   @IsEnum(FrenteBloco)
-  frente?: FrenteBloco;
+  frente!: FrenteBloco;
 }
