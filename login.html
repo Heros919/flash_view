@@ -9,6 +9,9 @@
     <title>Flash View - Login</title>
 
     <link rel="stylesheet" href="css/login.css">
+   <link rel="icon" href="assets/logo.ico" type="image/x-icon">
+
+    
 
 </head>
 
@@ -67,12 +70,6 @@
 
     </main>
 
-    <!--
-        IMPORTANTE:
-        api.js precisa estar em:
-
-        front/js/api.js
-    -->
     <script src="js/api.js"></script>
 
     <script>
@@ -154,22 +151,11 @@
                 }
 
 
-                /*
-                 * Salva o JWT.
-                 * O api.js usará esse token
-                 * automaticamente nas próximas requisições.
-                 */
-
                 localStorage.setItem(
                     'token',
                     resposta.acesso
                 );
 
-
-                /*
-                 * Salva algumas informações caso
-                 * o backend as retorne.
-                 */
 
                 if (resposta.usuario) {
 
@@ -186,11 +172,6 @@
                     'sucesso'
                 );
 
-
-                /*
-                 * Aguarda um pequeno instante
-                 * para mostrar a mensagem.
-                 */
 
                 setTimeout(() => {
 

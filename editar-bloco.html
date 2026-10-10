@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Flash View - Editar Bloco</title>
-
+    <link rel="icon" href="assets/logo.ico" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
@@ -39,8 +39,6 @@
 
                 <div class="row g-3">
 
-                    <!-- Código -->
-
                     <div class="col-md-6">
 
                         <label for="codigo" class="form-label">
@@ -51,8 +49,6 @@
 
                     </div>
 
-
-                    <!-- Número -->
 
                     <div class="col-md-6">
 
@@ -65,8 +61,6 @@
                     </div>
 
 
-                    <!-- Material -->
-
                     <div class="col-md-6">
 
                         <label for="material" class="form-label">
@@ -77,8 +71,6 @@
 
                     </div>
 
-
-                    <!-- Cor -->
 
                     <div class="col-md-6">
 
@@ -91,8 +83,6 @@
                     </div>
 
 
-                    <!-- Comprimento -->
-
                     <div class="col-md-4">
 
                         <label for="comprimento" class="form-label">
@@ -103,8 +93,6 @@
 
                     </div>
 
-
-                    <!-- Largura -->
 
                     <div class="col-md-4">
 
@@ -117,8 +105,6 @@
                     </div>
 
 
-                    <!-- Altura -->
-
                     <div class="col-md-4">
 
                         <label for="altura" class="form-label">
@@ -129,8 +115,6 @@
 
                     </div>
 
-
-                    <!-- Peso -->
 
                     <div class="col-md-4">
 
@@ -143,8 +127,6 @@
                     </div>
 
 
-                    <!-- Mês -->
-
                     <div class="col-md-4">
 
                         <label for="mes" class="form-label">
@@ -156,8 +138,6 @@
                     </div>
 
 
-                    <!-- Ano -->
-
                     <div class="col-md-4">
 
                         <label for="ano" class="form-label">
@@ -168,8 +148,6 @@
 
                     </div>
 
-
-                    <!-- Frente -->
 
                     <div class="col-md-6">
 
@@ -211,27 +189,19 @@
 
                     </div>
 
-                    <!-- Imagem -->
-
                     <div class="col-md-6">
 
                         <label for="imagem" class="form-label">
-                            Imagem do bloco
+                            Imagens do bloco (até 5)
                         </label>
 
-                        <input type="file" id="imagem" class="form-control" accept="image/*">
+                        <input type="file" id="imagem" name="imagens" class="form-control" accept="image/*" multiple>
 
                     </div>
 
                     <div class="col-12">
-
-                        <img
-                            id="preview-imagem"
-                            src=""
-                            alt="Imagem do bloco"
-                            class="img-fluid rounded border d-none"
-                            style="max-height: 220px;">
-
+                        <div id="contador-imagens" class="form-text">0/5 imagens</div>
+                        <div id="galeria-imagens" class="d-flex flex-wrap gap-3"></div>
                     </div>
 
                 </div>
@@ -257,6 +227,7 @@
 
 
     <script src="js/api.js"></script>
+    <script src="js/multiplas-imagens.js"></script>
 
 
     <script>
@@ -286,104 +257,12 @@
                 'btn-salvar'
             );
 
-        const inputImagem =
-            document.getElementById('imagem');
-
-        const previewImagem =
-            document.getElementById('preview-imagem');
-
-        let imagemSelecionada = null;
-        let imagemAtual = '';
-
-        // Ajuste se o seu backend roda em outra porta/endereço
-        const API_URL = 'http://localhost:3000';
-
-        // O GET /blocos/:id não devolve a imagem: ela fica na tabela de mídia e é
-        // servida por GET /blocos/:id/imagem. Baixamos com o token e mostramos via blob.
-        async function carregarImagemAtual(id) {
-            try {
-                const token = localStorage.getItem('token');
-
-                const resposta = await fetch(
-                    `${API_URL}/blocos/${encodeURIComponent(id)}/imagem`,
-                    { headers: token ? { Authorization: `Bearer ${token}` } : {} }
-                );
-
-                if (!resposta.ok) return ''; // 404 = bloco ainda sem imagem
-
-                const blob = await resposta.blob();
-                return URL.createObjectURL(blob);
-            } catch (error) {
-                console.warn('Não foi possível carregar a imagem atual:', error);
-                return '';
-            }
-        }
-
-        // Envia a imagem como arquivo (multipart), igual ao cadastro de bloco.
-        // Nunca em base64 dentro do JSON, que estoura o limite do servidor.
-        async function enviarImagemBloco(id, arquivo) {
-            const formData = new FormData();
-            formData.append('imagem', arquivo);
-
-            const token = localStorage.getItem('token');
-
-            const resposta = await fetch(
-                `${API_URL}/blocos/${encodeURIComponent(id)}/imagem`,
-                {
-                    method: 'POST',
-                    headers: token
-                        ? { Authorization: `Bearer ${token}` }
-                        : {},
-                    body: formData
-                }
-            );
-
-            if (!resposta.ok) {
-                let detalhe = '';
-                try {
-                    const erro = await resposta.json();
-                    detalhe = Array.isArray(erro.message)
-                        ? erro.message.join(', ')
-                        : erro.message || erro.error || '';
-                } catch {
-                    detalhe = await resposta.text().catch(() => '');
-                }
-                throw new Error(`Falha ao enviar a imagem. ${detalhe}`);
-            }
-        }
-
-
-        inputImagem.addEventListener('change', () => {
-
-            imagemSelecionada = inputImagem.files[0] || null;
-
-            if (!imagemSelecionada) {
-                previewImagem.src = imagemAtual;
-                previewImagem.classList.toggle('d-none', !imagemAtual);
-                return;
-            }
-
-            const leitor = new FileReader();
-
-            leitor.onload = () => {
-                if (typeof leitor.result !== 'string') {
-                    mostrarMensagem(
-                        'Não foi possível carregar a imagem selecionada.'
-                    );
-                    return;
-                }
-
-                previewImagem.src = leitor.result;
-                previewImagem.classList.remove('d-none');
-            };
-
-            leitor.onerror = () => {
-                mostrarMensagem(
-                    'Não foi possível carregar a imagem selecionada.'
-                );
-            };
-
-            leitor.readAsDataURL(imagemSelecionada);
+        const galeriaImagens = window.criarGaleriaImagens({
+            recurso: 'blocos',
+            input: document.getElementById('imagem'),
+            galeria: document.getElementById('galeria-imagens'),
+            contador: document.getElementById('contador-imagens'),
+            aoErro: (texto) => mostrarMensagem(texto),
         });
 
 
@@ -499,12 +378,7 @@
                     bloco.frente
                 );
 
-                imagemAtual = await carregarImagemAtual(blocoId);
-
-                if (imagemAtual) {
-                    previewImagem.src = imagemAtual;
-                    previewImagem.classList.remove('d-none');
-                }
+                await galeriaImagens.carregar(blocoId);
 
 
             } catch (error) {
@@ -541,15 +415,6 @@
 
 
                 const dados = {};
-
-
-                /*
-                 * Só adicionamos ao PATCH os campos
-                 * que realmente possuem valor.
-                 *
-                 * Assim o usuário não precisa
-                 * preencher tudo novamente.
-                 */
 
 
                 const codigo =
@@ -673,7 +538,8 @@
 
                 if (
                     Object.keys(dados).length === 0 &&
-                    !imagemSelecionada
+                    galeriaImagens.selecionadas.length === 0 &&
+                    !galeriaImagens.houveRemocao
                 ) {
 
                     mostrarMensagem(
@@ -702,9 +568,9 @@
                         );
                     }
 
-                    if (imagemSelecionada) {
-                        btnSalvar.textContent = 'Enviando imagem...';
-                        await enviarImagemBloco(blocoId, imagemSelecionada);
+                    if (galeriaImagens.selecionadas.length > 0) {
+                        btnSalvar.textContent = 'Enviando imagens...';
+                        await galeriaImagens.enviar(blocoId);
                     }
 
 

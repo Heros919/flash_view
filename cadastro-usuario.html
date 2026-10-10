@@ -49,10 +49,8 @@
 
         form.addEventListener('submit', async (event) => {
         
-        // 1. Impede o recarregamento da página
         event.preventDefault();
 
-        // 2. Coleta os valores dos inputs
         const novoUsuario = {
             cpf: document.getElementById('cpf').value,
             nome: document.getElementById('nome').value,
@@ -60,12 +58,10 @@
             senha: document.getElementById('senha').value,
         };
 
-        // 3. Feedback visual
         mensagem.textContent = 'Cadastrando...';
         mensagem.style.color = 'blue';
 
         try {
-            // 4. Envia para o back-end via POST
             const response = await fetch(`${API_URL}/auth/register`, {
                 method: 'POST',
                 headers: {
@@ -74,23 +70,18 @@
                 body: JSON.stringify(novoUsuario),
             });
 
-            // 5. Verifica se deu certo
             if (!response.ok) {
-                // Se o back retornou erro (ex: email duplicado), pega a mensagem
                 const erro = await response.json();
                 throw new Error(erro.message || `Erro ${response.status}`);
             }
 
-            // 6. Pega o usuário criado (sem senha)
             const usuarioCriado = await response.json();
 
-            // O backend valida os dados e confirma o cadastro persistido.
             mensagem.textContent = `Usuário "${usuarioCriado.nome || novoUsuario.nome}" cadastrado com sucesso. Redirecionando...`;
             mensagem.style.color = 'green';
             window.location.href = 'login.html';
 
         } catch (error) {
-            // Se der erro, mostra na tela
             console.error('Erro:', error);
             mensagem.textContent = `Erro: ${error.message || 'erro inesperado, tente novamente.'}`;
             mensagem.style.color = 'red';
