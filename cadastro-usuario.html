@@ -37,6 +37,7 @@
             </p>
 
             <button type="submit">Cadastrar</button>
+            <p id="mensagem" role="status" aria-live="polite"></p>
             <p>Ja tem uma conta?: <a href="login.html">Faça seu Login</a></p>
         </form>
     </div>
@@ -83,17 +84,15 @@
             // 6. Pega o usuário criado (sem senha)
             const usuarioCriado = await response.json();
 
-            // 7. Mostra sucesso
-            mensagem.textContent = `Usuário "${usuarioCriado.nome}" cadastrado com sucesso!`;
+            // O backend valida os dados e confirma o cadastro persistido.
+            mensagem.textContent = `Usuário "${usuarioCriado.nome || novoUsuario.nome}" cadastrado com sucesso. Redirecionando...`;
             mensagem.style.color = 'green';
-
-            // 8. Limpa o formulário
-            form.reset();
+            window.location.href = 'login.html';
 
         } catch (error) {
             // Se der erro, mostra na tela
             console.error('Erro:', error);
-            mensagem.textContent = `Erro: ${error.message}'erro inesperado, recarregue a página e tente novamente.'`;
+            mensagem.textContent = `Erro: ${error.message || 'erro inesperado, tente novamente.'}`;
             mensagem.style.color = 'red';
         }
     });
