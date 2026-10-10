@@ -16,7 +16,7 @@ export class AuthService {
     email: string,
     senha: string
   ): Promise<UsuarioAutenticado | null> {
-    const usuario = this.usuarioService.buscarPorEmail(email);
+    const usuario = await this.usuarioService.buscarPorEmail(email);
     const senhaValida = await bcrypt.compare(
       senha,
       usuario?.senhaHash ?? HASH_FALSO

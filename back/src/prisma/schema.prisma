@@ -8,6 +8,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum PapelConta {
+  FUNCIONARIO
+}
+
+model usuario {
+  cpf          String     @id @db.VarChar(11)
+  nome         String     @db.VarChar(150)
+  email        String     @unique @db.VarChar(255)
+  senha_hash   String     @db.VarChar(255)
+  ativo        Boolean    @default(true)
+  papel        PapelConta @default(FUNCIONARIO)
+  datacadastro DateTime   @default(now()) @db.Timestamp(6)
+}
+
 model admin {
   id          Int           @id @default(autoincrement())
   nome        String        @db.VarChar(100)

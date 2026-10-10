@@ -9,16 +9,20 @@ import {
   UseGuards
 } from '@nestjs/common';
 import { UsuarioAutenticado } from '../usuario/usuario.service';
+import { UsuarioService } from '../usuario/usuario.service';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
 import { LocalAuthGuard } from './guard/local-auth.guard';
+import { RegistroDto } from './dto/registro.dto';
 
 type RequisicaoAutenticada = { user: UsuarioAutenticado };
 
 @Controller('auth')
 export class AuthController {
-  usuarioService: any;
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly usuarioService: UsuarioService
+  ) {}
 
   @Public()
   @UseGuards(LocalAuthGuard)
@@ -32,9 +36,10 @@ export class AuthController {
   perfil(@Req() request: RequisicaoAutenticada) {
     return request.user;
   }
+
   @Public()
   @Post('register')
-  register(@Body() dados: { cpf: number; nome: string; email: string; senha: string }) {
+  register(@Body() dados: RegistroDto) {
     return this.usuarioService.criar(dados);
   }
 }

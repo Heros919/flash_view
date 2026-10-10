@@ -29,7 +29,15 @@
 
 ```bash
 $ npm install
+$ npm run db:migrate
 ```
+
+The migration creates the account table used by `POST /auth/register`. New
+accounts are assigned the `FUNCIONARIO` role automatically. Docker Compose runs
+this migration when the API container starts. Public registration grants the
+`FUNCIONARIO` role to anyone who signs up. These accounts are not linked to a
+client or a row in the `funcionario` table, so operations requiring that
+relationship still need a later account-linking flow.
 
 ## Compile and run the project
 
