@@ -1,0 +1,74 @@
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	min-height: 100vh;
+	display: grid;
+	place-items: center;
+	padding: 24px;
+	background: #f3f4f6;
+	color: #1f2937;
+	font-family: Arial, sans-serif;
+}
+
+.cadastro {
+	width: 100%;
+	max-width: 400px;
+	padding: 28px;
+	background: #fff;
+	border: 1px solid #e5e7eb;
+	border-radius: 8px;
+	box-shadow: 0 4px 14px rgb(0 0 0 / 8%);
+}
+
+.cadastro h1 {
+	margin: 0 0 22px;
+	font-size: 24px;
+	text-align: center;
+}
+
+.campo {
+	margin-bottom: 16px;
+}
+
+.campo label {
+	display: block;
+	margin-bottom: 6px;
+	font-size: 14px;
+}
+
+.campo input {
+	width: 100%;
+	padding: 10px 12px;
+	border: 1px solid #cbd5e1;
+	border-radius: 4px;
+	font: inherit;
+}
+
+.campo input:focus {
+	outline: 2px solid #2563eb;
+	outline-offset: 1px;
+}
+
+.cadastro button {
+	width: 100%;
+	padding: 11px;
+	border: 0;
+	border-radius: 4px;
+	background: #2563eb;
+	color: #fff;
+	font: inherit;
+	cursor: pointer;
+}
+
+.cadastro button:hover {
+	background: #1d4ed8;
+}
+
+@media (max-width: 480px) {
+	.cadastro {
+		padding: 22px;
+	}
+}
