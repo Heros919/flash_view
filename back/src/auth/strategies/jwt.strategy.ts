@@ -22,7 +22,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  // Busca o usuário de novo: papel atualizado e bloqueio de quem foi desativado/excluído
   validate(payload: JwtPayload): UsuarioAutenticado {
     const usuario = this.usuarioService.buscarPorId(payload.sub);
     if (!usuario || !usuario.ativo) throw new UnauthorizedException();

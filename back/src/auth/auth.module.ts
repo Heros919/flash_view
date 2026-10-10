@@ -30,7 +30,6 @@ import { LocalStrategy } from './strategies/local.strategy';
     AuthService,
     LocalStrategy,
     JwtStrategy,
-    // A ordem importa: primeiro autentica, depois checa o papel
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard }
   ],

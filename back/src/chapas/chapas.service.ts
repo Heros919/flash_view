@@ -11,6 +11,7 @@ import { AutualizarStatus } from './dto/autera-status.dto';
 import { AtualizarChapaDto } from './dto/atualizar-chapa.dto';
 import type { ArquivoImagem } from '../common/upload-imagem.options';
 import { erroAoGravarImagem } from '../common/erro-imagem';
+import { MAX_IMAGENS } from '../common/upload-imagem.options';
 
 const incluirBlocoEMidia = {
   bloco: {
@@ -171,6 +172,113 @@ export class ChapasService {
     }
 
     return midia;
+  }
+
+  async listarImagens(id: string) {
+    const chapa = await this.prisma.chapa.findUnique({ where: { id } });
+    if (!chapa) {
+      throw new NotFoundException('Chapa não encontrada');
+    }
+
+    return this.prisma.midia.findMany({
+      where: { chapaid: id },
+      orderBy: [{ datacadastro: 'asc' }, { nome: 'asc' }],
+      select: {
+        id: true,
+        nome: true,
+        tipo: true,
+        formato: true
+      }
+    });
+  }
+
+  async buscarImagemPorId(id: string, midiaId: string) {
+    const midia = await this.prisma.midia.findFirst({
+      where: {
+        id: midiaId,
+        chapaid: id
+      }
+    });
+
+    if (!midia) {
+      throw new NotFoundException('Imagem não encontrada');
+    }
+
+    return midia;
+  }
+
+  async adicionarImagens(id: string, arquivos: ArquivoImagem[]) {
+    const chapa = await this.prisma.chapa.findUnique({ where: { id } });
+    if (!chapa) {
+      throw new NotFoundException('Chapa não encontrada');
+    }
+
+    try {
+      return await this.prisma.$transaction(
+        async (transaction) => {
+          const quantidadeAtual = await transaction.midia.count({
+            where: { chapaid: id }
+          });
+          if (quantidadeAtual + arquivos.length > MAX_IMAGENS) {
+            throw new ConflictException(
+              `Uma chapa pode ter no máximo ${MAX_IMAGENS} imagens. Ela já possui ${quantidadeAtual}.`
+            );
+          }
+
+          return Promise.all(
+            arquivos.map((arquivo) =>
+              transaction.midia.create({
+                data: {
+                  id: randomUUID(),
+                  nome: arquivo.originalname,
+                  tipo: 'FOTO',
+                  formato: arquivo.mimetype,
+                  dados: new Uint8Array(arquivo.buffer),
+                  chapaid: id
+                },
+                select: {
+                  id: true,
+                  nome: true,
+                  tipo: true,
+                  formato: true,
+                  chapaid: true
+                }
+              })
+            )
+          );
+        },
+        { isolationLevel: Prisma.TransactionIsolationLevel.Serializable }
+      );
+    } catch (e) {
+      if (
+        e instanceof Prisma.PrismaClientKnownRequestError &&
+        e.code === 'P2034'
+      ) {
+        throw new ConflictException(
+          'O limite de imagens foi atingido por outro envio. Atualize a lista e tente novamente.'
+        );
+      }
+
+      return erroAoGravarImagem(e);
+    }
+  }
+
+  async excluirImagem(id: string, midiaId: string) {
+    const resultado = await this.prisma.midia.deleteMany({
+      where: {
+        id: midiaId,
+        chapaid: id
+      }
+    });
+
+    if (resultado.count === 0) {
+      throw new NotFoundException('Imagem não encontrada');
+    }
+
+    return {
+      id: midiaId,
+      mensagem: 'Imagem excluída com sucesso'
+    };
   }
 
   async salvarImagem(id: string, arquivo: ArquivoImagem) {

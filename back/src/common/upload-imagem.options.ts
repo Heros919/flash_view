@@ -13,7 +13,7 @@ export const MAX_IMAGENS = 5;
 
 export const opcoesUploadImagem = {
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10 MB
+    fileSize: 10 * 1024 * 1024,
   },
   fileFilter: (
     _req: unknown,

@@ -3,7 +3,6 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UsuarioAutenticado, UsuarioService } from '../usuario/usuario.service';
 
-// Usado para gastar o mesmo tempo quando o e-mail não existe (evita enumeração de usuários)
 const HASH_FALSO = bcrypt.hashSync('senha-falsa', 10);
 
 @Injectable()

@@ -13,6 +13,7 @@ import { CreateBlocos } from './dto/criar-bloco.dto';
 import { AtualizarBlocoDto } from './dto/atualizar-bloco.dto';
 
 import type { ArquivoImagem } from '../common/upload-imagem.options';
+import { MAX_IMAGENS } from '../common/upload-imagem.options';
 import { erroAoGravarImagem } from '../common/erro-imagem';
 
 
@@ -160,7 +161,6 @@ export class BlocosService {
       throw new NotFoundException('Bloco não encontrado');
     }
 
-    // A chapa referencia o bloco sem cascade: precisa excluir as chapas antes.
     if (bloco._count.chapa > 0) {
       throw new ConflictException(
         `Não é possível excluir o bloco ${bloco.codigo}: ele possui ${bloco._count.chapa} chapa(s) cadastrada(s). Exclua as chapas primeiro.`,
@@ -168,7 +168,6 @@ export class BlocosService {
     }
 
     try {
-      // As imagens (tabela midia) são apagadas junto, via ON DELETE CASCADE.
       await this.prisma.bloco.delete({
         where: {
           id,
@@ -252,28 +251,53 @@ export class BlocosService {
 
     try {
       return await this.prisma.$transaction(
-        arquivos.map((arquivo) =>
-          this.prisma.midia.create({
-            data: {
-              id: randomUUID(),
-              nome: arquivo.originalname,
-              tipo: 'FOTO',
-              formato: arquivo.mimetype,
-              dados: new Uint8Array(arquivo.buffer),
+        async (transaction) => {
+          const quantidadeAtual = await transaction.midia.count({
+            where: {
               blocoid: id,
             },
+          });
+          if (quantidadeAtual + arquivos.length > MAX_IMAGENS) {
+            throw new ConflictException(
+              `Um bloco pode ter no máximo ${MAX_IMAGENS} imagens. Ele já possui ${quantidadeAtual}.`,
+            );
+          }
 
-            select: {
-              id: true,
-              nome: true,
-              tipo: true,
-              formato: true,
-              blocoid: true,
-            },
-          }),
-        ),
+          return Promise.all(
+            arquivos.map((arquivo) =>
+              transaction.midia.create({
+                data: {
+                  id: randomUUID(),
+                  nome: arquivo.originalname,
+                  tipo: 'FOTO',
+                  formato: arquivo.mimetype,
+                  dados: new Uint8Array(arquivo.buffer),
+                  blocoid: id,
+                },
+
+                select: {
+                  id: true,
+                  nome: true,
+                  tipo: true,
+                  formato: true,
+                  blocoid: true,
+                },
+              }),
+            ),
+          );
+        },
+        { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
       );
     } catch (e) {
+      if (
+        e instanceof Prisma.PrismaClientKnownRequestError &&
+        e.code === 'P2034'
+      ) {
+        throw new ConflictException(
+          'O limite de imagens foi atingido por outro envio. Atualize a lista e tente novamente.',
+        );
+      }
+
       return erroAoGravarImagem(e);
     }
   }

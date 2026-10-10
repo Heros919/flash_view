@@ -112,7 +112,6 @@ export class BlocosController {
     return this.blocosService.atualizarBloco(id, body);
   }
 
-  // Exclui o bloco (e a imagem dele). Retorna JSON para o front conseguir ler a resposta.
   @Papeis(Papel.Funcionario)
   @Delete(':id')
   excluir(@Param('id') id: string) {

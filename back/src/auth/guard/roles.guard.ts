@@ -12,7 +12,6 @@ export class RolesGuard implements CanActivate {
       PAPEIS_KEY,
       [context.getHandler(), context.getClass()]
     );
-    // Sem @Papeis(): basta estar autenticado
     if (!papeisPermitidos || papeisPermitidos.length === 0) return true;
 
     const { user } = context
@@ -20,7 +19,6 @@ export class RolesGuard implements CanActivate {
       .getRequest<{ user?: UsuarioAutenticado }>();
     if (!user) return false;
 
-    // Administrador tem acesso total
     if (user.papel === Papel.Administrador) return true;
     return papeisPermitidos.includes(user.papel);
   }

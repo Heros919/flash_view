@@ -16,7 +16,6 @@ model admin {
   funcionario funcionario[]
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model bloco {
   id             String      @id @db.VarChar(100)
   cliente_id     Int
@@ -48,7 +47,6 @@ model bloco {
   @@index([mes], map: "idx_bloco_mes")
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model chapa {
   id             String      @id @db.VarChar(100)
   cliente_id     Int
@@ -73,7 +71,6 @@ model chapa {
   @@index([status], map: "idx_chapa_status")
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model cliente {
   id              Int               @id @default(autoincrement())
   nome            String            @db.VarChar(100)
@@ -87,7 +84,6 @@ model cliente {
   venda           venda[]
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model endereco {
   id            Int     @id @default(autoincrement())
   cliente_id    Int
@@ -117,7 +113,7 @@ model funcionario {
   @@index([cliente_id], map: "idx_funcionario_cliente_id")
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+
 model midia {
   id           String   @id @db.VarChar(100)
   nome         String   @db.VarChar(255)
@@ -131,7 +127,7 @@ model midia {
   chapa        chapa?   @relation(fields: [chapaid], references: [id], onDelete: Cascade, map: "fk_midia_chapa")
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+
 model produto_servico {
   id           Int          @id @default(autoincrement())
   cliente_id   Int
@@ -156,7 +152,7 @@ model tipo_produto {
   produto_servico produto_servico[]
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+
 model venda {
   id             Int          @id @default(autoincrement())
   cliente_id     Int
@@ -175,7 +171,7 @@ model venda {
   @@index([status], map: "idx_venda_status")
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+
 model venda_item {
   id                 Int             @id @default(autoincrement())
   cliente_id         Int

@@ -20,7 +20,6 @@ export type UsuarioAutenticado = Omit<Usuario, 'senhaHash'>;
 
 @Injectable()
 export class UsuarioService {
-  // Temporário: enquanto não há banco. Em produção o hash vem do banco.
   private readonly usuarios: Usuario[] = [
     {
       cpf: 1,

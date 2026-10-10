@@ -21,7 +21,6 @@ export enum FrenteBloco {
 }
 
 export class CreateBlocos {
-  // O cliente_id é descoberto a partir do funcionário (ver service)
   @IsString()
   @IsNotEmpty()
   funcionarioId!: string;

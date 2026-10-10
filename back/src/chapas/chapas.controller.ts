@@ -9,9 +9,10 @@ import {
   Post,
   StreamableFile,
   UploadedFile,
+  UploadedFiles,
   UseInterceptors
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ChapasService } from './chapas.service';
 import { Papeis } from '../auth/decorators/roles.decorator';
 import { CreatChapas } from './dto/criar-chapas.dto';
@@ -20,6 +21,8 @@ import { AtualizarChapaDto } from './dto/atualizar-chapa.dto';
 import { Papel } from '../usuario/usuario.service';
 import {
   CAMPO_IMAGEM,
+  CAMPO_IMAGENS,
+  MAX_IMAGENS,
   opcoesUploadImagem
 } from '../common/upload-imagem.options';
 import type { ArquivoImagem } from '../common/upload-imagem.options';
@@ -48,6 +51,51 @@ export class ChapasController {
       type: midia.formato,
       disposition: `inline; filename="${encodeURIComponent(midia.nome)}"`
     });
+  }
+
+  @Get(':id/imagens')
+  listarImagens(@Param('id') id: string) {
+    return this.chapasservice.listarImagens(id);
+  }
+
+  @Get(':id/imagens/:midiaId')
+  async imagemPorId(
+    @Param('id') id: string,
+    @Param('midiaId') midiaId: string
+  ) {
+    const midia = await this.chapasservice.buscarImagemPorId(id, midiaId);
+
+    return new StreamableFile(Buffer.from(midia.dados), {
+      type: midia.formato,
+      disposition: `inline; filename="${encodeURIComponent(midia.nome)}"`
+    });
+  }
+
+  @Papeis(Papel.Funcionario)
+  @Post(':id/imagens')
+  @UseInterceptors(
+    FilesInterceptor(CAMPO_IMAGENS, MAX_IMAGENS, opcoesUploadImagem)
+  )
+  async enviarImagens(
+    @Param('id') id: string,
+    @UploadedFiles() arquivos: ArquivoImagem[]
+  ) {
+    if (!arquivos || arquivos.length === 0) {
+      throw new BadRequestException(
+        `Nenhuma imagem foi enviada (campo "${CAMPO_IMAGENS}").`
+      );
+    }
+
+    return this.chapasservice.adicionarImagens(id, arquivos);
+  }
+
+  @Papeis(Papel.Funcionario)
+  @Delete(':id/imagens/:midiaId')
+  excluirImagem(
+    @Param('id') id: string,
+    @Param('midiaId') midiaId: string
+  ) {
+    return this.chapasservice.excluirImagem(id, midiaId);
   }
  
   @Get(':id')
