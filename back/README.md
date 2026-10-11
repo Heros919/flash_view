@@ -32,12 +32,15 @@ $ npm install
 $ npm run db:migrate
 ```
 
-The migration creates the account table used by `POST /auth/register`. New
-accounts are assigned the `FUNCIONARIO` role automatically. Docker Compose runs
-this migration when the API container starts. Public registration grants the
-`FUNCIONARIO` role to anyone who signs up. These accounts are not linked to a
-client or a row in the `funcionario` table, so operations requiring that
-relationship still need a later account-linking flow.
+`POST /auth/registrar` creates a row in `funcionario` and links it to the first
+registered client and administrator. Both must exist before public registration
+is available. Docker Compose runs database migrations when the API container
+starts.
+
+After registration, sign in with `POST /auth/login` and send the returned
+`access_token` as a Bearer token when creating blocks or sheets. Their
+`funcionario_id` is taken from the authenticated employee, so `funcionarioId`
+does not need to be included in those request bodies.
 
 ## Compile and run the project
 

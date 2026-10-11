@@ -1,210 +1,183 @@
 import {
   ConflictException,
   Injectable,
-  InternalServerErrorException,
-  Logger
+  NotFoundException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { Prisma } from '../generated/prisma/client';
-import { PapelConta } from '../generated/prisma/enums';
+
 import { PrismaService } from '../prisma/prisma.service';
-import { RegistroDto } from '../auth/dto/registro.dto';
+import { PapelConta } from '../generated/prisma/enums';
 
-export enum Papel {
-  Funcionario = 'FUNCIONARIO',
-  Financeiro = 'FINANCEIRO',
-  Administrador = 'ADMINISTRADOR'
-}
+export const Papel = {
+  Funcionario: 'FUNCIONARIO',
+  Administrador: 'ADMINISTRADOR',
+  Financeiro: 'FINANCEIRO',
+} as const;
 
-export type Usuario = {
+export type Papel =
+  (typeof Papel)[keyof typeof Papel];
+
+export type UsuarioAutenticado = {
+  id: number;
   cpf: string;
   nome: string;
   email: string;
-  senhaHash: string;
   ativo: boolean;
   papel: Papel;
 };
 
-export type UsuarioAutenticado = Omit<Usuario, 'senhaHash'>;
-
-const MAPA_PAPEL: Record<string, Papel> = {
-  FUNCIONARIO: Papel.Funcionario,
-  FINANCEIRO: Papel.Financeiro,
-  ADMINISTRADOR: Papel.Administrador
-};
-
 @Injectable()
 export class UsuarioService {
-  private readonly logger = new Logger(UsuarioService.name);
+  constructor(
+    private readonly prisma: PrismaService,
+  ) {}
 
-  constructor(private readonly prisma: PrismaService) {}
-
-  private readonly usuarios: Usuario[] = [
-    {
-      cpf: '1',
-      nome: 'Henrique Luiz Dantas',
-      email: 'henrique@empresa.com',
-      senhaHash:
-        '$2b$12$1TxO6MRn5RPcoL3AvNGrb.if.HubmYVzI204/nNeXd0zd98N5OEv2',
-      ativo: true,
-      papel: Papel.Administrador
-    },
-    {
-      cpf: '2',
-      nome: 'Claudio Araujo Casta',
-      email: 'caraujo@empresa.com',
-      senhaHash:
-        '$2b$12$1TxO6MRn5RPcoL3AvNGrb.if.HubmYVzI204/nNeXd0zd98N5OEv2',
-      ativo: true,
-      papel: Papel.Financeiro
-    },
-    {
-      cpf: '3',
-      nome: 'Luiz Conzaga Garcia',
-      email: 'conzaga@empresa.com',
-      senhaHash:
-        '$2b$12$1TxO6MRn5RPcoL3AvNGrb.if.HubmYVzI204/nNeXd0zd98N5OEv2',
-      ativo: true,
-      papel: Papel.Funcionario
-    }
-  ];
-
-  async buscarPorEmail(email: string): Promise<Usuario | undefined> {
-    const alvo = email.trim().toLowerCase();
-
-    try {
-      const registrado = await this.prisma.usuario.findUnique({
-        where: { email: alvo }
-      });
-
-      if (registrado) {
-        return this.mapearUsuario(registrado);
-      }
-    } catch (erro) {
-      this.registrarErro('Falha ao buscar usuário por e-mail', erro);
-      throw new InternalServerErrorException(
-        'Não foi possível buscar o usuário'
-      );
-    }
-
-    return this.usuarios.find(
-      (usuario) => usuario.email.toLowerCase() === alvo
-    );
+  async buscarPorId(id: number) {
+    return this.prisma.usuario.findUnique({
+      where: { id },
+    });
   }
 
-  async buscarPorId(cpf: string | number): Promise<Usuario | undefined> {
-    const identificador = String(cpf);
-
-    try {
-      const registrado = await this.prisma.usuario.findUnique({
-        where: { cpf: identificador }
-      });
-
-      if (registrado) {
-        return this.mapearUsuario(registrado);
-      }
-    } catch (erro) {
-      this.registrarErro('Falha ao buscar usuário por CPF', erro);
-      throw new InternalServerErrorException(
-        'Não foi possível buscar o usuário'
-      );
-    }
-
-    return this.usuarios.find(
-      (usuario) => usuario.cpf === identificador
-    );
+  async buscarPorCpf(cpf: string) {
+    return this.prisma.usuario.findUnique({
+      where: { cpf },
+    });
   }
 
-  async criar(dados: RegistroDto): Promise<UsuarioAutenticado> {
-    const cpf = dados.cpf.trim();
-    const nome = dados.nome.trim();
-    const email = dados.email.trim().toLowerCase();
-
-    const existente = this.usuarios.some(
-      (usuario) =>
-        usuario.cpf === cpf ||
-        usuario.email.toLowerCase() === email
-    );
-
-    if (existente) {
-      throw new ConflictException(
-        'Já existe uma conta com esse CPF ou e-mail'
-      );
-    }
-
-    const senhaHash = await bcrypt.hash(dados.senha, 12);
-
-    try {
-      const usuario = await this.prisma.usuario.create({
-        data: {
-          cpf,
-          nome,
-          email,
-          senha_hash: senhaHash,
-          papel: PapelConta.FUNCIONARIO
-        }
-      });
-
-      return this.semSenha(this.mapearUsuario(usuario));
-    } catch (erro) {
-      if (
-        erro instanceof Prisma.PrismaClientKnownRequestError &&
-        erro.code === 'P2002'
-      ) {
-        throw new ConflictException(
-          'Já existe uma conta com esse CPF ou e-mail'
-        );
-      }
-
-      this.registrarErro('Falha ao criar usuário', erro);
-
-      throw new InternalServerErrorException(
-        'Não foi possível cadastrar o usuário'
-      );
-    }
+  async buscarPorEmail(email: string) {
+    return this.prisma.usuario.findUnique({
+      where: { email },
+    });
   }
 
-  private mapearUsuario(usuario: {
+  async listar() {
+    const usuarios = await this.prisma.usuario.findMany({
+      orderBy: { datacadastro: 'desc' },
+    });
+
+    return usuarios.map((usuario) => this.semSenha(usuario));
+  }
+
+  async criar(dados: {
     cpf: string;
     nome: string;
     email: string;
-    senha_hash: string;
-    ativo: boolean;
-    papel: PapelConta;
-  }): Usuario {
-    const papel = MAPA_PAPEL[usuario.papel];
+    senha: string;
+    papel?: PapelConta;
+  }): Promise<UsuarioAutenticado> {
+    const cpf = dados.cpf.replace(/\D/g, '');
+    const email = dados.email.trim().toLowerCase();
 
-    if (!papel) {
-      throw new InternalServerErrorException(
-        'A conta possui um papel de acesso inválido'
+    if (!/^\d{11}$/.test(cpf)) {
+      throw new ConflictException(
+        'O CPF deve conter 11 números.',
       );
     }
 
-    return {
-      cpf: usuario.cpf,
-      nome: usuario.nome,
-      email: usuario.email,
-      senhaHash: usuario.senha_hash,
-      ativo: usuario.ativo,
-      papel
-    };
-  }
+    const existente = await this.prisma.usuario.findFirst({
+      where: {
+        OR: [{ cpf }, { email }],
+      },
+    });
 
-  semSenha(usuario: Usuario): UsuarioAutenticado {
-    return {
-      cpf: usuario.cpf,
-      nome: usuario.nome,
-      email: usuario.email,
-      ativo: usuario.ativo,
-      papel: usuario.papel
-    };
-  }
+    if (existente) {
+      if (existente.cpf === cpf) {
+        throw new ConflictException(
+          'Já existe um usuário cadastrado com este CPF.',
+        );
+      }
 
-  private registrarErro(mensagem: string, erro: unknown): void {
-    if (erro instanceof Error) {
-      this.logger.error(`${mensagem}: ${erro.message}`, erro.stack);
-    } else {
-      this.logger.error(`${mensagem}: ${String(erro)}`);
+      throw new ConflictException(
+        'Já existe um usuário cadastrado com este e-mail.',
+      );
     }
+
+    const senha_hash = await bcrypt.hash(dados.senha, 10);
+
+    const usuario = await this.prisma.usuario.create({
+      data: {
+        cpf,
+        nome: dados.nome.trim(),
+        email,
+        senha_hash,
+        papel: PapelConta.FUNCIONARIO,
+      },
+    });
+
+    return this.semSenha(usuario);
+  }
+
+  async atualizar(
+    id: number,
+    dados: {
+      nome?: string;
+      email?: string;
+      ativo?: boolean;
+    },
+  ): Promise<UsuarioAutenticado> {
+    const existente = await this.buscarPorId(id);
+
+    if (!existente) {
+      throw new NotFoundException('Usuário não encontrado.');
+    }
+
+    const email = dados.email?.trim().toLowerCase();
+
+    if (email && email !== existente.email) {
+      const emailExistente = await this.buscarPorEmail(email);
+
+      if (emailExistente) {
+        throw new ConflictException(
+          'Este e-mail já está cadastrado.',
+        );
+      }
+    }
+
+    const usuario = await this.prisma.usuario.update({
+      where: { id },
+      data: {
+        ...(dados.nome !== undefined && {
+          nome: dados.nome.trim(),
+        }),
+        ...(email !== undefined && { email }),
+        ...(dados.ativo !== undefined && {
+          ativo: dados.ativo,
+        }),
+      },
+    });
+
+    return this.semSenha(usuario);
+  }
+
+  async remover(id: number): Promise<UsuarioAutenticado> {
+    const existente = await this.buscarPorId(id);
+
+    if (!existente) {
+      throw new NotFoundException('Usuário não encontrado.');
+    }
+
+    const usuario = await this.prisma.usuario.delete({
+      where: { id },
+    });
+
+    return this.semSenha(usuario);
+  }
+
+  semSenha(usuario: {
+    id: number;
+    cpf: string;
+    nome: string;
+    email: string;
+    ativo: boolean;
+    papel: PapelConta;
+  }): UsuarioAutenticado {
+    return {
+      id: usuario.id,
+      cpf: usuario.cpf,
+      nome: usuario.nome,
+      email: usuario.email,
+      ativo: usuario.ativo,
+      papel: usuario.papel,
+    };
   }
 }

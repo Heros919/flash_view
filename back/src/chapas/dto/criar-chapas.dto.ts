@@ -12,8 +12,8 @@ import { StatusChapas } from './autera-status.dto';
 export class CreatChapas {
 
   @IsString()
-  @IsNotEmpty()
-  funcionarioId!: string;
+  @IsOptional()
+  funcionarioId?: string;
 
   @IsString()
   @IsNotEmpty()

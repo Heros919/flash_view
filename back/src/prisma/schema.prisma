@@ -10,10 +10,13 @@ datasource db {
 
 enum PapelConta {
   FUNCIONARIO
+ ADMINISTRADOR
+  FINANCEIRO
 }
 
 model usuario {
   cpf          String     @id @db.VarChar(11)
+  id           Int        @unique @default(autoincrement())
   nome         String     @db.VarChar(150)
   email        String     @unique @db.VarChar(255)
   senha_hash   String     @db.VarChar(255)
@@ -121,6 +124,7 @@ model funcionario {
   admin      admin   @relation(fields: [admin_id], references: [id], map: "fk_funcionario_admin")
   cliente    cliente @relation(fields: [cliente_id], references: [id], map: "fk_funcionario_cliente")
   venda      venda[]
+  cpf    String? @unique @db.VarChar(11)
 
   @@unique([cliente_id, id], map: "uq_funcionario_cliente_id")
   @@index([admin_id], map: "idx_funcionario_admin_id")

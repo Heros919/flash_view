@@ -1,45 +1,29 @@
 import {
   Body,
   Controller,
-  Get,
   HttpCode,
   HttpStatus,
   Post,
-  Req,
-  UseGuards
 } from '@nestjs/common';
-import { UsuarioAutenticado } from '../usuario/usuario.service';
-import { UsuarioService } from '../usuario/usuario.service';
-import { AuthService } from './auth.service';
-import { Public } from './decorators/public.decorator';
-import { LocalAuthGuard } from './guard/local-auth.guard';
-import { RegistroDto } from './dto/registro.dto';
 
-type RequisicaoAutenticada = { user: UsuarioAutenticado };
+import { AuthService } from './auth.service';
+import { RegistroDto } from './dto/registro.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly usuarioService: UsuarioService
   ) {}
 
-  @Public()
-  @UseGuards(LocalAuthGuard)
+  @Post('registrar')
+  registrar(@Body() dto: RegistroDto) {
+    return this.authService.registrar(dto);
+  }
+
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  login(@Req() request: RequisicaoAutenticada) {
-    return this.authService.login(request.user);
-  }
-
-  @Get('perfil')
-  perfil(@Req() request: RequisicaoAutenticada) {
-    return request.user;
-  }
-
-  @Public()
-  @Post('register')
-  register(@Body() dados: RegistroDto) {
-    return this.usuarioService.criar(dados);
+  login(@Body() dto: LoginDto) {
+    return this.authService.login(dto);
   }
 }

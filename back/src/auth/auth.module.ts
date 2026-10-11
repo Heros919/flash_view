@@ -1,38 +1,49 @@
 import { Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { UsuarioModule } from '../usuario/usuario.module';
+
+import { PrismaService } from '../prisma/prisma.service';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './guard/jwt-auth.guard';
-import { RolesGuard } from './guard/roles.guard';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { LocalStrategy } from './strategies/local.strategy';
 
 @Module({
   imports: [
-    UsuarioModule,
-    PassportModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
+
+    PassportModule.register({
+      defaultStrategy: 'jwt',
+    }),
+
     JwtModule.registerAsync({
+      imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        secret: config.getOrThrow<string>('JWT_SECRET'),
-        signOptions: {
-          expiresIn: Number(config.get('JWT_EXPIRA_SEGUNDOS') ?? 3600)
+      useFactory: (config: ConfigService) => {
+        const secret = config.get<string>('JWT_SECRET');
+
+        if (!secret) {
+          throw new Error(
+            'JWT_SECRET não foi definida no arquivo .env',
+          );
         }
-      })
-    })
+
+        return {
+          secret,
+          signOptions: { expiresIn: '1d' },
+        };
+      },
+    }),
   ],
   controllers: [AuthController],
   providers: [
     AuthService,
-    LocalStrategy,
     JwtStrategy,
-    { provide: APP_GUARD, useClass: JwtAuthGuard },
-    { provide: APP_GUARD, useClass: RolesGuard }
+    PrismaService,
   ],
-  exports: [AuthService]
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

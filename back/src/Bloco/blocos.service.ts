@@ -8,6 +8,7 @@ import { randomUUID } from 'crypto';
 
 import { Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import type { FuncionarioAutenticado } from '../auth/strategies/jwt.strategy';
 
 import { CreateBlocos } from './dto/criar-bloco.dto';
 import { AtualizarBlocoDto } from './dto/atualizar-bloco.dto';
@@ -22,17 +23,10 @@ export class BlocosService {
   constructor(private readonly prisma: PrismaService) { }
 
 
-  async criarBloco(dados: CreateBlocos) {
-    const funcionario = await this.prisma.funcionario.findUnique({
-      where: {
-        id: dados.funcionarioId,
-      },
-    });
-
-    if (!funcionario) {
-      throw new NotFoundException('Funcionário não encontrado');
-    }
-
+  async criarBloco(
+    dados: CreateBlocos,
+    funcionario: Pick<FuncionarioAutenticado, 'id' | 'cliente_id'>,
+  ) {
     try {
       return await this.prisma.bloco.create({
         data: {

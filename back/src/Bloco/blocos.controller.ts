@@ -7,15 +7,20 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   StreamableFile,
   UploadedFile,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import type { Request } from 'express';
 
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 
 import { BlocosService } from './blocos.service';
+import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
+import type { FuncionarioAutenticado } from '../auth/strategies/jwt.strategy';
 
 import { Papeis } from '../auth/decorators/roles.decorator';
 import { Papel } from '../usuario/usuario.service';
@@ -36,9 +41,13 @@ export class BlocosController {
   constructor(private readonly blocosService: BlocosService) {}
 
   @Papeis(Papel.Funcionario)
+  @UseGuards(JwtAuthGuard)
   @Post()
-  criar(@Body() body: CreateBlocos) {
-    return this.blocosService.criarBloco(body);
+  criar(
+    @Body() body: CreateBlocos,
+    @Req() request: Request & { user: FuncionarioAutenticado },
+  ) {
+    return this.blocosService.criarBloco(body, request.user);
   }
 
   @Get()

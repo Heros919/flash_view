@@ -6,6 +6,7 @@ import {
 import { randomUUID } from 'crypto';
 import { Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import type { FuncionarioAutenticado } from '../auth/strategies/jwt.strategy';
 import { CreatChapas } from './dto/criar-chapas.dto';
 import { AutualizarStatus } from './dto/autera-status.dto';
 import { AtualizarChapaDto } from './dto/atualizar-chapa.dto';
@@ -32,14 +33,10 @@ const incluirBlocoEMidia = {
 export class ChapasService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async criarChapas(dados: CreatChapas) {
-    const funcionario = await this.prisma.funcionario.findUnique({
-      where: { id: dados.funcionarioId }
-    });
-    if (!funcionario) {
-      throw new NotFoundException('Funcionário não encontrado');
-    }
-
+  async criarChapas(
+    dados: CreatChapas,
+    funcionario: Pick<FuncionarioAutenticado, 'id' | 'cliente_id'>
+  ) {
     const bloco = await this.prisma.bloco.findUnique({
       where: { id: dados.blocoId }
     });

@@ -31,7 +31,7 @@ export class PrismaService
         to_regclass('public.usuario')::text AS tabela_usuario
     `;
 
-    console.log('[Prisma diagnóstico]', diagnostico);
+    
   }
 
   async onModuleDestroy() {

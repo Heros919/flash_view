@@ -7,13 +7,18 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   StreamableFile,
   UploadedFile,
   UploadedFiles,
+  UseGuards,
   UseInterceptors
 } from '@nestjs/common';
+import type { Request } from 'express';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ChapasService } from './chapas.service';
+import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
+import type { FuncionarioAutenticado } from '../auth/strategies/jwt.strategy';
 import { Papeis } from '../auth/decorators/roles.decorator';
 import { CreatChapas } from './dto/criar-chapas.dto';
 import { AutualizarStatus } from './dto/autera-status.dto';
@@ -32,9 +37,13 @@ export class ChapasController {
   constructor(private readonly chapasservice: ChapasService) {}
  
   @Papeis(Papel.Funcionario)
+  @UseGuards(JwtAuthGuard)
   @Post()
-  criar(@Body() body: CreatChapas) {
-    return this.chapasservice.criarChapas(body);
+  criar(
+    @Body() body: CreatChapas,
+    @Req() request: Request & { user: FuncionarioAutenticado }
+  ) {
+    return this.chapasservice.criarChapas(body, request.user);
   }
  
   @Get()

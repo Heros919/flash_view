@@ -22,8 +22,8 @@ export enum FrenteBloco {
 
 export class CreateBlocos {
   @IsString()
-  @IsNotEmpty()
-  funcionarioId!: string;
+  @IsOptional()
+  funcionarioId?: string;
 
   @IsString()
   @IsNotEmpty()

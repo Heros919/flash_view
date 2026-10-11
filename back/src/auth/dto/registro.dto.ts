@@ -1,34 +1,33 @@
-import { Transform } from 'class-transformer';
 import {
+  Equals,
   IsEmail,
+  IsNotEmpty,
+  IsOptional,
   IsString,
-  Matches,
-  MaxLength,
-  MinLength
+  Length,
+  MinLength,
 } from 'class-validator';
+import { PapelConta } from '../../generated/prisma/enums';
 
 export class RegistroDto {
   @IsString()
-  @Matches(/^\d{11}$/, { message: 'cpf deve ter 11 dígitos numéricos' })
+  @Length(11, 11)
   cpf!: string;
 
-  @Transform(({ value }) =>
-    typeof value === 'string' ? value.trim() : value
-  )
   @IsString()
-  @MinLength(2)
-  @MaxLength(150)
+  @IsNotEmpty()
+  @Length(2, 150)
   nome!: string;
 
-  @Transform(({ value }) =>
-    typeof value === 'string' ? value.trim().toLowerCase() : value
-  )
   @IsEmail()
-  @MaxLength(255)
+  @Length(1, 255)
   email!: string;
 
   @IsString()
   @MinLength(8)
-  @MaxLength(72)
   senha!: string;
+
+  @IsOptional()
+  @Equals(PapelConta.FUNCIONARIO)
+  papel?: PapelConta;
 }
