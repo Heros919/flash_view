@@ -17,12 +17,6 @@ async function api(endpoint, options = {}) {
         headers
     });
 
-    if (response.status === 401) {
-        localStorage.removeItem('token');
-        window.location.href = 'login.html';
-        return;
-    }
-
     const texto = await response.text();
 
     let data = null;
@@ -34,9 +28,17 @@ async function api(endpoint, options = {}) {
     }
 
     if (!response.ok) {
-        throw new Error(
-            data?.message || `Erro ${response.status}`
-        );
+        if (response.status === 401 && endpoint !== '/auth/login') {
+            localStorage.removeItem('token');
+            localStorage.removeItem('usuario');
+            window.location.href = 'login.html';
+        }
+
+        const mensagem = Array.isArray(data?.message)
+            ? data.message.join(', ')
+            : data?.message;
+
+        throw new Error(mensagem || `Erro ${response.status}`);
     }
 
     return data;

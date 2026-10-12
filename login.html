@@ -44,9 +44,9 @@
             </footer>
         </section>
     </main>
-
-    <script src="js/api.js"></script>
+    <script src="./js/api.js"></script>
     <script>
+
         const form = document.getElementById('loginForm');
         const emailInput = document.getElementById('email');
         const senhaInput = document.getElementById('senha');
@@ -84,22 +84,21 @@
                     body: JSON.stringify({ email, senha })
                 });
 
-                // O backend retorna access_token.
-                // "acesso" é mantido como alternativa para versões antigas.
-                const token = resposta?.access_token || resposta?.acesso;
+                console.log('Resposta do login:', resposta);
 
-                if (!token) {
+                if (!resposta || !resposta.access_token) {
                     throw new Error(
-                        'O servidor não retornou o token de acesso.'
+                        'O servidor não retornou o token. Verifique a resposta no console do navegador.'
                     );
                 }
 
-                localStorage.setItem('token', token);
+                localStorage.setItem('token', resposta.access_token);
 
-                if (resposta.usuario) {
+                // O backend retorna "funcionario", não "usuario".
+                if (resposta.funcionario) {
                     localStorage.setItem(
                         'usuario',
-                        JSON.stringify(resposta.usuario)
+                        JSON.stringify(resposta.funcionario)
                     );
                 }
 
@@ -108,11 +107,12 @@
                 window.setTimeout(() => {
                     window.location.href = 'dashboard.html';
                 }, 500);
+
             } catch (erro) {
                 console.error('Erro ao fazer login:', erro);
 
                 mostrarMensagem(
-                    erro.message || 'E-mail ou senha inválidos.',
+                    erro.message || 'Não foi possível realizar o login.',
                     'erro'
                 );
 
