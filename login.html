@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Flash View - Login</title>
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="icon" href="assets/logo.ico" type="image/x-icon">
+</head>
+
+<body>
+    <main class="login-container">
+        <section class="login-card">
+            <header class="logo">
+                <h1>Flash View</h1>
+                <h3>Login - Usuário</h3>
+                <p>Acesse sua conta</p>
+            </header>
+
+            <div id="mensagem" class="mensagem" role="status" aria-live="polite"></div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" name="email" placeholder="Digite seu e-mail" autocomplete="email"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="senha">Senha</label>
+                    <input type="password" id="senha" name="senha" placeholder="Digite sua senha"
+                        autocomplete="current-password" required>
+                </div>
+
+                <button type="submit" id="btnLogin" class="btn-login">
+                    Entrar
+                </button>
+            </form>
+
+            <footer class="footer">
+                <a href="cadastro-usuario.html">Não tem uma conta? Cadastre-se aqui</a>
+            </footer>
+        </section>
+    </main>
+    <script src="./js/api.js"></script>
+    <script>
+
+        const form = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const senhaInput = document.getElementById('senha');
+        const btnLogin = document.getElementById('btnLogin');
+        const mensagem = document.getElementById('mensagem');
+
+        function mostrarMensagem(texto, tipo) {
+            mensagem.textContent = texto;
+            mensagem.className = `mensagem ${tipo}`;
+        }
+
+        function limparMensagem() {
+            mensagem.textContent = '';
+            mensagem.className = 'mensagem';
+        }
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            limparMensagem();
+
+            const email = emailInput.value.trim().toLowerCase();
+            const senha = senhaInput.value;
+
+            if (!email || !senha) {
+                mostrarMensagem('Informe o e-mail e a senha.', 'erro');
+                return;
+            }
+
+            btnLogin.disabled = true;
+            btnLogin.textContent = 'Entrando...';
+
+            try {
+                const resposta = await api('/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ email, senha })
+                });
+
+                console.log('Resposta do login:', resposta);
+
+                if (!resposta || !resposta.access_token) {
+                    throw new Error(
+                        'O servidor não retornou o token. Verifique a resposta no console do navegador.'
+                    );
+                }
+
+                localStorage.setItem('token', resposta.access_token);
+
+                // O backend retorna "funcionario", não "usuario".
+                if (resposta.funcionario) {
+                    localStorage.setItem(
+                        'usuario',
+                        JSON.stringify(resposta.funcionario)
+                    );
+                }
+
+                mostrarMensagem('Login realizado com sucesso!', 'sucesso');
+
+                window.setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 500);
+
+            } catch (erro) {
+                console.error('Erro ao fazer login:', erro);
+
+                mostrarMensagem(
+                    erro.message || 'Não foi possível realizar o login.',
+                    'erro'
+                );
+
+                btnLogin.disabled = false;
+                btnLogin.textContent = 'Entrar';
+            }
+        });
+    </script>
+</body>
+
+</html>

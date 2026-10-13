@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Flash View - Novo Bloco</title>
+    <link rel="icon" href="assets/logo.ico" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="container mt-5">
+
+    <div class="d-flex align-items-center gap-3 mb-3">
+
+        <a href="dashboard.html" aria-label="Voltar para dashboard" class="d-inline-flex align-items-center">
+
+            <img src="assets/logo.ico" alt="Flash View" style="width: 48px; height: 48px; object-fit: contain;">
+
+        </a>
+
+        <h1 class="mb-0">
+            Cadastrar Novo Bloco
+        </h1>
+
+    </div>
+
+    <hr>
+
+
+    <form id="form-bloco" class="row g-3">
+
+        <div class="col-md-6">
+
+            <label for="funcionarioId" class="form-label">
+
+                ID do Funcionário
+            </label>
+
+            <input type="text" class="form-control" id="funcionarioId" placeholder="ID do funcionário" required>
+
+            <div class="form-text">
+                Informe o ID real do funcionário autenticado.
+            </div>
+
+        </div>
+
+
+        <div class="col-md-6">
+
+            <label for="codigo" class="form-label">
+
+                Código
+            </label>
+
+            <input type="text" class="form-control" id="codigo" maxlength="50" placeholder="Ex.: BL001" required>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <label for="numero" class="form-label">
+
+                Número
+            </label>
+
+            <input type="number" class="form-control" id="numero" min="0" max="99" value="1" required>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <label for="material" class="form-label">
+
+                Material
+            </label>
+
+            <input type="text" class="form-control" id="material" maxlength="150" placeholder="Ex.: Granito">
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <label for="cor" class="form-label">
+
+                Cor
+            </label>
+
+            <input type="text" class="form-control" id="cor" maxlength="160" placeholder="Ex.: Branco">
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <label for="comprimento" class="form-label">
+
+                Comprimento
+            </label>
+
+            <input type="number" class="form-control" id="comprimento" min="0.01" step="0.01" placeholder="Ex.: 3.20"
+                required>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <label for="largura" class="form-label">
+
+                Largura
+            </label>
+
+            <input type="number" class="form-control" id="largura" min="0.01" step="0.01" placeholder="Ex.: 1.80"
+                required>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <label for="altura" class="form-label">
+
+                Altura
+            </label>
+
+            <input type="number" class="form-control" id="altura" min="0.01" step="0.01" placeholder="Ex.: 1.70"
+                required>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <label for="peso" class="form-label">
+
+                Peso (kg)
+            </label>
+
+            <input type="number" class="form-control" id="peso" min="0.01" step="0.01" placeholder="Ex.: 8500">
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <label for="mes" class="form-label">
+
+                Mês
+            </label>
+
+            <select class="form-select" id="mes" required>
+
+                <option value="">
+                    Selecione
+                </option>
+
+                <option value="1">Janeiro</option>
+                <option value="2">Fevereiro</option>
+                <option value="3">Março</option>
+                <option value="4">Abril</option>
+                <option value="5">Maio</option>
+                <option value="6">Junho</option>
+                <option value="7">Julho</option>
+                <option value="8">Agosto</option>
+                <option value="9">Setembro</option>
+                <option value="10">Outubro</option>
+                <option value="11">Novembro</option>
+                <option value="12">Dezembro</option>
+
+            </select>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <label for="ano" class="form-label">
+
+                Ano
+            </label>
+
+            <input type="number" class="form-control" id="ano" min="2000" value="2026" required>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <label for="frente" class="form-label">
+
+                Frente
+            </label>
+
+            <select class="form-select" id="frente" required>
+
+                <option value="">
+                    Selecione
+                </option>
+
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+                <option value="BARRAGEM">BARRAGEM</option>
+                <option value="BARREIRO">BARREIRO</option>
+
+            </select>
+
+        </div>
+
+
+        <div class="col-md-6">
+
+            <label for="imagem" class="form-label">
+
+                Imagens do bloco (até 5)
+            </label>
+
+            <input type="file" class="form-control" id="imagem" name="imagens" accept="image/*" multiple>
+
+        </div>
+
+
+        <div class="col-12">
+
+            <div id="contador-imagens" class="form-text">0/5 imagens</div>
+            <div id="galeria-imagens" class="d-flex flex-wrap gap-3"></div>
+
+        </div>
+
+
+        <div class="col-12">
+
+            <div id="mensagem" class="alert d-none" role="alert">
+            </div>
+
+        </div>
+
+
+        <div class="col-12 mt-4">
+
+            <button type="submit" id="btn-salvar" class="btn btn-success">
+
+                Salvar Bloco
+
+            </button>
+
+            <a href="historicoBlocosChapas.html" class="btn btn-secondary">
+
+                Cancelar
+
+            </a>
+
+        </div>
+
+    </form>
+
+
+    <script src="js/api.js"></script>
+    <script src="js/multiplas-imagens.js"></script>
+
+
+    <script>
+
+        const formulario = document.getElementById('form-bloco');
+        const mensagem = document.getElementById('mensagem');
+        const botaoSalvar = document.getElementById('btn-salvar');
+        const galeriaImagens = window.criarGaleriaImagens({
+            recurso: 'blocos',
+            input: document.getElementById('imagem'),
+            galeria: document.getElementById('galeria-imagens'),
+            contador: document.getElementById('contador-imagens'),
+            aoErro: (texto) => mostrarMensagem(texto, 'danger'),
+        });
+
+        function mostrarMensagem(texto, tipo) {
+            mensagem.textContent = texto;
+            mensagem.className = `alert alert-${tipo}`;
+        }
+
+        function esconderMensagem() {
+            mensagem.className = 'alert d-none';
+            mensagem.textContent = '';
+        }
+
+        formulario.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            esconderMensagem();
+
+            botaoSalvar.disabled = true;
+            botaoSalvar.textContent = 'Salvando...';
+
+            let blocoCriado = false;
+
+            try {
+                const funcionarioId =
+                    document.getElementById('funcionarioId').value.trim();
+
+                const codigo =
+                    document.getElementById('codigo').value.trim();
+
+                const numero =
+                    Number(document.getElementById('numero').value);
+
+                const material =
+                    document.getElementById('material').value.trim();
+
+                const cor =
+                    document.getElementById('cor').value.trim();
+
+                const comprimento =
+                    Number(document.getElementById('comprimento').value);
+
+                const largura =
+                    Number(document.getElementById('largura').value);
+
+                const altura =
+                    Number(document.getElementById('altura').value);
+
+                const pesoCampo =
+                    document.getElementById('peso').value;
+
+                const mes =
+                    Number(document.getElementById('mes').value);
+
+                const ano =
+                    Number(document.getElementById('ano').value);
+
+                const frente =
+                    document.getElementById('frente').value;
+
+
+                const novoBloco = {
+                    funcionarioId,
+                    codigo,
+                    numero,
+                    altura,
+                    largura,
+                    comprimento,
+                    mes,
+                    ano,
+                    frente
+                };
+
+                if (material) {
+                    novoBloco.material = material;
+                }
+
+                if (cor) {
+                    novoBloco.cor = cor;
+                }
+
+                if (pesoCampo !== '') {
+                    novoBloco.peso = Number(pesoCampo);
+                }
+
+                console.log('Cadastrando bloco:', novoBloco);
+
+                const resposta = await api('/blocos', {
+                    method: 'POST',
+                    body: JSON.stringify(novoBloco)
+                });
+
+                blocoCriado = true;
+
+                if (!resposta || !resposta.id) {
+                    throw new Error(
+                        'O bloco foi cadastrado, mas a API não retornou seu ID. Não envie o formulário novamente.'
+                    );
+                }
+
+                const possuiImagens = galeriaImagens.selecionadas.length > 0;
+
+                if (possuiImagens) {
+                    botaoSalvar.textContent = 'Enviando imagens...';
+                    await galeriaImagens.enviar(resposta.id);
+                }
+
+                mostrarMensagem(
+                    possuiImagens
+                        ? 'Bloco e imagens cadastrados com sucesso!'
+                        : 'Bloco cadastrado com sucesso!',
+                    'success'
+                );
+
+                formulario.reset();
+
+                setTimeout(() => {
+                    window.location.href = 'historicoBlocosChapas.html';
+                }, 1200);
+
+            } catch (error) {
+                console.error('Erro ao cadastrar bloco:', error);
+
+                mostrarMensagem(
+                    error.message || 'Erro ao cadastrar o bloco.',
+                    'danger'
+                );
+
+
+                if (blocoCriado) {
+                    botaoSalvar.disabled = true;
+                    botaoSalvar.textContent = 'Bloco já cadastrado';
+                    return;
+                }
+
+            } finally {
+                if (!blocoCriado) {
+                    botaoSalvar.disabled = false;
+                    botaoSalvar.textContent = 'Salvar Bloco';
+                }
+            }
+        });
+    </script>
+
+</body>
+
+</html>
