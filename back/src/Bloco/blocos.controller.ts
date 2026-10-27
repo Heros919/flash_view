@@ -20,7 +20,9 @@ import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 
 import { BlocosService } from './blocos.service';
 import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
+import { RolesGuard } from '../auth/guard/roles.guard';
 import type { FuncionarioAutenticado } from '../auth/strategies/jwt.strategy';
+import type { UsuarioAutenticado } from '../usuario/usuario.service';
 
 import { Papeis } from '../auth/decorators/roles.decorator';
 import { Papel } from '../usuario/usuario.service';
@@ -41,11 +43,14 @@ export class BlocosController {
   constructor(private readonly blocosService: BlocosService) {}
 
   @Papeis(Papel.Funcionario)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Post()
   criar(
     @Body() body: CreateBlocos,
-    @Req() request: Request & { user: FuncionarioAutenticado },
+    @Req()
+    request: Request & {
+      user: FuncionarioAutenticado | UsuarioAutenticado;
+    },
   ) {
     return this.blocosService.criarBloco(body, request.user);
   }
@@ -103,10 +108,7 @@ export class BlocosController {
 
   @Papeis(Papel.Funcionario)
   @Delete(':id/imagens/:midiaId')
-  excluirImagem(
-    @Param('id') id: string,
-    @Param('midiaId') midiaId: string,
-  ) {
+  excluirImagem(@Param('id') id: string, @Param('midiaId') midiaId: string) {
     return this.blocosService.excluirImagem(id, midiaId);
   }
 

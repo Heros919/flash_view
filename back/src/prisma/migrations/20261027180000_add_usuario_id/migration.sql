@@ -1,0 +1,4 @@
+ALTER TABLE "usuario"
+ADD COLUMN IF NOT EXISTS "id" SERIAL NOT NULL;
+
+CREATE UNIQUE INDEX IF NOT EXISTS "usuario_id_key" ON "usuario"("id");

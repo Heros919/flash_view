@@ -1,7 +1,7 @@
 import {
   ConflictException,
   Injectable,
-  NotFoundException
+  NotFoundException,
 } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { Prisma } from '../generated/prisma/client';
@@ -13,6 +13,8 @@ import { AtualizarChapaDto } from './dto/atualizar-chapa.dto';
 import type { ArquivoImagem } from '../common/upload-imagem.options';
 import { erroAoGravarImagem } from '../common/erro-imagem';
 import { MAX_IMAGENS } from '../common/upload-imagem.options';
+import { obterFuncionarioResponsavel } from '../common/funcionario-responsavel';
+import type { UsuarioAutenticado } from '../usuario/usuario.service';
 
 const incluirBlocoEMidia = {
   bloco: {
@@ -23,10 +25,10 @@ const incluirBlocoEMidia = {
       cor: true,
       comprimento: true,
       altura: true,
-      largura: true
-    }
+      largura: true,
+    },
   },
-  midia: { select: { id: true }, take: 1 }
+  midia: { select: { id: true }, take: 1 },
 } satisfies Prisma.chapaInclude;
 
 @Injectable()
@@ -35,13 +37,25 @@ export class ChapasService {
 
   async criarChapas(
     dados: CreatChapas,
-    funcionario: Pick<FuncionarioAutenticado, 'id' | 'cliente_id'>
+    usuario: FuncionarioAutenticado | UsuarioAutenticado,
   ) {
     const bloco = await this.prisma.bloco.findUnique({
-      where: { id: dados.blocoId }
+      where: { id: dados.blocoId },
     });
     if (!bloco) {
       throw new NotFoundException('Bloco não encontrado');
+    }
+
+    const funcionario = await obterFuncionarioResponsavel(
+      this.prisma,
+      usuario,
+      dados.funcionarioId,
+    );
+
+    if (funcionario.cliente_id !== bloco.cliente_id) {
+      throw new ConflictException(
+        'O funcionário responsável deve pertencer ao mesmo cliente do bloco.',
+      );
     }
 
     try {
@@ -56,8 +70,8 @@ export class ChapasService {
           altura: dados.altura,
           largura: dados.largura,
           acabamento: dados.acabamento,
-          status: dados.status
-        }
+          status: dados.status,
+        },
       });
     } catch (e) {
       if (
@@ -73,14 +87,14 @@ export class ChapasService {
   listar() {
     return this.prisma.chapa.findMany({
       orderBy: { datacadastro: 'desc' },
-      include: incluirBlocoEMidia
+      include: incluirBlocoEMidia,
     });
   }
 
   async buscarPorId(id: string) {
     const chapa = await this.prisma.chapa.findUnique({
       where: { id },
-      include: incluirBlocoEMidia
+      include: incluirBlocoEMidia,
     });
 
     if (!chapa) {
@@ -100,9 +114,9 @@ export class ChapasService {
           ...(dados.altura !== undefined && { altura: dados.altura }),
           ...(dados.largura !== undefined && { largura: dados.largura }),
           ...(dados.acabamento !== undefined && {
-            acabamento: dados.acabamento
-          })
-        }
+            acabamento: dados.acabamento,
+          }),
+        },
       });
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
@@ -121,7 +135,7 @@ export class ChapasService {
     try {
       return await this.prisma.chapa.update({
         where: { id },
-        data: { status: dto.status }
+        data: { status: dto.status },
       });
     } catch (e) {
       if (
@@ -144,7 +158,7 @@ export class ChapasService {
         }
         if (e.code === 'P2003') {
           throw new ConflictException(
-            'Não é possível excluir: a chapa está vinculada a outros registros.'
+            'Não é possível excluir: a chapa está vinculada a outros registros.',
           );
         }
       }
@@ -162,7 +176,7 @@ export class ChapasService {
 
     const midia = await this.prisma.midia.findFirst({
       where: { chapaid: id },
-      orderBy: { datacadastro: 'desc' }
+      orderBy: { datacadastro: 'desc' },
     });
     if (!midia) {
       throw new NotFoundException('Imagem da chapa não encontrada');
@@ -184,8 +198,8 @@ export class ChapasService {
         id: true,
         nome: true,
         tipo: true,
-        formato: true
-      }
+        formato: true,
+      },
     });
   }
 
@@ -193,8 +207,8 @@ export class ChapasService {
     const midia = await this.prisma.midia.findFirst({
       where: {
         id: midiaId,
-        chapaid: id
-      }
+        chapaid: id,
+      },
     });
 
     if (!midia) {
@@ -214,11 +228,11 @@ export class ChapasService {
       return await this.prisma.$transaction(
         async (transaction) => {
           const quantidadeAtual = await transaction.midia.count({
-            where: { chapaid: id }
+            where: { chapaid: id },
           });
           if (quantidadeAtual + arquivos.length > MAX_IMAGENS) {
             throw new ConflictException(
-              `Uma chapa pode ter no máximo ${MAX_IMAGENS} imagens. Ela já possui ${quantidadeAtual}.`
+              `Uma chapa pode ter no máximo ${MAX_IMAGENS} imagens. Ela já possui ${quantidadeAtual}.`,
             );
           }
 
@@ -231,20 +245,20 @@ export class ChapasService {
                   tipo: 'FOTO',
                   formato: arquivo.mimetype,
                   dados: new Uint8Array(arquivo.buffer),
-                  chapaid: id
+                  chapaid: id,
                 },
                 select: {
                   id: true,
                   nome: true,
                   tipo: true,
                   formato: true,
-                  chapaid: true
-                }
-              })
-            )
+                  chapaid: true,
+                },
+              }),
+            ),
           );
         },
-        { isolationLevel: Prisma.TransactionIsolationLevel.Serializable }
+        { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
       );
     } catch (e) {
       if (
@@ -252,7 +266,7 @@ export class ChapasService {
         e.code === 'P2034'
       ) {
         throw new ConflictException(
-          'O limite de imagens foi atingido por outro envio. Atualize a lista e tente novamente.'
+          'O limite de imagens foi atingido por outro envio. Atualize a lista e tente novamente.',
         );
       }
 
@@ -264,8 +278,8 @@ export class ChapasService {
     const resultado = await this.prisma.midia.deleteMany({
       where: {
         id: midiaId,
-        chapaid: id
-      }
+        chapaid: id,
+      },
     });
 
     if (resultado.count === 0) {
@@ -274,7 +288,7 @@ export class ChapasService {
 
     return {
       id: midiaId,
-      mensagem: 'Imagem excluída com sucesso'
+      mensagem: 'Imagem excluída com sucesso',
     };
   }
 
@@ -294,16 +308,16 @@ export class ChapasService {
             tipo: 'FOTO',
             formato: arquivo.mimetype,
             dados: new Uint8Array(arquivo.buffer),
-            chapaid: id
+            chapaid: id,
           },
           select: {
             id: true,
             nome: true,
             tipo: true,
             formato: true,
-            chapaid: true
-          }
-        })
+            chapaid: true,
+          },
+        }),
       ]);
 
       return midia;

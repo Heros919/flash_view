@@ -1,13 +1,13 @@
 import {
-  Equals,
+  IsEnum,
   IsEmail,
   IsNotEmpty,
   IsOptional,
   IsString,
   Length,
   MinLength,
-} from 'class-validator';
-import { PapelConta } from '../../generated/prisma/enums';
+} from "class-validator";
+import { PapelConta } from "../../generated/prisma/enums";
 
 export class RegistroDto {
   @IsString()
@@ -28,6 +28,6 @@ export class RegistroDto {
   senha!: string;
 
   @IsOptional()
-  @Equals(PapelConta.FUNCIONARIO)
+  @IsEnum(PapelConta)
   papel?: PapelConta;
 }

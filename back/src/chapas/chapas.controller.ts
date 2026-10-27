@@ -12,13 +12,15 @@ import {
   UploadedFile,
   UploadedFiles,
   UseGuards,
-  UseInterceptors
+  UseInterceptors,
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ChapasService } from './chapas.service';
 import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
+import { RolesGuard } from '../auth/guard/roles.guard';
 import type { FuncionarioAutenticado } from '../auth/strategies/jwt.strategy';
+import type { UsuarioAutenticado } from '../usuario/usuario.service';
 import { Papeis } from '../auth/decorators/roles.decorator';
 import { CreatChapas } from './dto/criar-chapas.dto';
 import { AutualizarStatus } from './dto/autera-status.dto';
@@ -28,37 +30,39 @@ import {
   CAMPO_IMAGEM,
   CAMPO_IMAGENS,
   MAX_IMAGENS,
-  opcoesUploadImagem
+  opcoesUploadImagem,
 } from '../common/upload-imagem.options';
 import type { ArquivoImagem } from '../common/upload-imagem.options';
- 
+
 @Controller('chapas')
 export class ChapasController {
   constructor(private readonly chapasservice: ChapasService) {}
- 
+
   @Papeis(Papel.Funcionario)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Post()
   criar(
     @Body() body: CreatChapas,
-    @Req() request: Request & { user: FuncionarioAutenticado }
+    @Req()
+    request: Request & {
+      user: FuncionarioAutenticado | UsuarioAutenticado;
+    },
   ) {
     return this.chapasservice.criarChapas(body, request.user);
   }
- 
+
   @Get()
   listar() {
     return this.chapasservice.listar();
   }
- 
- 
+
   @Get(':id/imagem')
   async imagem(@Param('id') id: string) {
     const midia = await this.chapasservice.buscarImagem(id);
- 
+
     return new StreamableFile(Buffer.from(midia.dados), {
       type: midia.formato,
-      disposition: `inline; filename="${encodeURIComponent(midia.nome)}"`
+      disposition: `inline; filename="${encodeURIComponent(midia.nome)}"`,
     });
   }
 
@@ -70,28 +74,28 @@ export class ChapasController {
   @Get(':id/imagens/:midiaId')
   async imagemPorId(
     @Param('id') id: string,
-    @Param('midiaId') midiaId: string
+    @Param('midiaId') midiaId: string,
   ) {
     const midia = await this.chapasservice.buscarImagemPorId(id, midiaId);
 
     return new StreamableFile(Buffer.from(midia.dados), {
       type: midia.formato,
-      disposition: `inline; filename="${encodeURIComponent(midia.nome)}"`
+      disposition: `inline; filename="${encodeURIComponent(midia.nome)}"`,
     });
   }
 
   @Papeis(Papel.Funcionario)
   @Post(':id/imagens')
   @UseInterceptors(
-    FilesInterceptor(CAMPO_IMAGENS, MAX_IMAGENS, opcoesUploadImagem)
+    FilesInterceptor(CAMPO_IMAGENS, MAX_IMAGENS, opcoesUploadImagem),
   )
   async enviarImagens(
     @Param('id') id: string,
-    @UploadedFiles() arquivos: ArquivoImagem[]
+    @UploadedFiles() arquivos: ArquivoImagem[],
   ) {
     if (!arquivos || arquivos.length === 0) {
       throw new BadRequestException(
-        `Nenhuma imagem foi enviada (campo "${CAMPO_IMAGENS}").`
+        `Nenhuma imagem foi enviada (campo "${CAMPO_IMAGENS}").`,
       );
     }
 
@@ -100,48 +104,45 @@ export class ChapasController {
 
   @Papeis(Papel.Funcionario)
   @Delete(':id/imagens/:midiaId')
-  excluirImagem(
-    @Param('id') id: string,
-    @Param('midiaId') midiaId: string
-  ) {
+  excluirImagem(@Param('id') id: string, @Param('midiaId') midiaId: string) {
     return this.chapasservice.excluirImagem(id, midiaId);
   }
- 
+
   @Get(':id')
   buscarPorId(@Param('id') id: string) {
     return this.chapasservice.buscarPorId(id);
   }
- 
+
   @Papeis(Papel.Funcionario)
   @Patch(':id')
   atualizar(@Param('id') id: string, @Body() body: AtualizarChapaDto) {
     return this.chapasservice.atualizarChapa(id, body);
   }
- 
+
   @Papeis(Papel.Financeiro)
   @Patch(':id/status')
   atualizarStatus(@Param('id') id: string, @Body() dto: AutualizarStatus) {
     return this.chapasservice.atualizarStatus(id, dto);
   }
- @Papeis(Papel.Funcionario)
+  @Papeis(Papel.Funcionario)
   @Delete(':id')
   excluir(@Param('id') id: string) {
     return this.chapasservice.excluirChapa(id);
   }
- 
+
   @Papeis(Papel.Funcionario)
   @Post(':id/imagem')
   @UseInterceptors(FileInterceptor(CAMPO_IMAGEM, opcoesUploadImagem))
   async enviarImagem(
     @Param('id') id: string,
-    @UploadedFile() arquivo: ArquivoImagem
+    @UploadedFile() arquivo: ArquivoImagem,
   ) {
     if (!arquivo) {
       throw new BadRequestException(
-        `Nenhuma imagem foi enviada (campo "${CAMPO_IMAGEM}").`
+        `Nenhuma imagem foi enviada (campo "${CAMPO_IMAGEM}").`,
       );
     }
- 
+
     return this.chapasservice.salvarImagem(id, arquivo);
   }
 }

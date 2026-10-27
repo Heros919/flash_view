@@ -16,17 +16,23 @@ import { AtualizarBlocoDto } from './dto/atualizar-bloco.dto';
 import type { ArquivoImagem } from '../common/upload-imagem.options';
 import { MAX_IMAGENS } from '../common/upload-imagem.options';
 import { erroAoGravarImagem } from '../common/erro-imagem';
-
+import { obterFuncionarioResponsavel } from '../common/funcionario-responsavel';
+import type { UsuarioAutenticado } from '../usuario/usuario.service';
 
 @Injectable()
 export class BlocosService {
-  constructor(private readonly prisma: PrismaService) { }
-
+  constructor(private readonly prisma: PrismaService) {}
 
   async criarBloco(
     dados: CreateBlocos,
-    funcionario: Pick<FuncionarioAutenticado, 'id' | 'cliente_id'>,
+    usuario: FuncionarioAutenticado | UsuarioAutenticado,
   ) {
+    const funcionario = await obterFuncionarioResponsavel(
+      this.prisma,
+      usuario,
+      dados.funcionarioId,
+    );
+
     try {
       return await this.prisma.bloco.create({
         data: {
@@ -58,7 +64,6 @@ export class BlocosService {
     }
   }
 
-
   async listas() {
     return this.prisma.bloco.findMany({
       orderBy: {
@@ -74,8 +79,6 @@ export class BlocosService {
     });
   }
 
-
-
   async buscarPorId(id: string) {
     const bloco = await this.prisma.bloco.findUnique({
       where: {
@@ -89,8 +92,6 @@ export class BlocosService {
 
     return bloco;
   }
-
-
 
   async atualizarBloco(id: string, dados: AtualizarBlocoDto) {
     const bloco = await this.prisma.bloco.findUnique({
@@ -136,7 +137,6 @@ export class BlocosService {
       throw e;
     }
   }
-
 
   async excluirBloco(id: string) {
     const bloco = await this.prisma.bloco.findUnique({
@@ -188,7 +188,6 @@ export class BlocosService {
       mensagem: 'Bloco excluído com sucesso',
     };
   }
-
 
   async listarImagens(id: string) {
     const bloco = await this.prisma.bloco.findUnique({
@@ -342,7 +341,6 @@ export class BlocosService {
     return midia;
   }
 
-
   async salvarImagem(id: string, arquivo: ArquivoImagem) {
     const bloco = await this.prisma.bloco.findUnique({
       where: {
@@ -353,7 +351,6 @@ export class BlocosService {
     if (!bloco) {
       throw new NotFoundException('Bloco não encontrado');
     }
-
 
     try {
       const [, midia] = await this.prisma.$transaction([

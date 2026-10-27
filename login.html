@@ -94,11 +94,11 @@
 
                 localStorage.setItem('token', resposta.access_token);
 
-                // O backend retorna "funcionario", não "usuario".
-                if (resposta.funcionario) {
+                const usuario = resposta.usuario || resposta.funcionario;
+                if (usuario) {
                     localStorage.setItem(
                         'usuario',
-                        JSON.stringify(resposta.funcionario)
+                        JSON.stringify(usuario)
                     );
                 }
 
