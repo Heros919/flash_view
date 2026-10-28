@@ -22,8 +22,8 @@
         <div class="col-md-6">
             <label for="funcionarioId" class="form-label">ID do Funcionário</label>
             <input type="text" class="form-control" id="funcionarioId" placeholder="ID do funcionário" required>
-            <div class="form-text">
-                Administrador: informe o ID do funcionário responsável pela chapa.
+            <div id="ajuda-funcionario" class="form-text">
+                Financeiro/Administrador: informe o ID do funcionário responsável pela chapa.
             </div>
         </div>
 
@@ -83,6 +83,13 @@
         const mensagem = document.getElementById('mensagem');
         const botaoSalvar = document.getElementById('btn-salvar');
         const selectBloco = document.getElementById('blocoId');
+        const contaLogada = JSON.parse(localStorage.getItem('usuario') || 'null');
+        if (contaLogada?.papel === 'FUNCIONARIO') {
+            document.getElementById('funcionarioId').value = contaLogada.id;
+            document.getElementById('funcionarioId').readOnly = true;
+            document.getElementById('ajuda-funcionario').textContent =
+                'ID do funcionário preenchido automaticamente pela sua conta.';
+        }
         const galeriaImagens = window.criarGaleriaImagens({
             recurso: 'chapas',
             input: document.getElementById('imagem'),

@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -100,7 +101,7 @@ export class UsuarioService {
         nome: dados.nome.trim(),
         email,
         senha_hash,
-        papel: PapelConta.FUNCIONARIO,
+        papel: dados.papel ?? PapelConta.FUNCIONARIO,
       },
     });
 
@@ -113,12 +114,49 @@ export class UsuarioService {
       nome?: string;
       email?: string;
       ativo?: boolean;
+      papel?:
+        | typeof PapelConta.ADMINISTRADOR
+        | typeof PapelConta.FINANCEIRO;
     },
+    administradorId?: number,
   ): Promise<UsuarioAutenticado> {
     const existente = await this.buscarPorId(id);
 
     if (!existente) {
       throw new NotFoundException('Usuário não encontrado.');
+    }
+
+    if (
+      id === administradorId &&
+      (dados.ativo === false ||
+        (dados.papel !== undefined &&
+          dados.papel !== PapelConta.ADMINISTRADOR))
+    ) {
+      throw new ForbiddenException(
+        'Não é possível desativar ou rebaixar a própria conta.',
+      );
+    }
+
+    const perdePapelAdministrador =
+      existente.papel === PapelConta.ADMINISTRADOR &&
+      existente.ativo &&
+      (dados.ativo === false ||
+        (dados.papel !== undefined &&
+          dados.papel !== PapelConta.ADMINISTRADOR));
+
+    if (perdePapelAdministrador) {
+      const administradoresAtivos = await this.prisma.usuario.count({
+        where: {
+          papel: PapelConta.ADMINISTRADOR,
+          ativo: true,
+        },
+      });
+
+      if (administradoresAtivos <= 1) {
+        throw new ConflictException(
+          'Não é possível remover o último administrador ativo.',
+        );
+      }
     }
 
     const email = dados.email?.trim().toLowerCase();
@@ -143,21 +181,52 @@ export class UsuarioService {
         ...(dados.ativo !== undefined && {
           ativo: dados.ativo,
         }),
+        ...(dados.papel !== undefined && {
+          papel: dados.papel,
+        }),
       },
     });
 
     return this.semSenha(usuario);
   }
 
-  async remover(id: number): Promise<UsuarioAutenticado> {
+  async remover(
+    id: number,
+    administradorId: number,
+  ): Promise<UsuarioAutenticado> {
+    if (id === administradorId) {
+      throw new ForbiddenException(
+        'Não é possível desativar a própria conta.',
+      );
+    }
+
     const existente = await this.buscarPorId(id);
 
     if (!existente) {
       throw new NotFoundException('Usuário não encontrado.');
     }
 
-    const usuario = await this.prisma.usuario.delete({
+    if (
+      existente.papel === PapelConta.ADMINISTRADOR &&
+      existente.ativo
+    ) {
+      const administradoresAtivos = await this.prisma.usuario.count({
+        where: {
+          papel: PapelConta.ADMINISTRADOR,
+          ativo: true,
+        },
+      });
+
+      if (administradoresAtivos <= 1) {
+        throw new ConflictException(
+          'Não é possível desativar o último administrador ativo.',
+        );
+      }
+    }
+
+    const usuario = await this.prisma.usuario.update({
       where: { id },
+      data: { ativo: false },
     });
 
     return this.semSenha(usuario);

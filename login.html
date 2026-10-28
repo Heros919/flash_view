@@ -41,6 +41,10 @@
 
             <footer class="footer">
                 <a href="cadastro-usuario.html">Não tem uma conta? Cadastre-se aqui</a>
+                <br>
+                <a href="bootstrap-admin.html">Cadastro do Administrador</a>
+                <br>
+                <a href="bootstrap-financeiro.html">Cadastro do Financeiro</a>
             </footer>
         </section>
     </main>
@@ -100,6 +104,7 @@
                         'usuario',
                         JSON.stringify(usuario)
                     );
+                    localStorage.setItem('usuarioId', String(usuario.id));
                 }
 
                 mostrarMensagem('Login realizado com sucesso!', 'sucesso');

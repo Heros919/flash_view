@@ -42,7 +42,7 @@ import type { ArquivoImagem } from '../common/upload-imagem.options';
 export class BlocosController {
   constructor(private readonly blocosService: BlocosService) {}
 
-  @Papeis(Papel.Funcionario)
+  @Papeis(Papel.Funcionario, Papel.Financeiro)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Post()
   criar(
@@ -88,7 +88,8 @@ export class BlocosController {
     });
   }
 
-  @Papeis(Papel.Funcionario)
+  @Papeis(Papel.Funcionario, Papel.Financeiro)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Post(':id/imagens')
   @UseInterceptors(
     FilesInterceptor(CAMPO_IMAGENS, MAX_IMAGENS, opcoesUploadImagem),
@@ -106,7 +107,8 @@ export class BlocosController {
     return this.blocosService.adicionarImagens(id, arquivos);
   }
 
-  @Papeis(Papel.Funcionario)
+  @Papeis(Papel.Funcionario, Papel.Financeiro)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Delete(':id/imagens/:midiaId')
   excluirImagem(@Param('id') id: string, @Param('midiaId') midiaId: string) {
     return this.blocosService.excluirImagem(id, midiaId);
@@ -117,19 +119,22 @@ export class BlocosController {
     return this.blocosService.buscarPorId(id);
   }
 
-  @Papeis(Papel.Funcionario)
+  @Papeis(Papel.Funcionario, Papel.Financeiro)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Patch(':id')
   atualizar(@Param('id') id: string, @Body() body: AtualizarBlocoDto) {
     return this.blocosService.atualizarBloco(id, body);
   }
 
-  @Papeis(Papel.Funcionario)
+  @Papeis(Papel.Funcionario, Papel.Financeiro)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Delete(':id')
   excluir(@Param('id') id: string) {
     return this.blocosService.excluirBloco(id);
   }
 
-  @Papeis(Papel.Funcionario)
+  @Papeis(Papel.Funcionario, Papel.Financeiro)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Post(':id/imagem')
   @UseInterceptors(FileInterceptor(CAMPO_IMAGEM, opcoesUploadImagem))
   async enviarImagem(

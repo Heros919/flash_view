@@ -1,6 +1,5 @@
 import {
   BadRequestException,
-  ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
 import { PapelConta } from '../generated/prisma/enums';
@@ -96,7 +95,12 @@ describe('obterFuncionarioResponsavel', () => {
     ).rejects.toBeInstanceOf(NotFoundException);
   });
 
-  it('does not allow financial accounts to register products', async () => {
+  it('resolves the selected employee for financial registrations', async () => {
+    funcionarioFindUnique.mockResolvedValue({
+      id: 'funcionario-3',
+      cliente_id: 9,
+    });
+
     await expect(
       obterFuncionarioResponsavel(
         prisma,
@@ -108,9 +112,14 @@ describe('obterFuncionarioResponsavel', () => {
           ativo: true,
           papel: PapelConta.FINANCEIRO,
         },
-        'funcionario-1',
+        'funcionario-3',
       ),
-    ).rejects.toBeInstanceOf(ForbiddenException);
-    expect(funcionarioFindUnique).not.toHaveBeenCalled();
+    ).resolves.toEqual({
+      id: 'funcionario-3',
+      cliente_id: 9,
+    });
+    expect(funcionarioFindUnique).toHaveBeenCalledWith({
+      where: { id: 'funcionario-3' },
+    });
   });
 });

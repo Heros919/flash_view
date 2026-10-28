@@ -8,6 +8,7 @@ import { ChapasModule } from './chapas/chapas.module';
 import { UsuarioModule } from './usuario/usuario.module';
 import { ClienteModule } from './Cliente/cliente.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { VendasModule } from './vendas/vendas.module';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { PrismaModule } from './prisma/prisma.module';
     UsuarioModule,
     BlocosModule,
     ChapasModule,
-    ClienteModule
+    ClienteModule,
+    VendasModule,
   ],
   controllers: [AppController],
   providers: [AppService]

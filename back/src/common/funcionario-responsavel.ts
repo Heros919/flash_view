@@ -27,9 +27,12 @@ export async function obterFuncionarioResponsavel(
     };
   }
 
-  if (usuario.papel !== 'ADMINISTRADOR') {
+  if (
+    usuario.papel !== 'ADMINISTRADOR' &&
+    usuario.papel !== 'FINANCEIRO'
+  ) {
     throw new ForbiddenException(
-      'Somente funcionários ou administradores podem cadastrar produtos.',
+      'Somente funcionários, financeiro ou administradores podem cadastrar produtos.',
     );
   }
 

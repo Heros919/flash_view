@@ -3,6 +3,7 @@ generator client {
   output       = "../generated/prisma"
   moduleFormat = "cjs"
 }
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -10,7 +11,7 @@ datasource db {
 
 enum PapelConta {
   FUNCIONARIO
- ADMINISTRADOR
+  ADMINISTRADOR
   FINANCEIRO
 }
 
@@ -23,6 +24,7 @@ model usuario {
   ativo        Boolean    @default(true)
   papel        PapelConta @default(FUNCIONARIO)
   datacadastro DateTime   @default(now()) @db.Timestamp(6)
+  venda        venda[]
 }
 
 model admin {
@@ -124,13 +126,12 @@ model funcionario {
   admin      admin   @relation(fields: [admin_id], references: [id], map: "fk_funcionario_admin")
   cliente    cliente @relation(fields: [cliente_id], references: [id], map: "fk_funcionario_cliente")
   venda      venda[]
-  cpf    String? @unique @db.VarChar(11)
+  cpf        String? @unique @db.VarChar(11)
 
   @@unique([cliente_id, id], map: "uq_funcionario_cliente_id")
   @@index([admin_id], map: "idx_funcionario_admin_id")
   @@index([cliente_id], map: "idx_funcionario_cliente_id")
 }
-
 
 model midia {
   id           String   @id @db.VarChar(100)
@@ -144,7 +145,6 @@ model midia {
   bloco        bloco?   @relation(fields: [blocoid], references: [id], onDelete: Cascade, map: "fk_midia_bloco")
   chapa        chapa?   @relation(fields: [chapaid], references: [id], onDelete: Cascade, map: "fk_midia_chapa")
 }
-
 
 model produto_servico {
   id           Int          @id @default(autoincrement())
@@ -170,25 +170,26 @@ model tipo_produto {
   produto_servico produto_servico[]
 }
 
-
 model venda {
   id             Int          @id @default(autoincrement())
   cliente_id     Int
-  funcionario_id String       @db.VarChar(100)
+  funcionario_id String?      @db.VarChar(100)
+  usuario_id     Int?
   datavenda      DateTime     @default(now()) @db.Timestamp(6)
   status         String       @default("ABERTA") @db.VarChar(10)
   total          Decimal      @default(0) @db.Decimal(12, 2)
   cliente        cliente      @relation(fields: [cliente_id], references: [id], map: "fk_venda_cliente")
-  funcionario    funcionario  @relation(fields: [cliente_id, funcionario_id], references: [cliente_id, id], map: "fk_venda_funcionario_cliente")
+  funcionario    funcionario? @relation(fields: [funcionario_id], references: [id], map: "fk_venda_funcionario")
+  usuario        usuario?     @relation(fields: [usuario_id], references: [id], map: "fk_venda_usuario")
   venda_item     venda_item[]
 
   @@unique([cliente_id, id], map: "uq_venda_cliente_id")
+  @@index([usuario_id], map: "idx_venda_usuario_id")
   @@index([cliente_id], map: "idx_venda_cliente_id")
   @@index([datavenda], map: "idx_venda_data")
   @@index([funcionario_id], map: "idx_venda_funcionario_id")
   @@index([status], map: "idx_venda_status")
 }
-
 
 model venda_item {
   id                 Int             @id @default(autoincrement())

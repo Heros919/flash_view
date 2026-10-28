@@ -9,6 +9,7 @@ import {
 import { AuthService } from './auth.service';
 import { RegistroDto } from './dto/registro.dto';
 import { LoginDto } from './dto/login.dto';
+import { BootstrapContaDto } from './dto/bootstrap-conta.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -19,6 +20,16 @@ export class AuthController {
   @Post('registrar')
   registrar(@Body() dto: RegistroDto) {
     return this.authService.registrar(dto);
+  }
+
+  @Post('bootstrap-admin')
+  bootstrapAdmin(@Body() dto: BootstrapContaDto) {
+    return this.authService.bootstrapAdministrador(dto, dto.chave);
+  }
+
+  @Post('bootstrap-financeiro')
+  bootstrapFinanceiro(@Body() dto: BootstrapContaDto) {
+    return this.authService.bootstrapFinanceiro(dto, dto.chave);
   }
 
   @Post('login')

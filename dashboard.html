@@ -49,6 +49,10 @@
                         Cadastrar Chapa
                     </a>
 
+                    <a href="gestao.html" id="link-gestao" class="btn btn-outline-light text-start d-none">
+                        Gestão Financeira/Usuários
+                    </a>
+
                 </nav>
 
             </div>
@@ -58,6 +62,7 @@
                 <div id="nome-usuario" class="fw-semibold text-light mb-2">
                     Usuário
                 </div>
+                <div id="id-usuario" class="small text-white-50 mb-2"></div>
 
                 <button id="btn-sair" type="button" class="btn btn-danger w-100">
                     Sair
@@ -731,6 +736,18 @@
                     nomeSalvo ||
                     'Usuário';
 
+                    if (usuario.id !== undefined) {
+                        document.getElementById('id-usuario').textContent =
+                            `ID: ${usuario.id}`;
+                    }
+
+                    if (
+                        usuario.papel === 'ADMINISTRADOR' ||
+                        usuario.papel === 'FINANCEIRO'
+                    ) {
+                        document.getElementById('link-gestao').classList.remove('d-none');
+                    }
+
             } else {
 
                 nomeUsuario.textContent =
@@ -756,6 +773,7 @@
 
                     localStorage.removeItem('token');
                     localStorage.removeItem('usuario');
+                    localStorage.removeItem('usuarioId');
                     localStorage.removeItem('usuarioNome');
 
                     window.location.href =

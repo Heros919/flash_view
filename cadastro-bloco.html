@@ -40,8 +40,8 @@
 
             <input type="text" class="form-control" id="funcionarioId" placeholder="ID do funcionário" required>
 
-            <div class="form-text">
-                Funcionário: informe seu ID. Administrador: informe o ID do funcionário responsável pelo bloco.
+            <div id="ajuda-funcionario" class="form-text">
+                Funcionário: ID preenchido pelo login. Financeiro/Administrador: informe o ID do funcionário responsável pelo bloco.
             </div>
 
         </div>
@@ -270,6 +270,13 @@
         const formulario = document.getElementById('form-bloco');
         const mensagem = document.getElementById('mensagem');
         const botaoSalvar = document.getElementById('btn-salvar');
+        const contaLogada = JSON.parse(localStorage.getItem('usuario') || 'null');
+        if (contaLogada?.papel === 'FUNCIONARIO') {
+            document.getElementById('funcionarioId').value = contaLogada.id;
+            document.getElementById('funcionarioId').readOnly = true;
+            document.getElementById('ajuda-funcionario').textContent =
+                'ID do funcionário preenchido automaticamente pela sua conta.';
+        }
         const galeriaImagens = window.criarGaleriaImagens({
             recurso: 'blocos',
             input: document.getElementById('imagem'),

@@ -1,12 +1,14 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
+  ServiceUnavailableException,
   UnauthorizedException,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from "bcrypt";
-import { randomUUID } from "node:crypto";
+import { randomUUID, timingSafeEqual } from "node:crypto";
 
 import { PrismaService } from "../prisma/prisma.service";
 import { PapelConta } from "../generated/prisma/enums";
@@ -21,10 +23,17 @@ export class AuthService {
   ) {}
 
   async registrar(dto: RegistroDto) {
+    const papel = dto.papel ?? PapelConta.FUNCIONARIO;
+
+    if (papel !== PapelConta.FUNCIONARIO) {
+      throw new ForbiddenException(
+        "Somente um administrador pode criar contas Financeiro ou Administrador.",
+      );
+    }
+
     const cpf = dto.cpf.replace(/\D/g, "");
     const nome = dto.nome.trim();
     const email = dto.email.trim().toLowerCase();
-    const papel = dto.papel ?? PapelConta.FUNCIONARIO;
 
     if (!/^\d{11}$/.test(cpf)) {
       throw new ConflictException("O CPF deve conter 11 números.");
@@ -51,23 +60,6 @@ export class AuthService {
     }
 
     const senhaHash = await bcrypt.hash(dto.senha, 10);
-
-    if (papel !== PapelConta.FUNCIONARIO) {
-      const usuario = await this.prisma.usuario.create({
-        data: {
-          cpf,
-          nome,
-          email,
-          senha_hash: senhaHash,
-          papel,
-        },
-      });
-
-      return {
-        mensagem: "Usuário cadastrado com sucesso.",
-        usuario: this.dadosPublicosUsuario(usuario),
-      };
-    }
 
     const [cliente, admin] = await Promise.all([
       this.prisma.cliente.findFirst({
@@ -99,6 +91,113 @@ export class AuthService {
     return {
       mensagem: "Funcionário cadastrado com sucesso.",
       funcionario: this.dadosPublicos(funcionario),
+    };
+  }
+
+  async bootstrapAdministrador(dto: RegistroDto, chave: string) {
+    return this.bootstrapContaPrivilegiada(
+      dto,
+      chave,
+      PapelConta.ADMINISTRADOR,
+    );
+  }
+
+  async bootstrapFinanceiro(dto: RegistroDto, chave: string) {
+    return this.bootstrapContaPrivilegiada(
+      dto,
+      chave,
+      PapelConta.FINANCEIRO,
+    );
+  }
+
+  private async bootstrapContaPrivilegiada(
+    dto: RegistroDto,
+    chave: string,
+    papel:
+      | typeof PapelConta.ADMINISTRADOR
+      | typeof PapelConta.FINANCEIRO,
+  ) {
+    const chaveConfigurada = process.env.ADMIN_BOOTSTRAP_KEY?.trim();
+    if (!chaveConfigurada) {
+      throw new ServiceUnavailableException(
+        "ADMIN_BOOTSTRAP_KEY não foi configurada.",
+      );
+    }
+
+    const chaveRecebida = Buffer.from(chave.trim());
+    const chaveEsperada = Buffer.from(chaveConfigurada);
+    if (
+      chaveRecebida.length !== chaveEsperada.length ||
+      !timingSafeEqual(chaveRecebida, chaveEsperada)
+    ) {
+      throw new UnauthorizedException("Chave de configuração inválida.");
+    }
+
+    const contaExistente = await this.prisma.usuario.findFirst({
+      where: { papel, ativo: true },
+      orderBy: { id: "asc" },
+    });
+
+    const cpf = dto.cpf.replace(/\D/g, "");
+    const nome = dto.nome.trim();
+    const email = dto.email.trim().toLowerCase();
+
+    if (!/^\d{11}$/.test(cpf)) {
+      throw new ConflictException("O CPF deve conter 11 números.");
+    }
+
+    const [
+      funcionarioComEmail,
+      funcionarioComCpf,
+      usuarioComEmail,
+      usuarioComCpf,
+    ] = await Promise.all([
+      this.prisma.funcionario.findFirst({ where: { email } }),
+      this.prisma.funcionario.findFirst({ where: { cpf } }),
+      this.prisma.usuario.findFirst({ where: { email } }),
+      this.prisma.usuario.findFirst({ where: { cpf } }),
+    ]);
+
+    if (funcionarioComEmail || funcionarioComCpf) {
+      throw new ConflictException(
+        funcionarioComEmail
+          ? "Já existe uma conta com este e-mail."
+          : "Já existe uma conta com este CPF.",
+      );
+    }
+
+    if (
+      (usuarioComEmail && usuarioComEmail.id !== contaExistente?.id) ||
+      (usuarioComCpf && usuarioComCpf.id !== contaExistente?.id)
+    ) {
+      throw new ConflictException(
+        usuarioComEmail && usuarioComEmail.id !== contaExistente?.id
+          ? "Já existe uma conta com este e-mail."
+          : "Já existe uma conta com este CPF.",
+      );
+    }
+
+    const data = {
+      cpf,
+      nome,
+      email,
+      senha_hash: await bcrypt.hash(dto.senha, 10),
+      papel,
+      ativo: true,
+    };
+    const usuario = contaExistente
+      ? await this.prisma.usuario.update({
+          where: { id: contaExistente.id },
+          data,
+        })
+      : await this.prisma.usuario.create({ data });
+
+    return {
+      mensagem:
+        papel === PapelConta.ADMINISTRADOR
+          ? "Acesso do Administrador configurado com sucesso."
+          : "Acesso do Financeiro configurado com sucesso.",
+      usuario: this.dadosPublicosUsuario(usuario),
     };
   }
 
@@ -193,6 +292,7 @@ export class AuthService {
       email: funcionario.email,
       cliente_id: funcionario.cliente_id,
       admin_id: funcionario.admin_id,
+      papel: PapelConta.FUNCIONARIO,
     };
   }
 

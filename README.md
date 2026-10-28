@@ -203,17 +203,15 @@ CH-000891    Chapa      04/09/2026
 
 ### 1. Autenticação
 
-```jsx
-POST   /auth/register
-POST   /auth/login
-GET    /auth/me
-POST   /auth/forgot-password
-POST   /auth/reset-password
+```text
+POST /auth/registrar
+POST /auth/login
+POST /auth/bootstrap-admin
 ```
 
 ### 2. Blocos
 
-```jsx
+```text
 POST   /blocos
 GET    /blocos
 GET    /blocos/:id
@@ -233,7 +231,7 @@ GET /blocos/:id/chapas
 
 ### 3. Chapas
 
-```jsx
+```text
 POST   /chapas
 GET    /chapas
 GET    /chapas/:id
@@ -243,15 +241,30 @@ DELETE /chapas/:id
 
 ### 4. Usuários
 
-```jsx
+```text
 GET    /usuarios
-GET    /usuarios/:cpf
 POST   /usuarios
-PATCH  /usuarios/:cpf
-DELETE /usuarios/:cpf
+PATCH  /usuarios/:id
+DELETE /usuarios/:id
+POST   /auth/bootstrap-admin
+POST   /auth/bootstrap-financeiro
 ```
 
-### 5. Dashboard
+### 5. Clientes, produtos e pedidos
+
+```text
+GET    /cliente
+POST   /cliente
+GET    /tipos-produto
+POST   /tipos-produto
+GET    /produtos
+POST   /produtos
+GET    /vendas
+POST   /vendas
+PATCH  /vendas/:id/status
+```
+
+### 6. Dashboard
 
 ```jsx
 GET /dashboard/resumo
@@ -271,6 +284,44 @@ GET /dashboard/estatisticas
 }
 ```
 
+
+## Funcionário
+
+Se trata do principal usuário do sistema, onde ele cria a conta e pode cadastrar, editar e excluir blocos e chapas
+
+Ao criar uma conta, cada funcionário ganha um ID próprio. Esse ID é retornado no login e mostrado no dashboard; os formulários de bloco e chapa o preenchem automaticamente. O backend usa o funcionário autenticado como responsável pelo cadastro.
+
+
+## Financeiro e Administrador
+
+Com a ajuda de noss orientador, adicionamos a opção do usuário ter essas duas novas opções.
+
+O Financeiro herda os mesmos direitos de cadastro de blocos e chapas. Para esses cadastros, informa o ID do funcionário responsável. Também pode cadastrar clientes, tipos e produtos/serviços e registrar pedidos, que ficam vinculados à sua conta.
+
+O Administrador pode criar, listar, atualizar, ativar/desativar contas Financeiro e Administrador. A exclusão desativa a conta para preservar o histórico dos pedidos; não é permitido desativar a própria conta nem o último Administrador ativo.
+
+### Endpoints de gestão
+
+Os endpoints de gestão exigem autenticação por token. Os endpoints de clientes, catálogo e pedidos são destinados ao Financeiro e ao Administrador; a gestão de contas é exclusiva do Administrador.
+
+```text
+GET    /cliente
+POST   /cliente
+GET    /tipos-produto
+POST   /tipos-produto
+GET    /produtos
+POST   /produtos
+GET    /vendas
+POST   /vendas
+PATCH  /vendas/:id/status
+GET    /usuarios
+POST   /usuarios
+PATCH  /usuarios/:id
+DELETE /usuarios/:id
+POST   /auth/bootstrap-admin
+```
+
+O cadastro público cria apenas Funcionários. O acesso do Administrador é configurado separadamente em `/bootstrap-admin.html`, e o acesso Financeiro em `/bootstrap-financeiro.html`. Ambas as páginas usam a `ADMIN_BOOTSTRAP_KEY` configurada no `.env`; a tela do Administrador atualiza a conta ativa existente ou cria uma se ainda não existir, enquanto a tela Financeiro cria ou atualiza a conta Financeiro. Depois de confirmar os acessos, remova a chave do `.env` e reinicie o backend. A partir daí, o Administrador pode gerenciar outras contas na área de gestão.
  
 
 ## Estrutura do Projeto NestJS

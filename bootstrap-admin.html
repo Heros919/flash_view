@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash View - Configurar acessos</title>
+    <link rel="stylesheet" href="./css/cadastroUsuario.css">
+    <link rel="icon" href="assets/logo.ico" type="image/x-icon">
+</head>
+<body>
+    <main class="cadastro">
+        <header class="cabecalho">
+            <h1>Flash View</h1>
+            <h2>Cadastro do Administrador</h2>
+            <p>Informe os dados para criar ou atualizar o acesso do Administrador.</p>
+        </header>
+
+        <form id="form-admin" class="formulario">
+            <h3>Administrador</h3>
+            <div class="campo">
+                <label for="admin-cpf">CPF (11 números)</label>
+                <input id="admin-cpf" inputmode="numeric" maxlength="11" pattern="[0-9]{11}" required>
+            </div>
+            <div class="campo">
+                <label for="admin-nome">Nome</label>
+                <input id="admin-nome" maxlength="150" required>
+            </div>
+            <div class="campo">
+                <label for="admin-email">E-mail para entrar</label>
+                <input id="admin-email" type="email" maxlength="255" autocomplete="email" required>
+            </div>
+            <div class="campo">
+                <label for="admin-senha">Senha (mínimo 8 caracteres)</label>
+                <input id="admin-senha" type="password" minlength="8" autocomplete="new-password" required>
+            </div>
+            <div class="campo">
+                <label for="admin-chave">Chave de configuração do servidor</label>
+                <input id="admin-chave" type="password" minlength="32" autocomplete="off" required>
+            </div>
+            <button type="submit" id="admin-botao">Salvar acesso do Administrador</button>
+        </form>
+
+        <p id="mensagem" class="mensagem" role="status" aria-live="polite"></p>
+        <p class="rodape">
+            <a href="bootstrap-financeiro.html">Ir para cadastro do Financeiro</a>
+            <br>
+            <a href="login.html">Voltar ao login</a>
+        </p>
+    </main>
+    <script>
+        const mensagem = document.getElementById('mensagem');
+
+        function configurarFormulario(formId, prefixo, endpoint, rotuloBotao) {
+            const form = document.getElementById(formId);
+            const botao = document.getElementById(`${prefixo}-botao`);
+            form.addEventListener('submit', async event => {
+                event.preventDefault();
+                mensagem.textContent = '';
+                mensagem.className = 'mensagem';
+                botao.disabled = true;
+                botao.textContent = 'Salvando...';
+                try {
+                    const resposta = await fetch(`http://localhost:3000/auth/${endpoint}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            cpf: document.getElementById(`${prefixo}-cpf`).value,
+                            nome: document.getElementById(`${prefixo}-nome`).value.trim(),
+                            email: document.getElementById(`${prefixo}-email`).value.trim().toLowerCase(),
+                            senha: document.getElementById(`${prefixo}-senha`).value,
+                            chave: document.getElementById(`${prefixo}-chave`).value
+                        })
+                    });
+                    const dados = await resposta.json().catch(() => ({}));
+                    if (!resposta.ok) {
+                        const detalhe = Array.isArray(dados.message)
+                            ? dados.message.join(' ')
+                            : dados.message;
+                        throw new Error(detalhe || dados.mensagem || `Erro HTTP ${resposta.status}`);
+                    }
+                    mensagem.textContent = `${dados.mensagem} Agora você pode entrar com o e-mail e senha informados.`;
+                    mensagem.className = 'mensagem sucesso';
+                    form.reset();
+                } catch (erro) {
+                    mensagem.textContent = erro.message || 'Não foi possível salvar o acesso.';
+                    mensagem.className = 'mensagem erro';
+                } finally {
+                    botao.disabled = false;
+                    botao.textContent = rotuloBotao;
+                }
+            });
+        }
+
+        configurarFormulario('form-admin', 'admin', 'bootstrap-admin', 'Salvar acesso do Administrador');
+    </script>
+</body>
+</html>

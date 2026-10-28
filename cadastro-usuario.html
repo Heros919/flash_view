@@ -43,15 +43,6 @@
                     autocomplete="new-password" required>
             </div>
 
-            <div class="campo">
-                <label for="papel">Tipo de conta</label>
-                <select id="papel" name="papel" required>
-                    <option value="FUNCIONARIO" selected>Funcionário</option>
-                    <option value="ADMINISTRADOR">Administrador</option>
-                    <option value="FINANCEIRO">Financeiro</option>
-                </select>
-            </div>
-
             <p id="mensagem" class="mensagem" role="status" aria-live="polite"></p>
 
             <button type="submit" id="btnCadastrar">
@@ -61,6 +52,11 @@
             <p class="rodape">
                 Já tem uma conta?
                 <a href="login.html">Faça seu login</a>
+                <br>
+                Cadastros de acesso especiais:
+                <a href="bootstrap-admin.html">Administrador</a>
+                |
+                <a href="bootstrap-financeiro.html">Financeiro</a>
             </p>
         </form>
     </main>
@@ -108,7 +104,6 @@
             const nome = document.getElementById('nome').value.trim();
             const email = document.getElementById('email').value.trim().toLowerCase();
             const senha = senhaInput.value;
-            const papel = document.getElementById('papel').value;
 
             if (cpf.length !== 11) {
                 mostrarMensagem('Informe um CPF com 11 números.', 'erro');
@@ -125,7 +120,7 @@
                 return;
             }
 
-            const novoUsuario = { cpf, nome, email, senha, papel };
+            const novoUsuario = { cpf, nome, email, senha };
 
             botao.disabled = true;
             botao.textContent = 'Cadastrando...';

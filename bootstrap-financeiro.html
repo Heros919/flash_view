@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash View - Cadastro Financeiro</title>
+    <link rel="stylesheet" href="./css/cadastroUsuario.css">
+    <link rel="icon" href="assets/logo.ico" type="image/x-icon">
+</head>
+<body>
+    <main class="cadastro">
+        <header class="cabecalho">
+            <h1>Flash View</h1>
+            <h2>Cadastro do Financeiro</h2>
+            <p>Informe os dados para criar ou atualizar o acesso da conta Financeiro.</p>
+        </header>
+
+        <form id="form-financeiro" class="formulario">
+            <div class="campo">
+                <label for="financeiro-cpf">CPF (11 números)</label>
+                <input id="financeiro-cpf" inputmode="numeric" maxlength="11" pattern="[0-9]{11}" required>
+            </div>
+            <div class="campo">
+                <label for="financeiro-nome">Nome</label>
+                <input id="financeiro-nome" maxlength="150" required>
+            </div>
+            <div class="campo">
+                <label for="financeiro-email">E-mail para entrar</label>
+                <input id="financeiro-email" type="email" maxlength="255" autocomplete="email" required>
+            </div>
+            <div class="campo">
+                <label for="financeiro-senha">Senha (mínimo 8 caracteres)</label>
+                <input id="financeiro-senha" type="password" minlength="8" autocomplete="new-password" required>
+            </div>
+            <div class="campo">
+                <label for="financeiro-chave">Chave de configuração do servidor</label>
+                <input id="financeiro-chave" type="password" minlength="32" autocomplete="off" required>
+            </div>
+            <button type="submit" id="financeiro-botao">Salvar acesso do Financeiro</button>
+        </form>
+
+        <p id="mensagem" class="mensagem" role="status" aria-live="polite"></p>
+        <p class="rodape">
+            <a href="bootstrap-admin.html">Ir para cadastro do Administrador</a>
+            <br>
+            <a href="login.html">Voltar ao login</a>
+        </p>
+    </main>
+    <script>
+        const form = document.getElementById('form-financeiro');
+        const mensagem = document.getElementById('mensagem');
+        const botao = document.getElementById('financeiro-botao');
+
+        form.addEventListener('submit', async event => {
+            event.preventDefault();
+            mensagem.textContent = '';
+            mensagem.className = 'mensagem';
+            botao.disabled = true;
+            botao.textContent = 'Salvando...';
+            try {
+                const resposta = await fetch('http://localhost:3000/auth/bootstrap-financeiro', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        cpf: document.getElementById('financeiro-cpf').value,
+                        nome: document.getElementById('financeiro-nome').value.trim(),
+                        email: document.getElementById('financeiro-email').value.trim().toLowerCase(),
+                        senha: document.getElementById('financeiro-senha').value,
+                        chave: document.getElementById('financeiro-chave').value
+                    })
+                });
+                const dados = await resposta.json().catch(() => ({}));
+                if (!resposta.ok) {
+                    const detalhe = Array.isArray(dados.message)
+                        ? dados.message.join(' ')
+                        : dados.message;
+                    throw new Error(detalhe || dados.mensagem || `Erro HTTP ${resposta.status}`);
+                }
+                mensagem.textContent = `${dados.mensagem} Agora você pode entrar com o e-mail e senha informados.`;
+                mensagem.className = 'mensagem sucesso';
+                form.reset();
+            } catch (erro) {
+                mensagem.textContent = erro.message || 'Não foi possível salvar o acesso.';
+                mensagem.className = 'mensagem erro';
+            } finally {
+                botao.disabled = false;
+                botao.textContent = 'Salvar acesso do Financeiro';
+            }
+        });
+    </script>
+</body>
+</html>

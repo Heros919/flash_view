@@ -38,7 +38,7 @@ import type { ArquivoImagem } from '../common/upload-imagem.options';
 export class ChapasController {
   constructor(private readonly chapasservice: ChapasService) {}
 
-  @Papeis(Papel.Funcionario)
+  @Papeis(Papel.Funcionario, Papel.Financeiro)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Post()
   criar(
@@ -84,7 +84,8 @@ export class ChapasController {
     });
   }
 
-  @Papeis(Papel.Funcionario)
+  @Papeis(Papel.Funcionario, Papel.Financeiro)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Post(':id/imagens')
   @UseInterceptors(
     FilesInterceptor(CAMPO_IMAGENS, MAX_IMAGENS, opcoesUploadImagem),
@@ -102,7 +103,8 @@ export class ChapasController {
     return this.chapasservice.adicionarImagens(id, arquivos);
   }
 
-  @Papeis(Papel.Funcionario)
+  @Papeis(Papel.Funcionario, Papel.Financeiro)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Delete(':id/imagens/:midiaId')
   excluirImagem(@Param('id') id: string, @Param('midiaId') midiaId: string) {
     return this.chapasservice.excluirImagem(id, midiaId);
@@ -113,24 +115,28 @@ export class ChapasController {
     return this.chapasservice.buscarPorId(id);
   }
 
-  @Papeis(Papel.Funcionario)
+  @Papeis(Papel.Funcionario, Papel.Financeiro)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Patch(':id')
   atualizar(@Param('id') id: string, @Body() body: AtualizarChapaDto) {
     return this.chapasservice.atualizarChapa(id, body);
   }
 
   @Papeis(Papel.Financeiro)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Patch(':id/status')
   atualizarStatus(@Param('id') id: string, @Body() dto: AutualizarStatus) {
     return this.chapasservice.atualizarStatus(id, dto);
   }
-  @Papeis(Papel.Funcionario)
+  @Papeis(Papel.Funcionario, Papel.Financeiro)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Delete(':id')
   excluir(@Param('id') id: string) {
     return this.chapasservice.excluirChapa(id);
   }
 
-  @Papeis(Papel.Funcionario)
+  @Papeis(Papel.Funcionario, Papel.Financeiro)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Post(':id/imagem')
   @UseInterceptors(FileInterceptor(CAMPO_IMAGEM, opcoesUploadImagem))
   async enviarImagem(

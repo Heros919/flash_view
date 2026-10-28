@@ -31,6 +31,7 @@ async function api(endpoint, options = {}) {
         if (response.status === 401 && endpoint !== '/auth/login') {
             localStorage.removeItem('token');
             localStorage.removeItem('usuario');
+            localStorage.removeItem('usuarioId');
             window.location.href = 'login.html';
         }
 

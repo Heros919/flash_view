@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash View - Gestão</title>
+    <link rel="icon" href="assets/logo.ico" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <main class="container py-4">
+        <header class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+            <div>
+                <a href="dashboard.html" class="text-decoration-none">&larr; Dashboard</a>
+                <h1 class="h2 mt-2 mb-1">Área de gestão</h1>
+                <p id="papel-atual" class="text-secondary mb-0"></p>
+            </div>
+            <button id="sair" class="btn btn-outline-danger" type="button">Sair</button>
+        </header>
+
+        <div id="mensagem" class="alert d-none" role="status" aria-live="polite"></div>
+
+        <section id="area-financeiro" class="d-none">
+            <h2 class="h4">Clientes</h2>
+            <form id="form-cliente" class="card card-body mb-4">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label" for="cliente-nome">Nome</label>
+                        <input class="form-control" id="cliente-nome" maxlength="100" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" for="cliente-cpf">CPF (11 dígitos)</label>
+                        <input class="form-control" id="cliente-cpf" inputmode="numeric" pattern="[0-9]{11}" maxlength="11" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" for="cliente-telefone">Telefone</label>
+                        <input class="form-control" id="cliente-telefone" maxlength="20" required>
+                    </div>
+                </div>
+                <button class="btn btn-primary align-self-start mt-3" type="submit">Cadastrar cliente</button>
+            </form>
+
+            <div class="table-responsive mb-5">
+                <table class="table table-striped">
+                    <thead><tr><th>Nome</th><th>CPF</th><th>Telefone</th><th>ID</th></tr></thead>
+                    <tbody id="clientes-lista"></tbody>
+                </table>
+            </div>
+
+            <h2 class="h4">Produtos e serviços</h2>
+            <form id="form-tipo" class="card card-body mb-3">
+                <label class="form-label" for="tipo-nome">Novo tipo de produto/serviço</label>
+                <div class="d-flex gap-2">
+                    <input class="form-control" id="tipo-nome" maxlength="50" required>
+                    <button class="btn btn-outline-primary flex-shrink-0" type="submit">Adicionar tipo</button>
+                </div>
+            </form>
+
+            <form id="form-produto" class="card card-body mb-4">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label" for="produto-cliente">Cliente</label>
+                        <select class="form-select" id="produto-cliente" required></select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label" for="produto-tipo">Tipo</label>
+                        <select class="form-select" id="produto-tipo" required></select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label" for="produto-nome">Nome</label>
+                        <input class="form-control" id="produto-nome" maxlength="150" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label" for="produto-preco">Preço</label>
+                        <input class="form-control" id="produto-preco" type="number" min="0.01" step="0.01" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" for="produto-descricao">Descrição (opcional)</label>
+                        <input class="form-control" id="produto-descricao">
+                    </div>
+                </div>
+                <button class="btn btn-primary align-self-start mt-3" type="submit">Cadastrar produto/serviço</button>
+            </form>
+            <div class="table-responsive mb-5">
+                <table class="table table-striped">
+                    <thead><tr><th>Produto/serviço</th><th>Tipo</th><th>Cliente</th><th>Preço</th></tr></thead>
+                    <tbody id="produtos-lista"></tbody>
+                </table>
+            </div>
+
+            <h2 class="h4">Pedidos</h2>
+            <form id="form-pedido" class="card card-body mb-4">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label" for="pedido-cliente">Cliente</label>
+                        <select class="form-select" id="pedido-cliente" required></select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" for="pedido-produto">Produto/serviço</label>
+                        <select class="form-select" id="pedido-produto" required></select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" for="pedido-quantidade">Quantidade</label>
+                        <input class="form-control" id="pedido-quantidade" type="number" min="0.001" step="0.001" value="1" required>
+                    </div>
+                </div>
+                <button class="btn btn-success align-self-start mt-3" type="submit">Registrar pedido</button>
+            </form>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead><tr><th>Pedido</th><th>Data</th><th>Cliente</th><th>Itens</th><th>Total</th><th>Status</th><th></th></tr></thead>
+                    <tbody id="pedidos-lista"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="area-administrador" class="d-none">
+            <h2 class="h4">Contas Financeiro e Administrador</h2>
+            <form id="form-usuario" class="card card-body mb-4">
+                <div class="row g-3">
+                    <div class="col-md-2">
+                        <label class="form-label" for="usuario-cpf">CPF</label>
+                        <input class="form-control" id="usuario-cpf" inputmode="numeric" pattern="[0-9]{11}" maxlength="11" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label" for="usuario-nome">Nome</label>
+                        <input class="form-control" id="usuario-nome" maxlength="150" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label" for="usuario-email">E-mail</label>
+                        <input class="form-control" id="usuario-email" type="email" maxlength="255" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label" for="usuario-senha">Senha</label>
+                        <input class="form-control" id="usuario-senha" type="password" minlength="8" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label" for="usuario-papel">Papel</label>
+                        <select class="form-select" id="usuario-papel">
+                            <option value="FINANCEIRO">Financeiro</option>
+                            <option value="ADMINISTRADOR">Administrador</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary align-self-start mt-3" type="submit">Criar conta</button>
+            </form>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead><tr><th>Nome</th><th>E-mail</th><th>Papel</th><th>Status</th><th>Ações</th></tr></thead>
+                    <tbody id="usuarios-lista"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script>
+        const mensagem = document.getElementById('mensagem');
+        const usuarioAtual = JSON.parse(localStorage.getItem('usuario') || 'null');
+        const papelAtual = usuarioAtual?.papel;
+        const financeiro = papelAtual === 'FINANCEIRO';
+        const administrador = papelAtual === 'ADMINISTRADOR';
+        let clientes = [];
+        let tipos = [];
+        let produtos = [];
+
+        function notificar(texto, erro = false) {
+            mensagem.textContent = texto;
+            mensagem.className = `alert ${erro ? 'alert-danger' : 'alert-success'}`;
+        }
+
+        function adicionarCelula(linha, valor) {
+            const celula = document.createElement('td');
+            celula.textContent = valor ?? '';
+            linha.append(celula);
+            return celula;
+        }
+
+        function adicionarOpcao(seletor, valor, texto) {
+            const opcao = document.createElement('option');
+            opcao.value = valor;
+            opcao.textContent = texto;
+            seletor.append(opcao);
+        }
+
+        async function carregarClientes() {
+            clientes = await api('/cliente');
+            const tbody = document.getElementById('clientes-lista');
+            tbody.replaceChildren();
+            clientes.forEach(cliente => {
+                const linha = document.createElement('tr');
+                adicionarCelula(linha, cliente.nome);
+                adicionarCelula(linha, cliente.cpf);
+                adicionarCelula(linha, cliente.numero);
+                adicionarCelula(linha, cliente.id);
+                tbody.append(linha);
+            });
+
+            for (const id of ['produto-cliente', 'pedido-cliente']) {
+                const seletor = document.getElementById(id);
+                seletor.replaceChildren();
+                adicionarOpcao(seletor, '', 'Selecione um cliente');
+                clientes.forEach(cliente => adicionarOpcao(seletor, cliente.id, cliente.nome));
+            }
+        }
+
+        async function carregarTipos() {
+            tipos = await api('/tipos-produto');
+            const seletor = document.getElementById('produto-tipo');
+            seletor.replaceChildren();
+            adicionarOpcao(seletor, '', 'Selecione um tipo');
+            tipos.forEach(tipo => adicionarOpcao(seletor, tipo.id, tipo.nome));
+        }
+
+        async function carregarProdutos() {
+            produtos = await api('/produtos');
+            const tbody = document.getElementById('produtos-lista');
+            tbody.replaceChildren();
+            produtos.forEach(produto => {
+                const linha = document.createElement('tr');
+                adicionarCelula(linha, produto.nome);
+                adicionarCelula(linha, produto.tipo_produto?.nome);
+                adicionarCelula(linha, produto.cliente?.nome);
+                adicionarCelula(linha, Number(produto.preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }));
+                tbody.append(linha);
+            });
+            atualizarProdutosDoPedido();
+        }
+
+        function atualizarProdutosDoPedido() {
+            const clienteId = document.getElementById('pedido-cliente').value;
+            const seletor = document.getElementById('pedido-produto');
+            seletor.replaceChildren();
+            adicionarOpcao(seletor, '', 'Selecione um produto');
+            produtos
+                .filter(produto => String(produto.cliente_id) === clienteId)
+                .forEach(produto => adicionarOpcao(seletor, produto.id, `${produto.nome} — R$ ${Number(produto.preco).toFixed(2)}`));
+        }
+
+        async function carregarPedidos() {
+            const pedidos = await api('/vendas');
+            const tbody = document.getElementById('pedidos-lista');
+            tbody.replaceChildren();
+            pedidos.forEach(pedido => {
+                const linha = document.createElement('tr');
+                adicionarCelula(linha, pedido.id);
+                adicionarCelula(linha, new Date(pedido.datavenda).toLocaleString('pt-BR'));
+                adicionarCelula(linha, pedido.cliente?.nome);
+                adicionarCelula(linha, pedido.venda_item.map(item => `${item.produto_servico.nome} (${item.quantidade})`).join(', '));
+                adicionarCelula(linha, Number(pedido.total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }));
+                adicionarCelula(linha, pedido.status);
+                const acoes = document.createElement('td');
+                if (pedido.status === 'ABERTA') {
+                    const concluir = document.createElement('button');
+                    concluir.type = 'button';
+                    concluir.className = 'btn btn-sm btn-outline-success me-2';
+                    concluir.textContent = 'Concluir';
+                    concluir.addEventListener('click', async () => {
+                        await executar(async () => {
+                            await api(`/vendas/${pedido.id}/status`, {
+                                method: 'PATCH',
+                                body: JSON.stringify({ status: 'FECHADA' })
+                            });
+                            await carregarPedidos();
+                        });
+                    });
+                    acoes.append(concluir);
+                }
+                linha.append(acoes);
+                tbody.append(linha);
+            });
+        }
+
+        async function carregarUsuarios() {
+            const usuarios = await api('/usuarios');
+            const tbody = document.getElementById('usuarios-lista');
+            tbody.replaceChildren();
+            usuarios.forEach(usuario => {
+                const linha = document.createElement('tr');
+                adicionarCelula(linha, usuario.nome);
+                adicionarCelula(linha, usuario.email);
+                adicionarCelula(linha, usuario.papel);
+                adicionarCelula(linha, usuario.ativo ? 'Ativa' : 'Desativada');
+                const acoes = document.createElement('td');
+                if (usuario.id !== usuarioAtual.id) {
+                    const alternar = document.createElement('button');
+                    alternar.type = 'button';
+                    alternar.className = 'btn btn-sm btn-outline-secondary me-2';
+                    alternar.textContent = usuario.ativo ? 'Desativar' : 'Ativar';
+                    alternar.addEventListener('click', async () => {
+                        await executar(async () => {
+                            await api(`/usuarios/${usuario.id}`, {
+                                method: 'PATCH',
+                                body: JSON.stringify({ ativo: !usuario.ativo })
+                            });
+                            await carregarUsuarios();
+                        });
+                    });
+                    acoes.append(alternar);
+                    if (usuario.ativo) {
+                        const excluir = document.createElement('button');
+                        excluir.type = 'button';
+                        excluir.className = 'btn btn-sm btn-outline-danger';
+                        excluir.textContent = 'Excluir';
+                        excluir.addEventListener('click', async () => {
+                            if (!confirm(`Desativar a conta de ${usuario.nome}?`)) return;
+                            await executar(async () => {
+                                await api(`/usuarios/${usuario.id}`, { method: 'DELETE' });
+                                await carregarUsuarios();
+                            });
+                        });
+                        acoes.append(excluir);
+                    }
+                }
+                linha.append(acoes);
+                tbody.append(linha);
+            });
+        }
+
+        async function executar(acao) {
+            try {
+                await acao();
+                mensagem.className = 'alert d-none';
+            } catch (erro) {
+                notificar(erro.message || 'Não foi possível concluir a operação.', true);
+            }
+        }
+
+        if (!localStorage.getItem('token') || (!financeiro && !administrador)) {
+            window.location.replace('login.html');
+        } else {
+            document.getElementById('papel-atual').textContent =
+                `${usuarioAtual.nome} — ${financeiro ? 'Financeiro' : 'Administrador'}`;
+            document.getElementById(financeiro ? 'area-financeiro' : 'area-administrador').classList.remove('d-none');
+        }
+
+        document.getElementById('sair').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            localStorage.removeItem('usuario');
+            localStorage.removeItem('usuarioId');
+            window.location.href = 'login.html';
+        });
+
+        document.getElementById('form-cliente').addEventListener('submit', event => {
+            event.preventDefault();
+            executar(async () => {
+                await api('/cliente', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        nome: document.getElementById('cliente-nome').value.trim(),
+                        cpf: document.getElementById('cliente-cpf').value,
+                        numero: document.getElementById('cliente-telefone').value.trim()
+                    })
+                });
+                event.target.reset();
+                await carregarClientes();
+            });
+        });
+
+        document.getElementById('form-tipo').addEventListener('submit', event => {
+            event.preventDefault();
+            executar(async () => {
+                await api('/tipos-produto', {
+                    method: 'POST',
+                    body: JSON.stringify({ nome: document.getElementById('tipo-nome').value.trim() })
+                });
+                event.target.reset();
+                await carregarTipos();
+            });
+        });
+
+        document.getElementById('form-produto').addEventListener('submit', event => {
+            event.preventDefault();
+            executar(async () => {
+                await api('/produtos', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        clienteId: Number(document.getElementById('produto-cliente').value),
+                        tipoId: Number(document.getElementById('produto-tipo').value),
+                        nome: document.getElementById('produto-nome').value.trim(),
+                        descricao: document.getElementById('produto-descricao').value.trim() || undefined,
+                        preco: Number(document.getElementById('produto-preco').value)
+                    })
+                });
+                event.target.reset();
+                await carregarProdutos();
+            });
+        });
+
+        document.getElementById('pedido-cliente').addEventListener('change', atualizarProdutosDoPedido);
+        document.getElementById('form-pedido').addEventListener('submit', event => {
+            event.preventDefault();
+            executar(async () => {
+                await api('/vendas', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        clienteId: Number(document.getElementById('pedido-cliente').value),
+                        itens: [{
+                            produtoServicoId: Number(document.getElementById('pedido-produto').value),
+                            quantidade: Number(document.getElementById('pedido-quantidade').value)
+                        }]
+                    })
+                });
+                event.target.reset();
+                await carregarPedidos();
+            });
+        });
+
+        document.getElementById('form-usuario').addEventListener('submit', event => {
+            event.preventDefault();
+            executar(async () => {
+                await api('/usuarios', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        cpf: document.getElementById('usuario-cpf').value,
+                        nome: document.getElementById('usuario-nome').value.trim(),
+                        email: document.getElementById('usuario-email').value.trim(),
+                        senha: document.getElementById('usuario-senha').value,
+                        papel: document.getElementById('usuario-papel').value
+                    })
+                });
+                event.target.reset();
+                await carregarUsuarios();
+            });
+        });
+
+        executar(async () => {
+            if (financeiro) {
+                await carregarClientes();
+                await carregarTipos();
+                await carregarProdutos();
+                await carregarPedidos();
+            } else if (administrador) {
+                await carregarUsuarios();
+            }
+        });
+    </script>
+</body>
+</html>
