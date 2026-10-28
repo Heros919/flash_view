@@ -118,18 +118,26 @@ export class VendasService {
       }
 
       return {
-        cliente_id: dados.clienteId,
-        produto_servico_id: produto.id,
+        produto_servico: {
+          connect: {
+            cliente_id_id: {
+              cliente_id: dados.clienteId,
+              id: produto.id,
+            },
+          },
+        },
         quantidade: item.quantidade,
         preco_unitario: produto.preco,
-        subtotal: new Prisma.Decimal(produto.preco.toString())
-          .mul(item.quantidade)
-          .toDecimalPlaces(2),
       };
     });
 
     const total = itens.reduce(
-      (soma, item) => soma.add(item.subtotal),
+      (soma, item) =>
+        soma.add(
+          new Prisma.Decimal(item.preco_unitario.toString())
+            .mul(item.quantidade)
+            .toDecimalPlaces(2),
+        ),
       new Prisma.Decimal(0),
     );
 

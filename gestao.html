@@ -248,7 +248,7 @@
                 adicionarCelula(linha, pedido.cliente?.nome);
                 adicionarCelula(linha, pedido.venda_item.map(item => `${item.produto_servico.nome} (${item.quantidade})`).join(', '));
                 adicionarCelula(linha, Number(pedido.total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }));
-                adicionarCelula(linha, pedido.status);
+                adicionarCelula(linha, pedido.status === 'PAGA' ? 'Concluído' : pedido.status);
                 const acoes = document.createElement('td');
                 if (pedido.status === 'ABERTA') {
                     const concluir = document.createElement('button');
@@ -259,7 +259,7 @@
                         await executar(async () => {
                             await api(`/vendas/${pedido.id}/status`, {
                                 method: 'PATCH',
-                                body: JSON.stringify({ status: 'FECHADA' })
+                                body: JSON.stringify({ status: 'PAGA' })
                             });
                             await carregarPedidos();
                         });

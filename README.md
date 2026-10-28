@@ -261,7 +261,7 @@ GET    /produtos
 POST   /produtos
 GET    /vendas
 POST   /vendas
-PATCH  /vendas/:id/status
+PATCH  /vendas/:id/status (`ABERTA`, `PAGA` ou `CANCELADA`)
 ```
 
 ### 6. Dashboard

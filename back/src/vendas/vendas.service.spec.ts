@@ -27,6 +27,8 @@ describe('VendasService', () => {
     },
     venda: {
       create: jest.fn(),
+      findUnique: jest.fn(),
+      update: jest.fn(),
     },
   };
 
@@ -77,10 +79,40 @@ describe('VendasService', () => {
       usuario_id: 4,
     });
     expect(createArgs.data.funcionario_id).toBeUndefined();
-    expect(createArgs.data.total.toString()).toBe('49.98');
-    expect(createArgs.data.venda_item.create[0].subtotal.toString()).toBe(
-      '49.98',
+    expect(createArgs.data.venda_item.create[0]).not.toHaveProperty(
+      'cliente_id',
     );
+    expect(createArgs.data.venda_item.create[0]).not.toHaveProperty(
+      'produto_servico_id',
+    );
+    expect(
+      createArgs.data.venda_item.create[0].produto_servico.connect
+        .cliente_id_id,
+    ).toEqual({ cliente_id: 8, id: 12 });
+    expect(createArgs.data.venda_item.create[0]).not.toHaveProperty(
+      'subtotal',
+    );
+    expect(createArgs.data.total.toString()).toBe('49.98');
     expect(result.usuario_id).toBe(4);
+  });
+
+  it('concludes an open order using the PAGA status accepted by the database', async () => {
+    prisma.venda.findUnique.mockResolvedValue({
+      id: 21,
+      status: 'ABERTA',
+    });
+    prisma.venda.update.mockResolvedValue({
+      id: 21,
+      status: 'PAGA',
+    });
+
+    await expect(service.atualizarStatus(21, 'PAGA')).resolves.toEqual({
+      id: 21,
+      status: 'PAGA',
+    });
+    expect(prisma.venda.update).toHaveBeenCalledWith({
+      where: { id: 21 },
+      data: { status: 'PAGA' },
+    });
   });
 });
