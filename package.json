@@ -1,0 +1,19 @@
+{
+  "name": "flash_view",
+  "version": "1.0.0",
+  "description": "Este projeto é uma proposta da empresa\r  **Ingá Granitos do Nordeste**",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Heros919/flash_view.git"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Heros919/flash_view/issues"
+  },
+  "homepage": "https://github.com/Heros919/flash_view#readme"
+}
