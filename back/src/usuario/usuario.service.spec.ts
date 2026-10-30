@@ -20,9 +20,15 @@ describe("UsuarioService registration", () => {
   let service: UsuarioService;
   let create: jest.Mock;
   let prisma: {
+    funcionario: {
+      findFirst: jest.Mock;
+    };
     usuario: {
       findFirst: jest.Mock;
       create: jest.Mock;
+    };
+    financeiro: {
+      findFirst: jest.Mock;
     };
   };
 
@@ -33,6 +39,12 @@ describe("UsuarioService registration", () => {
         findFirst: jest.fn().mockResolvedValue(null),
         create,
       },
+      funcionario: {
+        findFirst: jest.fn().mockResolvedValue(null),
+      },
+      financeiro: {
+        findFirst: jest.fn().mockResolvedValue(null),
+      },
     };
     const module: TestingModule = await Test.createTestingModule({
       providers: [UsuarioService, { provide: PrismaService, useValue: prisma }],
@@ -41,7 +53,7 @@ describe("UsuarioService registration", () => {
     service = module.get<UsuarioService>(UsuarioService);
   });
 
-  it("stores a hashed password and assigns the FUNCIONARIO role", async () => {
+  it("stores a hashed password and creates an administrator account", async () => {
     const dados: RegistroDto = {
       cpf: "12345678901",
       nome: "Pessoa Teste",
@@ -59,7 +71,7 @@ describe("UsuarioService registration", () => {
     const usuario = await service.criar(dados);
 
     const dadosSalvos = create.mock.calls[0][0].data;
-    expect(dadosSalvos.papel).toBe(PapelConta.FUNCIONARIO);
+    expect(dadosSalvos.papel).toBe(PapelConta.ADMINISTRADOR);
     expect(dadosSalvos.email).toBe("pessoa@exemplo.com");
     expect(dadosSalvos.senha_hash).not.toBe(dados.senha);
     await expect(
@@ -67,7 +79,7 @@ describe("UsuarioService registration", () => {
     ).resolves.toBe(true);
     expect(usuario).toMatchObject({
       cpf: dados.cpf,
-      papel: Papel.Funcionario,
+      papel: Papel.Administrador,
     });
     expect(usuario).not.toHaveProperty("senhaHash");
   });

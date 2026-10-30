@@ -1,8 +1,8 @@
 generator client {
-  provider     = "prisma-client"
+  provider      = "prisma-client"
   binaryTargets = ["native", "debian-openssl-3.0.x"]
-  output       = "../generated/prisma"
-  moduleFormat = "cjs"
+  output        = "../generated/prisma"
+  moduleFormat  = "cjs"
 }
 
 datasource db {
@@ -25,6 +25,17 @@ model usuario {
   ativo        Boolean    @default(true)
   papel        PapelConta @default(FUNCIONARIO)
   datacadastro DateTime   @default(now()) @db.Timestamp(6)
+  venda        venda[]
+}
+
+model financeiro {
+  id           Int      @id @default(autoincrement())
+  cpf          String   @unique @db.VarChar(11)
+  nome         String   @db.VarChar(150)
+  email        String   @unique @db.VarChar(255)
+  senha_hash   String   @db.VarChar(255)
+  ativo        Boolean  @default(true)
+  datacadastro DateTime @default(now()) @db.Timestamp(6)
   venda        venda[]
 }
 
@@ -176,16 +187,19 @@ model venda {
   cliente_id     Int
   funcionario_id String?      @db.VarChar(100)
   usuario_id     Int?
+  financeiro_id  Int?
   datavenda      DateTime     @default(now()) @db.Timestamp(6)
   status         String       @default("ABERTA") @db.VarChar(10)
   total          Decimal      @default(0) @db.Decimal(12, 2)
   cliente        cliente      @relation(fields: [cliente_id], references: [id], map: "fk_venda_cliente")
   funcionario    funcionario? @relation(fields: [funcionario_id], references: [id], map: "fk_venda_funcionario")
   usuario        usuario?     @relation(fields: [usuario_id], references: [id], map: "fk_venda_usuario")
+  financeiro     financeiro?  @relation(fields: [financeiro_id], references: [id], map: "fk_venda_financeiro")
   venda_item     venda_item[]
 
   @@unique([cliente_id, id], map: "uq_venda_cliente_id")
   @@index([usuario_id], map: "idx_venda_usuario_id")
+  @@index([financeiro_id], map: "idx_venda_financeiro_id")
   @@index([cliente_id], map: "idx_venda_cliente_id")
   @@index([datavenda], map: "idx_venda_data")
   @@index([funcionario_id], map: "idx_venda_funcionario_id")

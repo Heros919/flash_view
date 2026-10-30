@@ -1,20 +1,21 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { BlocosModule } from './Bloco/bloco.module';
-import { ChapasModule } from './chapas/chapas.module';
-import { UsuarioModule } from './usuario/usuario.module';
-import { ClienteModule } from './Cliente/cliente.module';
-import { PrismaModule } from './prisma/prisma.module';
-import { VendasModule } from './vendas/vendas.module';
+import { Module } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
+import { AppController } from "./app.controller";
+import { AppService } from "./app.service";
+import { AuthModule } from "./auth/auth.module";
+import { BlocosModule } from "./Bloco/bloco.module";
+import { ChapasModule } from "./chapas/chapas.module";
+import { UsuarioModule } from "./usuario/usuario.module";
+import { ClienteModule } from "./Cliente/cliente.module";
+import { PrismaModule } from "./prisma/prisma.module";
+import { VendasModule } from "./vendas/vendas.module";
+import { FinanceiroModule } from "./financeiro/financeiro.module";
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-       isGlobal: true 
-      }),
+      isGlobal: true,
+    }),
     PrismaModule,
     AuthModule,
     UsuarioModule,
@@ -22,8 +23,9 @@ import { VendasModule } from './vendas/vendas.module';
     ChapasModule,
     ClienteModule,
     VendasModule,
+    FinanceiroModule,
   ],
   controllers: [AppController],
-  providers: [AppService]
+  providers: [AppService],
 })
 export class AppModule {}

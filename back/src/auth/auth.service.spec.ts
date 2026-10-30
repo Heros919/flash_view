@@ -27,6 +27,12 @@ describe("AuthService privileged accounts", () => {
       create: jest.Mock;
       update: jest.Mock;
     };
+    financeiro: {
+      findFirst: jest.Mock;
+      findUnique: jest.Mock;
+      create: jest.Mock;
+      update: jest.Mock;
+    };
     cliente: { findFirst: jest.Mock };
     admin: { findFirst: jest.Mock };
   };
@@ -40,6 +46,12 @@ describe("AuthService privileged accounts", () => {
         create: jest.fn(),
       },
       usuario: {
+        findFirst: jest.fn().mockResolvedValue(null),
+        findUnique: jest.fn().mockResolvedValue(null),
+        create: jest.fn(),
+        update: jest.fn(),
+      },
+      financeiro: {
         findFirst: jest.fn().mockResolvedValue(null),
         findUnique: jest.fn().mockResolvedValue(null),
         create: jest.fn(),
@@ -183,7 +195,7 @@ describe("AuthService privileged accounts", () => {
     const chave = "chave-de-configuracao-segura-com-32-caracteres";
     const chaveAnterior = process.env.ADMIN_BOOTSTRAP_KEY;
     process.env.ADMIN_BOOTSTRAP_KEY = chave;
-    prisma.usuario.create.mockImplementation(({ data }) =>
+    prisma.financeiro.create.mockImplementation(({ data }) =>
       Promise.resolve({
         id: 2,
         ...data,
@@ -203,15 +215,14 @@ describe("AuthService privileged accounts", () => {
         ),
       ).resolves.toMatchObject({
         mensagem: "Acesso do Financeiro configurado com sucesso.",
-        usuario: {
+        financeiro: {
           papel: PapelConta.FINANCEIRO,
           email: "financeiro@exemplo.com",
         },
       });
 
-      expect(prisma.usuario.create).toHaveBeenCalledWith({
+      expect(prisma.financeiro.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
-          papel: PapelConta.FINANCEIRO,
           ativo: true,
         }),
       });
@@ -256,16 +267,15 @@ describe("AuthService privileged accounts", () => {
     });
   });
 
-  it("authenticates a privileged account and returns its role in the token payload", async () => {
+  it("authenticates a finance account from its dedicated table", async () => {
     const senha = "senha-segura";
     const senhaHash = await bcrypt.hash(senha, 10);
-    prisma.usuario.findUnique.mockResolvedValue({
+    prisma.financeiro.findUnique.mockResolvedValue({
       id: 1,
       cpf: "12345678901",
       nome: "Pessoa Teste",
       email: "pessoa@exemplo.com",
       ativo: true,
-      papel: PapelConta.FINANCEIRO,
       senha_hash: senhaHash,
     });
 
@@ -277,13 +287,13 @@ describe("AuthService privileged accounts", () => {
     expect(signAsync).toHaveBeenCalledWith(
       expect.objectContaining({
         sub: "1",
-        tipoConta: "usuario",
+        tipoConta: "financeiro",
         papel: PapelConta.FINANCEIRO,
       }),
     );
     expect(resultado).toMatchObject({
       access_token: "token",
-      usuario: { papel: PapelConta.FINANCEIRO },
+      financeiro: { papel: PapelConta.FINANCEIRO },
     });
   });
 });

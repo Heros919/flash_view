@@ -279,7 +279,7 @@
 
                 localStorage.setItem('token', token);
 
-                const usuario = resposta.usuario || resposta.funcionario;
+                const usuario = resposta.usuario || resposta.financeiro || resposta.funcionario;
                 if (usuario) {
                     localStorage.setItem('usuario', JSON.stringify(usuario));
                     localStorage.setItem('usuarioId', String(usuario.id));

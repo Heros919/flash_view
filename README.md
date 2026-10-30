@@ -156,6 +156,13 @@ Pesquisar   Pesquisar
 - **Ferramentas:** Git, Github e npm
 - **Containerização:** Docker e Docker Compose
 
+## Contas de acesso
+
+As contas de Administrador permanecem na tabela `usuario`. As contas de
+Financeiro são armazenadas separadamente na tabela `financeiro`; a migração do
+backend transfere as contas Financeiro existentes e atualiza o vínculo dos
+pedidos para preservar seu responsável.
+
 ---
 
 # Frontend

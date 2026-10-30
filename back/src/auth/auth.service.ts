@@ -39,19 +39,24 @@ export class AuthService {
       throw new ConflictException("O CPF deve conter 11 números.");
     }
 
-    const [funcionarioExistente, usuarioExistente] = await Promise.all([
-      this.prisma.funcionario.findFirst({
-        where: { OR: [{ email }, { cpf }] },
-      }),
-      this.prisma.usuario.findFirst({
-        where: { OR: [{ email }, { cpf }] },
-      }),
-    ]);
+    const [funcionarioExistente, usuarioExistente, financeiroExistente] =
+      await Promise.all([
+        this.prisma.funcionario.findFirst({
+          where: { OR: [{ email }, { cpf }] },
+        }),
+        this.prisma.usuario.findFirst({
+          where: { OR: [{ email }, { cpf }] },
+        }),
+        this.prisma.financeiro.findFirst({
+          where: { OR: [{ email }, { cpf }] },
+        }),
+      ]);
 
-    if (funcionarioExistente || usuarioExistente) {
+    if (funcionarioExistente || usuarioExistente || financeiroExistente) {
       if (
         funcionarioExistente?.email === email ||
-        usuarioExistente?.email === email
+        usuarioExistente?.email === email ||
+        financeiroExistente?.email === email
       ) {
         throw new ConflictException("Já existe uma conta com este e-mail.");
       }
@@ -95,46 +100,10 @@ export class AuthService {
   }
 
   async bootstrapAdministrador(dto: RegistroDto, chave: string) {
-    return this.bootstrapContaPrivilegiada(
-      dto,
-      chave,
-      PapelConta.ADMINISTRADOR,
-    );
-  }
-
-  async bootstrapFinanceiro(dto: RegistroDto, chave: string) {
-    return this.bootstrapContaPrivilegiada(
-      dto,
-      chave,
-      PapelConta.FINANCEIRO,
-    );
-  }
-
-  private async bootstrapContaPrivilegiada(
-    dto: RegistroDto,
-    chave: string,
-    papel:
-      | typeof PapelConta.ADMINISTRADOR
-      | typeof PapelConta.FINANCEIRO,
-  ) {
-    const chaveConfigurada = process.env.ADMIN_BOOTSTRAP_KEY?.trim();
-    if (!chaveConfigurada) {
-      throw new ServiceUnavailableException(
-        "ADMIN_BOOTSTRAP_KEY não foi configurada.",
-      );
-    }
-
-    const chaveRecebida = Buffer.from(chave.trim());
-    const chaveEsperada = Buffer.from(chaveConfigurada);
-    if (
-      chaveRecebida.length !== chaveEsperada.length ||
-      !timingSafeEqual(chaveRecebida, chaveEsperada)
-    ) {
-      throw new UnauthorizedException("Chave de configuração inválida.");
-    }
+    this.validarChaveBootstrap(chave);
 
     const contaExistente = await this.prisma.usuario.findFirst({
-      where: { papel, ativo: true },
+      where: { papel: PapelConta.ADMINISTRADOR, ativo: true },
       orderBy: { id: "asc" },
     });
 
@@ -149,18 +118,27 @@ export class AuthService {
     const [
       funcionarioComEmail,
       funcionarioComCpf,
+      financeiroComEmail,
+      financeiroComCpf,
       usuarioComEmail,
       usuarioComCpf,
     ] = await Promise.all([
       this.prisma.funcionario.findFirst({ where: { email } }),
       this.prisma.funcionario.findFirst({ where: { cpf } }),
+      this.prisma.financeiro.findFirst({ where: { email } }),
+      this.prisma.financeiro.findFirst({ where: { cpf } }),
       this.prisma.usuario.findFirst({ where: { email } }),
       this.prisma.usuario.findFirst({ where: { cpf } }),
     ]);
 
-    if (funcionarioComEmail || funcionarioComCpf) {
+    if (
+      funcionarioComEmail ||
+      funcionarioComCpf ||
+      financeiroComEmail ||
+      financeiroComCpf
+    ) {
       throw new ConflictException(
-        funcionarioComEmail
+        funcionarioComEmail || financeiroComEmail
           ? "Já existe uma conta com este e-mail."
           : "Já existe uma conta com este CPF.",
       );
@@ -182,7 +160,7 @@ export class AuthService {
       nome,
       email,
       senha_hash: await bcrypt.hash(dto.senha, 10),
-      papel,
+      papel: PapelConta.ADMINISTRADOR,
       ativo: true,
     };
     const usuario = contaExistente
@@ -193,12 +171,102 @@ export class AuthService {
       : await this.prisma.usuario.create({ data });
 
     return {
-      mensagem:
-        papel === PapelConta.ADMINISTRADOR
-          ? "Acesso do Administrador configurado com sucesso."
-          : "Acesso do Financeiro configurado com sucesso.",
+      mensagem: "Acesso do Administrador configurado com sucesso.",
       usuario: this.dadosPublicosUsuario(usuario),
     };
+  }
+
+  async bootstrapFinanceiro(dto: RegistroDto, chave: string) {
+    this.validarChaveBootstrap(chave);
+
+    const contaExistente = await this.prisma.financeiro.findFirst({
+      where: { ativo: true },
+      orderBy: { id: "asc" },
+    });
+    const cpf = dto.cpf.replace(/\D/g, "");
+    const nome = dto.nome.trim();
+    const email = dto.email.trim().toLowerCase();
+
+    if (!/^\d{11}$/.test(cpf)) {
+      throw new ConflictException("O CPF deve conter 11 números.");
+    }
+
+    const [
+      funcionarioComEmail,
+      funcionarioComCpf,
+      usuarioComEmail,
+      usuarioComCpf,
+      financeiroComEmail,
+      financeiroComCpf,
+    ] = await Promise.all([
+      this.prisma.funcionario.findFirst({ where: { email } }),
+      this.prisma.funcionario.findFirst({ where: { cpf } }),
+      this.prisma.usuario.findFirst({ where: { email } }),
+      this.prisma.usuario.findFirst({ where: { cpf } }),
+      this.prisma.financeiro.findFirst({ where: { email } }),
+      this.prisma.financeiro.findFirst({ where: { cpf } }),
+    ]);
+
+    if (
+      funcionarioComEmail ||
+      funcionarioComCpf ||
+      usuarioComEmail ||
+      usuarioComCpf
+    ) {
+      throw new ConflictException(
+        funcionarioComEmail || usuarioComEmail
+          ? "Já existe uma conta com este e-mail."
+          : "Já existe uma conta com este CPF.",
+      );
+    }
+
+    if (
+      (financeiroComEmail && financeiroComEmail.id !== contaExistente?.id) ||
+      (financeiroComCpf && financeiroComCpf.id !== contaExistente?.id)
+    ) {
+      throw new ConflictException(
+        financeiroComEmail && financeiroComEmail.id !== contaExistente?.id
+          ? "Já existe uma conta com este e-mail."
+          : "Já existe uma conta com este CPF.",
+      );
+    }
+
+    const data = {
+      cpf,
+      nome,
+      email,
+      senha_hash: await bcrypt.hash(dto.senha, 10),
+      ativo: true,
+    };
+    const financeiro = contaExistente
+      ? await this.prisma.financeiro.update({
+          where: { id: contaExistente.id },
+          data,
+        })
+      : await this.prisma.financeiro.create({ data });
+
+    return {
+      mensagem: "Acesso do Financeiro configurado com sucesso.",
+      financeiro: this.dadosPublicosFinanceiro(financeiro),
+    };
+  }
+
+  private validarChaveBootstrap(chave: string) {
+    const chaveConfigurada = process.env.ADMIN_BOOTSTRAP_KEY?.trim();
+    if (!chaveConfigurada) {
+      throw new ServiceUnavailableException(
+        "ADMIN_BOOTSTRAP_KEY não foi configurada.",
+      );
+    }
+
+    const chaveRecebida = Buffer.from(chave.trim());
+    const chaveEsperada = Buffer.from(chaveConfigurada);
+    if (
+      chaveRecebida.length !== chaveEsperada.length ||
+      !timingSafeEqual(chaveRecebida, chaveEsperada)
+    ) {
+      throw new UnauthorizedException("Chave de configuração inválida.");
+    }
   }
 
   async login(dto: LoginDto) {
@@ -235,7 +303,34 @@ export class AuthService {
     });
 
     if (!usuario || !usuario.ativo) {
-      throw new UnauthorizedException("E-mail ou senha inválidos.");
+      const financeiro = await this.prisma.financeiro.findUnique({
+        where: { email },
+      });
+
+      if (!financeiro || !financeiro.ativo) {
+        throw new UnauthorizedException("E-mail ou senha inválidos.");
+      }
+
+      const senhaFinanceiroValida = await bcrypt.compare(
+        dto.senha,
+        financeiro.senha_hash,
+      );
+
+      if (!senhaFinanceiroValida) {
+        throw new UnauthorizedException("E-mail ou senha inválidos.");
+      }
+
+      const payloadFinanceiro = {
+        sub: String(financeiro.id),
+        tipoConta: "financeiro",
+        papel: PapelConta.FINANCEIRO,
+        email: financeiro.email,
+      };
+
+      return {
+        access_token: await this.jwtService.signAsync(payloadFinanceiro),
+        financeiro: this.dadosPublicosFinanceiro(financeiro),
+      };
     }
 
     const senhaValida = await bcrypt.compare(dto.senha, usuario.senha_hash);
@@ -311,6 +406,23 @@ export class AuthService {
       email: usuario.email,
       ativo: usuario.ativo,
       papel: usuario.papel,
+    };
+  }
+
+  private dadosPublicosFinanceiro(financeiro: {
+    id: number;
+    cpf: string;
+    nome: string;
+    email: string;
+    ativo: boolean;
+  }) {
+    return {
+      id: financeiro.id,
+      cpf: financeiro.cpf,
+      nome: financeiro.nome,
+      email: financeiro.email,
+      ativo: financeiro.ativo,
+      papel: PapelConta.FINANCEIRO,
     };
   }
 }

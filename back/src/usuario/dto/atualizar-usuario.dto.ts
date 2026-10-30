@@ -1,13 +1,11 @@
 import {
   IsBoolean,
   IsEmail,
-  IsIn,
   IsOptional,
   IsString,
   MaxLength,
   MinLength,
-} from 'class-validator';
-import { PapelConta } from '../../generated/prisma/enums';
+} from "class-validator";
 
 export class AtualizarUsuarioDto {
   @IsOptional()
@@ -24,8 +22,4 @@ export class AtualizarUsuarioDto {
   @IsOptional()
   @IsBoolean()
   ativo?: boolean;
-
-  @IsOptional()
-  @IsIn([PapelConta.ADMINISTRADOR, PapelConta.FINANCEIRO])
-  papel?: typeof PapelConta.ADMINISTRADOR | typeof PapelConta.FINANCEIRO;
 }
