@@ -241,11 +241,9 @@
         const botoesPerfil = document.querySelectorAll('#perfilSelector .btn');
         botoesPerfil.forEach(btn => {
             btn.addEventListener('click', () => {
-                // Lógica original de ativar o botão
                 botoesPerfil.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
 
-                // Redirecionamento baseado no perfil clicado
                 const perfil = btn.textContent.trim().toLowerCase();
                 if (perfil === 'administrador') {
                     window.location.href = 'bootstrap-admin.html';
