@@ -301,7 +301,7 @@ Ao criar uma conta, cada funcionário ganha um ID próprio. Esse ID é retornado
 
 ## Financeiro e Administrador
 
-Com a ajuda de noss orientador, adicionamos a opção do usuário ter essas duas novas opções.
+Com a ajuda de nosso orientador, adicionamos a opção do usuário ter essas duas novas opções.
 
 O Financeiro herda os mesmos direitos de cadastro de blocos e chapas. Para esses cadastros, informa o ID do funcionário responsável. Também pode cadastrar clientes, tipos e produtos/serviços e registrar pedidos, que ficam vinculados à sua conta.
 
