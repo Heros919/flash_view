@@ -19,6 +19,19 @@ import { erroAoGravarImagem } from '../common/erro-imagem';
 import { obterFuncionarioResponsavel } from '../common/funcionario-responsavel';
 import type { UsuarioAutenticado } from '../usuario/usuario.service';
 
+function calcularVolume(
+  altura?: number | Prisma.Decimal | null,
+  largura?: number | Prisma.Decimal | null,
+  comprimento?: number | Prisma.Decimal | null,
+): number | null {
+  if (altura == null || largura == null || comprimento == null) {
+    return null;
+  }
+
+  return Number(
+    (Number(altura) * Number(largura) * Number(comprimento)).toFixed(3),
+  );
+}
 @Injectable()
 export class BlocosService {
   constructor(private readonly prisma: PrismaService) {}
@@ -35,7 +48,7 @@ export class BlocosService {
 
     try {
       return await this.prisma.bloco.create({
-        data: {
+              data: {
           id: randomUUID(),
           cliente_id: funcionario.cliente_id,
           funcionario_id: funcionario.id,
@@ -46,6 +59,11 @@ export class BlocosService {
           altura: dados.altura,
           largura: dados.largura,
           comprimento: dados.comprimento,
+          volume: calcularVolume(
+            dados.altura,
+            dados.largura,
+            dados.comprimento,
+          ),
           peso: dados.peso,
           mes: dados.mes,
           ano: dados.ano,

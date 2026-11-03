@@ -5,8 +5,10 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Em desenvolvimento aceita qualquer origem (Live Server em :5500).
+  // Em produção, defina FRONT_URL no .env com o endereço do front.
   app.enableCors({
-    origin: true,
+    origin: process.env.FRONT_URL ?? true,
     credentials: true,
   });
 
@@ -21,9 +23,10 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(process.env.PORT ?? 3000);
+  const port = process.env.PORT ?? 3000;
+  await app.listen(port);
 
-  console.log('Backend rodando em http://localhost:3000');
+  console.log(`Backend rodando em http://localhost:${port}`);
 }
 
-bootstrap();
+void bootstrap();

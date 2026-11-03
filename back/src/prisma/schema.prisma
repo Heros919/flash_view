@@ -47,7 +47,7 @@ model bloco {
   largura        Decimal?    @db.Decimal(10, 2)
   comprimento    Decimal?    @db.Decimal(10, 2)
   peso           Decimal?    @db.Decimal(10, 2)
-  volume         Decimal?    @default(dbgenerated("((altura * largura) * comprimento)")) @db.Decimal(12, 3)
+  volume         Decimal?    @db.Decimal(12, 3)
   mes            Int
   ano            Int
   frente         String      @db.VarChar(50)
@@ -198,7 +198,7 @@ model venda_item {
   produto_servico_id Int
   quantidade         Decimal         @db.Decimal(12, 3)
   preco_unitario     Decimal         @db.Decimal(12, 2)
-  subtotal           Decimal?        @default(dbgenerated("(quantidade * preco_unitario)")) @db.Decimal(14, 2)
+  subtotal           Decimal?        @db.Decimal(14, 2)
   produto_servico    produto_servico @relation(fields: [cliente_id, produto_servico_id], references: [cliente_id, id], map: "fk_venda_item_produto_servico")
   venda              venda           @relation(fields: [cliente_id, venda_id], references: [cliente_id, id], onDelete: Cascade, map: "fk_venda_item_venda")
 
