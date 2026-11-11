@@ -1,12 +1,10 @@
 import {
   IsEmail,
-  IsIn,
   IsString,
   Length,
   MaxLength,
   MinLength,
-} from 'class-validator';
-import { PapelConta } from '../../generated/prisma/enums';
+} from "class-validator";
 
 export class CriarUsuarioDto {
   @IsString()
@@ -25,7 +23,4 @@ export class CriarUsuarioDto {
   @IsString()
   @MinLength(8)
   senha!: string;
-
-  @IsIn([PapelConta.ADMINISTRADOR, PapelConta.FINANCEIRO])
-  papel!: typeof PapelConta.ADMINISTRADOR | typeof PapelConta.FINANCEIRO;
 }

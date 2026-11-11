@@ -2,13 +2,13 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-} from '@nestjs/common';
-import { Prisma } from '../generated/prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
-import type { UsuarioAutenticado } from '../usuario/usuario.service';
-import { CriarProdutoDto } from './dto/criar-produto.dto';
-import { CriarTipoProdutoDto } from './dto/criar-tipo-produto.dto';
-import { CriarVendaDto } from './dto/criar-venda.dto';
+} from "@nestjs/common";
+import { Prisma } from "../generated/prisma/client";
+import { PrismaService } from "../prisma/prisma.service";
+import type { UsuarioAutenticado } from "../usuario/usuario.service";
+import { CriarProdutoDto } from "./dto/criar-produto.dto";
+import { CriarTipoProdutoDto } from "./dto/criar-tipo-produto.dto";
+import { CriarVendaDto } from "./dto/criar-venda.dto";
 
 @Injectable()
 export class VendasService {
@@ -16,7 +16,7 @@ export class VendasService {
 
   listarTipos() {
     return this.prisma.tipo_produto.findMany({
-      orderBy: { nome: 'asc' },
+      orderBy: { nome: "asc" },
     });
   }
 
@@ -28,9 +28,9 @@ export class VendasService {
     } catch (erro) {
       if (
         erro instanceof Prisma.PrismaClientKnownRequestError &&
-        erro.code === 'P2002'
+        erro.code === "P2002"
       ) {
-        throw new ConflictException('Esse tipo de produto já existe.');
+        throw new ConflictException("Esse tipo de produto já existe.");
       }
 
       throw erro;
@@ -42,14 +42,14 @@ export class VendasService {
       where: { id: dados.clienteId },
     });
     if (!cliente) {
-      throw new NotFoundException('Cliente não encontrado.');
+      throw new NotFoundException("Cliente não encontrado.");
     }
 
     const tipo = await this.prisma.tipo_produto.findUnique({
       where: { id: dados.tipoId },
     });
     if (!tipo) {
-      throw new NotFoundException('Tipo de produto não encontrado.');
+      throw new NotFoundException("Tipo de produto não encontrado.");
     }
 
     return this.prisma.produto_servico.create({
@@ -70,7 +70,7 @@ export class VendasService {
     return this.prisma.produto_servico.findMany({
       where: { ativo: true },
       include: { tipo_produto: true, cliente: true },
-      orderBy: { nome: 'asc' },
+      orderBy: { nome: "asc" },
     });
   }
 
@@ -82,7 +82,7 @@ export class VendasService {
           include: { produto_servico: true },
         },
       },
-      orderBy: { datavenda: 'desc' },
+      orderBy: { datavenda: "desc" },
     });
   }
 
@@ -91,7 +91,7 @@ export class VendasService {
       where: { id: dados.clienteId },
     });
     if (!cliente) {
-      throw new NotFoundException('Cliente não encontrado.');
+      throw new NotFoundException("Cliente não encontrado.");
     }
 
     const idsProduto = dados.itens.map((item) => item.produtoServicoId);
@@ -104,7 +104,7 @@ export class VendasService {
     });
     if (produtos.length !== idsProduto.length) {
       throw new NotFoundException(
-        'Um ou mais produtos não pertencem ao cliente ou estão inativos.',
+        "Um ou mais produtos não pertencem ao cliente ou estão inativos.",
       );
     }
 
@@ -114,7 +114,7 @@ export class VendasService {
     const itens = dados.itens.map((item) => {
       const produto = produtosPorId.get(item.produtoServicoId);
       if (!produto) {
-        throw new NotFoundException('Produto não encontrado.');
+        throw new NotFoundException("Produto não encontrado.");
       }
 
       return {
@@ -144,7 +144,9 @@ export class VendasService {
     return this.prisma.venda.create({
       data: {
         cliente_id: dados.clienteId,
-        usuario_id: usuario.id,
+        ...(usuario.papel === "FINANCEIRO"
+          ? { financeiro_id: usuario.id }
+          : { usuario_id: usuario.id }),
         total,
         venda_item: { create: itens },
       },
@@ -162,7 +164,7 @@ export class VendasService {
       where: { id },
     });
     if (!venda) {
-      throw new NotFoundException('Pedido não encontrado.');
+      throw new NotFoundException("Pedido não encontrado.");
     }
 
     return this.prisma.venda.update({

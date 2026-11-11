@@ -9,7 +9,7 @@ import { UsuarioAutenticado } from "../../usuario/usuario.service";
 type JwtPayload = {
   sub: string;
   email: string;
-  tipoConta?: "usuario" | "funcionario";
+  tipoConta?: "usuario" | "financeiro" | "funcionario";
   papel?: string;
   cliente_id?: number;
   admin_id?: number;
@@ -48,29 +48,33 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException("Token inválido.");
     }
 
-    if (payload.tipoConta === "usuario") {
+    if (payload.tipoConta === "usuario" || payload.tipoConta === "financeiro") {
       const id = Number(payload.sub);
 
       if (!Number.isSafeInteger(id) || String(id) !== payload.sub) {
         throw new UnauthorizedException("Token inválido.");
       }
 
+      if (payload.tipoConta === "financeiro") {
+        return this.buscarFinanceiroAutenticado(id);
+      }
+
       const usuario = await this.prisma.usuario.findUnique({
         where: { id },
       });
 
-      if (!usuario || !usuario.ativo) {
-        throw new UnauthorizedException("Usuário não encontrado.");
+      if (usuario?.ativo) {
+        return {
+          id: usuario.id,
+          cpf: usuario.cpf,
+          nome: usuario.nome,
+          email: usuario.email,
+          ativo: usuario.ativo,
+          papel: usuario.papel,
+        };
       }
 
-      return {
-        id: usuario.id,
-        cpf: usuario.cpf,
-        nome: usuario.nome,
-        email: usuario.email,
-        ativo: usuario.ativo,
-        papel: usuario.papel,
-      };
+      return this.buscarFinanceiroAutenticado(id);
     }
 
     const funcionario = await this.prisma.funcionario.findUnique({
@@ -91,6 +95,27 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       cliente_id: funcionario.cliente_id,
       admin_id: funcionario.admin_id,
       papel: PapelConta.FUNCIONARIO,
+    };
+  }
+
+  private async buscarFinanceiroAutenticado(
+    id: number,
+  ): Promise<UsuarioAutenticado> {
+    const financeiro = await this.prisma.financeiro.findUnique({
+      where: { id },
+    });
+
+    if (!financeiro || !financeiro.ativo) {
+      throw new UnauthorizedException("Conta Financeiro não encontrada.");
+    }
+
+    return {
+      id: financeiro.id,
+      cpf: financeiro.cpf,
+      nome: financeiro.nome,
+      email: financeiro.email,
+      ativo: financeiro.ativo,
+      papel: PapelConta.FINANCEIRO,
     };
   }
 }

@@ -156,6 +156,13 @@ Pesquisar   Pesquisar
 - **Ferramentas:** Git, Github e npm
 - **Containerização:** Docker e Docker Compose
 
+## Contas de acesso
+
+As contas de Administrador permanecem na tabela `usuario`. As contas de
+Financeiro são armazenadas separadamente na tabela `financeiro`; a migração do
+backend transfere as contas Financeiro existentes e atualiza o vínculo dos
+pedidos para preservar seu responsável.
+
 ---
 
 # Frontend
@@ -294,7 +301,7 @@ Ao criar uma conta, cada funcionário ganha um ID próprio. Esse ID é retornado
 
 ## Financeiro e Administrador
 
-Com a ajuda de noss orientador, adicionamos a opção do usuário ter essas duas novas opções.
+Com a ajuda de nosso orientador, adicionamos a opção do usuário ter essas duas novas opções.
 
 O Financeiro herda os mesmos direitos de cadastro de blocos e chapas. Para esses cadastros, informa o ID do funcionário responsável. Também pode cadastrar clientes, tipos e produtos/serviços e registrar pedidos, que ficam vinculados à sua conta.
 

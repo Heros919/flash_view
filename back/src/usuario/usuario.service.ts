@@ -3,20 +3,19 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
-} from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
+} from "@nestjs/common";
+import * as bcrypt from "bcrypt";
 
-import { PrismaService } from '../prisma/prisma.service';
-import { PapelConta } from '../generated/prisma/enums';
+import { PrismaService } from "../prisma/prisma.service";
+import { PapelConta } from "../generated/prisma/enums";
 
 export const Papel = {
-  Funcionario: 'FUNCIONARIO',
-  Administrador: 'ADMINISTRADOR',
-  Financeiro: 'FINANCEIRO',
+  Funcionario: "FUNCIONARIO",
+  Administrador: "ADMINISTRADOR",
+  Financeiro: "FINANCEIRO",
 } as const;
 
-export type Papel =
-  (typeof Papel)[keyof typeof Papel];
+export type Papel = (typeof Papel)[keyof typeof Papel];
 
 export type UsuarioAutenticado = {
   id: number;
@@ -29,9 +28,7 @@ export type UsuarioAutenticado = {
 
 @Injectable()
 export class UsuarioService {
-  constructor(
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async buscarPorId(id: number) {
     return this.prisma.usuario.findUnique({
@@ -53,7 +50,7 @@ export class UsuarioService {
 
   async listar() {
     const usuarios = await this.prisma.usuario.findMany({
-      orderBy: { datacadastro: 'desc' },
+      orderBy: { datacadastro: "desc" },
     });
 
     return usuarios.map((usuario) => this.semSenha(usuario));
@@ -64,32 +61,36 @@ export class UsuarioService {
     nome: string;
     email: string;
     senha: string;
-    papel?: PapelConta;
   }): Promise<UsuarioAutenticado> {
-    const cpf = dados.cpf.replace(/\D/g, '');
+    const cpf = dados.cpf.replace(/\D/g, "");
     const email = dados.email.trim().toLowerCase();
 
     if (!/^\d{11}$/.test(cpf)) {
-      throw new ConflictException(
-        'O CPF deve conter 11 números.',
-      );
+      throw new ConflictException("O CPF deve conter 11 números.");
     }
 
-    const existente = await this.prisma.usuario.findFirst({
-      where: {
-        OR: [{ cpf }, { email }],
-      },
-    });
+    const [funcionario, existente, financeiro] = await Promise.all([
+      this.prisma.funcionario.findFirst({
+        where: { OR: [{ cpf }, { email }] },
+      }),
+      this.prisma.usuario.findFirst({
+        where: { OR: [{ cpf }, { email }] },
+      }),
+      this.prisma.financeiro.findFirst({
+        where: { OR: [{ cpf }, { email }] },
+      }),
+    ]);
 
-    if (existente) {
-      if (existente.cpf === cpf) {
+    if (funcionario || existente || financeiro) {
+      const contaExistente = funcionario ?? existente ?? financeiro;
+      if (contaExistente?.cpf === cpf) {
         throw new ConflictException(
-          'Já existe um usuário cadastrado com este CPF.',
+          "Já existe um usuário cadastrado com este CPF.",
         );
       }
 
       throw new ConflictException(
-        'Já existe um usuário cadastrado com este e-mail.',
+        "Já existe um usuário cadastrado com este e-mail.",
       );
     }
 
@@ -101,7 +102,7 @@ export class UsuarioService {
         nome: dados.nome.trim(),
         email,
         senha_hash,
-        papel: dados.papel ?? PapelConta.FUNCIONARIO,
+        papel: PapelConta.ADMINISTRADOR,
       },
     });
 
@@ -114,35 +115,25 @@ export class UsuarioService {
       nome?: string;
       email?: string;
       ativo?: boolean;
-      papel?:
-        | typeof PapelConta.ADMINISTRADOR
-        | typeof PapelConta.FINANCEIRO;
     },
     administradorId?: number,
   ): Promise<UsuarioAutenticado> {
     const existente = await this.buscarPorId(id);
 
     if (!existente) {
-      throw new NotFoundException('Usuário não encontrado.');
+      throw new NotFoundException("Usuário não encontrado.");
     }
 
-    if (
-      id === administradorId &&
-      (dados.ativo === false ||
-        (dados.papel !== undefined &&
-          dados.papel !== PapelConta.ADMINISTRADOR))
-    ) {
+    if (id === administradorId && dados.ativo === false) {
       throw new ForbiddenException(
-        'Não é possível desativar ou rebaixar a própria conta.',
+        "Não é possível desativar ou rebaixar a própria conta.",
       );
     }
 
     const perdePapelAdministrador =
       existente.papel === PapelConta.ADMINISTRADOR &&
       existente.ativo &&
-      (dados.ativo === false ||
-        (dados.papel !== undefined &&
-          dados.papel !== PapelConta.ADMINISTRADOR));
+      dados.ativo === false;
 
     if (perdePapelAdministrador) {
       const administradoresAtivos = await this.prisma.usuario.count({
@@ -154,20 +145,22 @@ export class UsuarioService {
 
       if (administradoresAtivos <= 1) {
         throw new ConflictException(
-          'Não é possível remover o último administrador ativo.',
+          "Não é possível remover o último administrador ativo.",
         );
       }
     }
 
     const email = dados.email?.trim().toLowerCase();
-
     if (email && email !== existente.email) {
-      const emailExistente = await this.buscarPorEmail(email);
+      const [emailExistente, financeiroExistente, funcionarioExistente] =
+        await Promise.all([
+          this.buscarPorEmail(email),
+          this.prisma.financeiro.findUnique({ where: { email } }),
+          this.prisma.funcionario.findUnique({ where: { email } }),
+        ]);
 
-      if (emailExistente) {
-        throw new ConflictException(
-          'Este e-mail já está cadastrado.',
-        );
+      if (emailExistente || financeiroExistente || funcionarioExistente) {
+        throw new ConflictException("Este e-mail já está cadastrado.");
       }
     }
 
@@ -181,9 +174,6 @@ export class UsuarioService {
         ...(dados.ativo !== undefined && {
           ativo: dados.ativo,
         }),
-        ...(dados.papel !== undefined && {
-          papel: dados.papel,
-        }),
       },
     });
 
@@ -195,21 +185,16 @@ export class UsuarioService {
     administradorId: number,
   ): Promise<UsuarioAutenticado> {
     if (id === administradorId) {
-      throw new ForbiddenException(
-        'Não é possível desativar a própria conta.',
-      );
+      throw new ForbiddenException("Não é possível desativar a própria conta.");
     }
 
     const existente = await this.buscarPorId(id);
 
     if (!existente) {
-      throw new NotFoundException('Usuário não encontrado.');
+      throw new NotFoundException("Usuário não encontrado.");
     }
 
-    if (
-      existente.papel === PapelConta.ADMINISTRADOR &&
-      existente.ativo
-    ) {
+    if (existente.papel === PapelConta.ADMINISTRADOR && existente.ativo) {
       const administradoresAtivos = await this.prisma.usuario.count({
         where: {
           papel: PapelConta.ADMINISTRADOR,
@@ -219,7 +204,7 @@ export class UsuarioService {
 
       if (administradoresAtivos <= 1) {
         throw new ConflictException(
-          'Não é possível desativar o último administrador ativo.',
+          "Não é possível desativar o último administrador ativo.",
         );
       }
     }
