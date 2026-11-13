@@ -19,13 +19,20 @@
     <hr>
 
     <form id="form-chapa" class="row g-3">
-        <div class="col-md-6">
-            <label for="funcionarioId" class="form-label">ID do Funcionário</label>
-            <input type="text" class="form-control" id="funcionarioId" placeholder="ID do funcionário" required>
-            <div id="ajuda-funcionario" class="form-text">
-                Financeiro/Administrador: informe o ID do funcionário responsável pela chapa.
+            <div class="col-md-6" id="funcionario-container">
+                <label for="funcionarioId" class="form-label">Funcionário responsável</label>
+                <select class="form-select" id="funcionarioId" required>
+                    <option value="">Carregando funcionários...</option>
+                </select>
+                <div id="ajuda-funcionario" class="form-text">
+                    Selecione o funcionário responsável.
+                </div>
             </div>
-        </div>
+            <div class="col-md-6" id="administrador-container" hidden>
+                <label for="administradorId" class="form-label">ID do Administrador responsável</label>
+                <input class="form-control" id="administradorId" readonly>
+                <div class="form-text">A chapa será associada à sua conta e ao cliente do bloco.</div>
+            </div>
 
         <div class="col-md-6">
             <label for="blocoId" class="form-label">Bloco proveniente</label>
@@ -82,14 +89,9 @@
     <script>
         const mensagem = document.getElementById('mensagem');
         const botaoSalvar = document.getElementById('btn-salvar');
+        const selectFuncionario = document.getElementById('funcionarioId');
         const selectBloco = document.getElementById('blocoId');
         const contaLogada = JSON.parse(localStorage.getItem('usuario') || 'null');
-        if (contaLogada?.papel === 'FUNCIONARIO') {
-            document.getElementById('funcionarioId').value = contaLogada.id;
-            document.getElementById('funcionarioId').readOnly = true;
-            document.getElementById('ajuda-funcionario').textContent =
-                'ID do funcionário preenchido automaticamente pela sua conta.';
-        }
         const galeriaImagens = window.criarGaleriaImagens({
             recurso: 'chapas',
             input: document.getElementById('imagem'),
@@ -108,31 +110,110 @@
             mensagem.textContent = '';
         }
 
+        async function carregarFuncionariosResponsaveis() {
+            const ajudaFuncionario = document.getElementById('ajuda-funcionario');
+            if (contaLogada?.papel === 'ADMINISTRADOR') {
+                document.getElementById('funcionario-container').hidden = true;
+                document.getElementById('administrador-container').hidden = false;
+                document.getElementById('administradorId').value = contaLogada.id;
+                selectFuncionario.required = false;
+                return;
+            }
+
+            if (contaLogada?.papel === 'FUNCIONARIO') {
+                const opcao = document.createElement('option');
+                opcao.value = String(contaLogada.id);
+                opcao.textContent = `${contaLogada.nome} — ${contaLogada.id}`;
+                opcao.dataset.clienteId = String(contaLogada.cliente_id);
+                selectFuncionario.replaceChildren(opcao);
+                selectFuncionario.disabled = true;
+                ajudaFuncionario.textContent =
+                    'Funcionário responsável preenchido automaticamente pela sua conta.';
+                filtrarBlocosPorFuncionario();
+                return;
+            }
+
+            try {
+                const funcionarios = await api('/auth/funcionarios-responsaveis');
+                if (!Array.isArray(funcionarios)) {
+                    throw new Error('A API retornou uma lista de funcionários inválida.');
+                }
+
+                selectFuncionario.innerHTML =
+                    '<option value="">Selecione o funcionário responsável</option>';
+                funcionarios.forEach((funcionario) => {
+                    const opcao = document.createElement('option');
+                    opcao.value = funcionario.id;
+                    opcao.textContent = `${funcionario.nome} — ${funcionario.id}`;
+                    opcao.dataset.clienteId = String(funcionario.cliente_id);
+                    selectFuncionario.appendChild(opcao);
+                });
+
+                if (funcionarios.length === 0) {
+                    selectFuncionario.innerHTML =
+                        '<option value="">Nenhum funcionário cadastrado</option>';
+                    selectFuncionario.disabled = true;
+                    ajudaFuncionario.textContent =
+                        'Cadastre um funcionário antes de criar a chapa.';
+                }
+            } catch (error) {
+                selectFuncionario.innerHTML =
+                    '<option value="">Erro ao carregar funcionários</option>';
+                selectFuncionario.disabled = true;
+                mostrarMensagem(
+                    `Não foi possível carregar os funcionários: ${error.message}`
+                );
+            }
+        }
+
+        const blocosDisponiveis = [];
+        function filtrarBlocosPorFuncionario() {
+            const podeAcessarTodosClientes =
+                contaLogada?.papel === 'ADMINISTRADOR' ||
+                contaLogada?.papel === 'FUNCIONARIO';
+            const clienteId = podeAcessarTodosClientes
+                ? null
+                : selectFuncionario.selectedOptions[0]?.dataset.clienteId;
+            const blocos = podeAcessarTodosClientes
+                ? blocosDisponiveis
+                : blocosDisponiveis.filter(
+                    (bloco) => String(bloco.cliente_id) === clienteId
+                );
+
+            selectBloco.innerHTML = podeAcessarTodosClientes || clienteId
+                ? '<option value="">Selecione o bloco</option>'
+                : '<option value="">Selecione primeiro o funcionário</option>';
+            blocos.forEach((bloco) => {
+                const option = document.createElement('option');
+                option.value = bloco.id;
+                option.textContent = [bloco.codigo, bloco.material, bloco.cor]
+                    .filter(Boolean)
+                    .join(' — ');
+                selectBloco.appendChild(option);
+            });
+
+            if ((podeAcessarTodosClientes || clienteId) && blocos.length === 0) {
+                selectBloco.innerHTML =
+                    '<option value="">Nenhum bloco disponível</option>';
+            }
+        }
+
         async function carregarBlocos() {
             try {
                 const dados = await api('/blocos');
                 const blocos = Array.isArray(dados) ? dados : (dados?.data ?? []);
-
-                selectBloco.innerHTML = '<option value="">Selecione o bloco</option>';
-
-                blocos.forEach(bloco => {
-                    const option = document.createElement('option');
-                    option.value = bloco.id;
-                    option.textContent = [bloco.codigo, bloco.material, bloco.cor]
-                        .filter(Boolean)
-                        .join(' — ');
-                    selectBloco.appendChild(option);
-                });
-
-                if (blocos.length === 0) {
-                    selectBloco.innerHTML = '<option value="">Nenhum bloco cadastrado</option>';
-                }
+                blocosDisponiveis.push(...blocos);
+                filtrarBlocosPorFuncionario();
             } catch (error) {
                 console.error('Erro ao carregar blocos:', error);
                 selectBloco.innerHTML = '<option value="">Erro ao carregar blocos</option>';
                 mostrarMensagem(`Não foi possível carregar os blocos: ${error.message}`);
             }
         }
+
+        selectFuncionario.addEventListener('change', filtrarBlocosPorFuncionario);
+        carregarFuncionariosResponsaveis();
+        carregarBlocos();
 
         function numeroOpcional(id) {
             const valor = document.getElementById(id).value;
@@ -143,11 +224,21 @@
             event.preventDefault();
             esconderMensagem();
 
+            const ehAdministrador = contaLogada?.papel === 'ADMINISTRADOR';
+            const funcionarioId = selectFuncionario.value.trim();
+            if (!ehAdministrador && !funcionarioId) {
+                mostrarMensagem('Selecione um funcionário responsável válido.');
+                return;
+            }
+
             const novaChapa = {
-                funcionarioId: document.getElementById('funcionarioId').value.trim(),
                 blocoId: selectBloco.value,
                 codigo: document.getElementById('codigo').value.trim()
             };
+
+            if (!ehAdministrador) {
+                novaChapa.funcionarioId = funcionarioId;
+            }
 
             const espessura = numeroOpcional('espessura');
             const altura = numeroOpcional('altura');
@@ -212,8 +303,6 @@
                 botaoSalvar.textContent = 'Salvar Chapa';
             }
         });
-
-        carregarBlocos();
     </script>
 </body>
 

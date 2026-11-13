@@ -42,6 +42,14 @@ After registration, sign in with `POST /auth/login` and send the returned
 `funcionario_id` is taken from the authenticated employee, so `funcionarioId`
 does not need to be included in those request bodies.
 
+Administrators are recorded as the author of blocks and sheets using their
+authenticated account ID (`usuario_id`), rather than selecting an employee.
+Administrators and employees can choose any client when creating a block;
+employees remain recorded by their authenticated `funcionario_id`. For a
+sheet, the client is inherited from the selected block. Financial users
+continue to select an employee using `funcionarioId`. The block form searches
+clients by name, CPF, or ID and shows at most 20 matches at a time.
+
 ## Compile and run the project
 
 ```bash

@@ -25,6 +25,11 @@ export class CreateBlocos {
   @IsOptional()
   funcionarioId?: string;
 
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+  clienteId?: number;
+
   @IsString()
   @IsNotEmpty()
   @MaxLength(50)

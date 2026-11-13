@@ -78,7 +78,11 @@
                             : dados.message;
                         throw new Error(detalhe || dados.mensagem || `Erro HTTP ${resposta.status}`);
                     }
-                    mensagem.textContent = `${dados.mensagem} Agora você pode entrar com o e-mail e senha informados.`;
+                    const idAdministrador = dados.usuario?.id;
+                    if (idAdministrador === undefined || idAdministrador === null) {
+                        throw new Error('O servidor não retornou o ID do Administrador.');
+                    }
+                    mensagem.textContent = `${dados.mensagem} ID do Administrador: ${idAdministrador}. Agora você pode entrar com o e-mail e senha informados.`;
                     mensagem.className = 'mensagem sucesso';
                     form.reset();
                 } catch (erro) {

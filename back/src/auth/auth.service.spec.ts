@@ -18,6 +18,7 @@ describe("AuthService privileged accounts", () => {
   let prisma: {
     funcionario: {
       findFirst: jest.Mock;
+      findMany: jest.Mock;
       findUnique: jest.Mock;
       create: jest.Mock;
     };
@@ -42,6 +43,7 @@ describe("AuthService privileged accounts", () => {
     prisma = {
       funcionario: {
         findFirst: jest.fn().mockResolvedValue(null),
+        findMany: jest.fn().mockResolvedValue([]),
         findUnique: jest.fn().mockResolvedValue(null),
         create: jest.fn(),
       },
@@ -91,6 +93,21 @@ describe("AuthService privileged accounts", () => {
     },
   );
 
+  it("lists employee IDs and names for responsible selection", async () => {
+    const funcionarios = [
+      { id: "funcionario-1", nome: "Pessoa Teste", cliente_id: 7 },
+    ];
+    prisma.funcionario.findMany.mockResolvedValue(funcionarios);
+
+    await expect(service.listarFuncionariosResponsaveis()).resolves.toEqual(
+      funcionarios,
+    );
+    expect(prisma.funcionario.findMany).toHaveBeenCalledWith({
+      select: { id: true, nome: true, cliente_id: true },
+      orderBy: { nome: "asc" },
+    });
+  });
+
   it("creates the first administrator with the configured key", async () => {
     const chave = "chave-de-configuracao-segura-com-32-caracteres";
     const chaveAnterior = process.env.ADMIN_BOOTSTRAP_KEY;
@@ -119,10 +136,14 @@ describe("AuthService privileged accounts", () => {
         ),
       ).resolves.toMatchObject({
         usuario: {
+          id: 1,
           papel: PapelConta.ADMINISTRADOR,
           email: "admin@exemplo.com",
         },
       });
+      expect(prisma.usuario.create.mock.calls[0][0].data).not.toHaveProperty(
+        "id",
+      );
     } finally {
       if (chaveAnterior === undefined) {
         delete process.env.ADMIN_BOOTSTRAP_KEY;

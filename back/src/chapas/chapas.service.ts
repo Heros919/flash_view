@@ -46,15 +46,16 @@ export class ChapasService {
       throw new NotFoundException('Bloco não encontrado');
     }
 
-    const funcionario = await obterFuncionarioResponsavel(
+    const responsavel = await obterFuncionarioResponsavel(
       this.prisma,
       usuario,
       dados.funcionarioId,
+      bloco.cliente_id,
     );
 
-    if (funcionario.cliente_id !== bloco.cliente_id) {
+    if (responsavel.cliente_id !== bloco.cliente_id) {
       throw new ConflictException(
-        'O funcionário responsável deve pertencer ao mesmo cliente do bloco.',
+        'O responsável deve pertencer ao mesmo cliente do bloco.',
       );
     }
 
@@ -62,8 +63,9 @@ export class ChapasService {
       return await this.prisma.chapa.create({
         data: {
           id: randomUUID(),
-          cliente_id: funcionario.cliente_id,
-          funcionario_id: funcionario.id,
+          cliente_id: responsavel.cliente_id,
+          funcionario_id: responsavel.id,
+          usuario_id: responsavel.usuario_id,
           blocoid: bloco.id,
           codigo: dados.codigo,
           espessura: dados.espessura,

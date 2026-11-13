@@ -99,6 +99,19 @@ export class AuthService {
     };
   }
 
+  listarFuncionariosResponsaveis() {
+    return this.prisma.funcionario.findMany({
+      select: {
+        id: true,
+        nome: true,
+        cliente_id: true,
+      },
+      orderBy: {
+        nome: "asc",
+      },
+    });
+  }
+
   async bootstrapAdministrador(dto: RegistroDto, chave: string) {
     this.validarChaveBootstrap(chave);
 

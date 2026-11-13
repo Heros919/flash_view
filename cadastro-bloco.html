@@ -33,15 +33,47 @@
 
         <div class="col-md-6">
 
-            <label for="funcionarioId" class="form-label">
+            <div id="funcionario-container">
+                <label for="funcionarioId" class="form-label">Funcionário responsável</label>
+                <select class="form-select" id="funcionarioId" required>
+                    <option value="">Carregando funcionários...</option>
+                </select>
+                <div id="ajuda-funcionario" class="form-text">
+                    Selecione o funcionário responsável.
+                </div>
+            </div>
 
-                ID do Funcionário
-            </label>
+            <div id="administrador-container" hidden>
+                <label for="administradorId" class="form-label">ID do Administrador responsável</label>
+                <input class="form-control" id="administradorId" readonly>
+                <div class="form-text">O cadastro será associado à sua conta.</div>
+            </div>
 
-            <input type="text" class="form-control" id="funcionarioId" placeholder="ID do funcionário" required>
-
-            <div id="ajuda-funcionario" class="form-text">
-                Funcionário: ID preenchido pelo login. Financeiro/Administrador: informe o ID do funcionário responsável pelo bloco.
+            <div id="cliente-container" hidden>
+                <label for="clienteBusca" class="form-label">Buscar cliente</label>
+                <div class="position-relative">
+                    <input
+                        class="form-control"
+                        id="clienteBusca"
+                        type="search"
+                        autocomplete="off"
+                        placeholder="Digite o nome, CPF ou ID do cliente"
+                        role="combobox"
+                        aria-autocomplete="list"
+                        aria-expanded="false"
+                        aria-controls="clientes-resultados">
+                    <input type="hidden" id="clienteId">
+                    <div
+                        id="clientes-resultados"
+                        class="list-group position-absolute w-100 shadow"
+                        role="listbox"
+                        hidden
+                        style="z-index: 1050;"></div>
+                </div>
+                <div id="ajuda-cliente" class="form-text">
+                    Digite pelo menos 2 caracteres para buscar. IDs também podem ser pesquisados diretamente.
+                </div>
+                <div id="cliente-selecionado" class="form-text" aria-live="polite"></div>
             </div>
 
         </div>
@@ -270,13 +302,13 @@
         const formulario = document.getElementById('form-bloco');
         const mensagem = document.getElementById('mensagem');
         const botaoSalvar = document.getElementById('btn-salvar');
+        const selectFuncionario = document.getElementById('funcionarioId');
+        const campoClienteId = document.getElementById('clienteId');
+        const buscaCliente = document.getElementById('clienteBusca');
+        const resultadosClientes = document.getElementById('clientes-resultados');
         const contaLogada = JSON.parse(localStorage.getItem('usuario') || 'null');
-        if (contaLogada?.papel === 'FUNCIONARIO') {
-            document.getElementById('funcionarioId').value = contaLogada.id;
-            document.getElementById('funcionarioId').readOnly = true;
-            document.getElementById('ajuda-funcionario').textContent =
-                'ID do funcionário preenchido automaticamente pela sua conta.';
-        }
+        let temporizadorBuscaCliente;
+        let versaoBuscaCliente = 0;
         const galeriaImagens = window.criarGaleriaImagens({
             recurso: 'blocos',
             input: document.getElementById('imagem'),
@@ -295,6 +327,155 @@
             mensagem.textContent = '';
         }
 
+        function fecharResultadosClientes() {
+            resultadosClientes.hidden = true;
+            buscaCliente.setAttribute('aria-expanded', 'false');
+        }
+
+        function mostrarEstadoBuscaCliente(texto) {
+            const estado = document.createElement('div');
+            estado.className = 'list-group-item text-muted';
+            estado.textContent = texto;
+            resultadosClientes.replaceChildren(estado);
+            resultadosClientes.hidden = false;
+            buscaCliente.setAttribute('aria-expanded', 'true');
+        }
+
+        function pesquisarClientes() {
+            clearTimeout(temporizadorBuscaCliente);
+            campoClienteId.value = '';
+            document.getElementById('cliente-selecionado').textContent = '';
+
+            const busca = buscaCliente.value.trim();
+            const buscaPorId = /^\d+$/.test(busca);
+            const versaoAtual = ++versaoBuscaCliente;
+
+            if (busca.length < 2 && !buscaPorId) {
+                resultadosClientes.replaceChildren();
+                fecharResultadosClientes();
+                return;
+            }
+
+            mostrarEstadoBuscaCliente('Buscando clientes...');
+            temporizadorBuscaCliente = setTimeout(async () => {
+                try {
+                    const clientes = await api(
+                        `/cliente/buscar?busca=${encodeURIComponent(busca)}`
+                    );
+                    if (
+                        versaoAtual !== versaoBuscaCliente ||
+                        busca !== buscaCliente.value.trim()
+                    ) {
+                        return;
+                    }
+                    if (!Array.isArray(clientes)) {
+                        throw new Error('A API retornou uma lista de clientes inválida.');
+                    }
+
+                    resultadosClientes.replaceChildren();
+                    if (clientes.length === 0) {
+                        mostrarEstadoBuscaCliente('Nenhum cliente encontrado.');
+                        return;
+                    }
+
+                    clientes.forEach((cliente) => {
+                        const opcao = document.createElement('button');
+                        opcao.type = 'button';
+                        opcao.className = 'list-group-item list-group-item-action';
+                        opcao.setAttribute('role', 'option');
+                        opcao.setAttribute('aria-selected', 'false');
+                        opcao.textContent = `${cliente.nome} — ID ${cliente.id}`;
+                        opcao.addEventListener('click', () => {
+                            campoClienteId.value = String(cliente.id);
+                            buscaCliente.value = `${cliente.nome} — ID ${cliente.id}`;
+                            document.getElementById('cliente-selecionado').textContent =
+                                `Cliente selecionado: ${cliente.nome} (ID ${cliente.id}).`;
+                            versaoBuscaCliente += 1;
+                            resultadosClientes.replaceChildren();
+                            fecharResultadosClientes();
+                        });
+                        resultadosClientes.appendChild(opcao);
+                    });
+                    resultadosClientes.hidden = false;
+                    buscaCliente.setAttribute('aria-expanded', 'true');
+                } catch (error) {
+                    if (versaoAtual !== versaoBuscaCliente) {
+                        return;
+                    }
+                    mostrarEstadoBuscaCliente('Erro ao buscar clientes.');
+                    mostrarMensagem(
+                        `Não foi possível buscar os clientes: ${error.message}`,
+                        'danger'
+                    );
+                }
+            }, 250);
+        }
+
+        buscaCliente.addEventListener('input', pesquisarClientes);
+        buscaCliente.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                fecharResultadosClientes();
+            }
+        });
+
+        async function carregarFuncionariosResponsaveis() {
+            const ajudaFuncionario = document.getElementById('ajuda-funcionario');
+            if (contaLogada?.papel === 'FUNCIONARIO') {
+                const opcao = document.createElement('option');
+                opcao.value = String(contaLogada.id);
+                opcao.textContent = `${contaLogada.nome} — ${contaLogada.id}`;
+                selectFuncionario.replaceChildren(opcao);
+                selectFuncionario.disabled = true;
+                ajudaFuncionario.textContent =
+                    'Funcionário responsável preenchido automaticamente pela sua conta.';
+                document.getElementById('cliente-container').hidden = false;
+                return;
+            }
+
+            if (contaLogada?.papel === 'ADMINISTRADOR') {
+                document.getElementById('funcionario-container').hidden = true;
+                document.getElementById('administrador-container').hidden = false;
+                document.getElementById('cliente-container').hidden = false;
+                document.getElementById('administradorId').value = contaLogada.id;
+                selectFuncionario.required = false;
+                return;
+            }
+
+            try {
+                const funcionarios = await api('/auth/funcionarios-responsaveis');
+                if (!Array.isArray(funcionarios)) {
+                    throw new Error('A API retornou uma lista de funcionários inválida.');
+                }
+
+                selectFuncionario.innerHTML =
+                    '<option value="">Selecione o funcionário responsável</option>';
+                funcionarios.forEach((funcionario) => {
+                    const opcao = document.createElement('option');
+                    opcao.value = funcionario.id;
+                    opcao.textContent = `${funcionario.nome} — ${funcionario.id}`;
+                    selectFuncionario.appendChild(opcao);
+                });
+
+                if (funcionarios.length === 0) {
+                    selectFuncionario.innerHTML =
+                        '<option value="">Nenhum funcionário cadastrado</option>';
+                    selectFuncionario.disabled = true;
+                    ajudaFuncionario.textContent =
+                        'Cadastre um funcionário antes de criar o bloco.';
+                }
+            } catch (error) {
+                selectFuncionario.innerHTML =
+                    '<option value="">Erro ao carregar funcionários</option>';
+                selectFuncionario.disabled = true;
+                mostrarMensagem(
+                    `Não foi possível carregar os funcionários: ${error.message}`,
+                    'danger'
+                );
+            }
+        }
+
+        carregarFuncionariosResponsaveis();
+
         formulario.addEventListener('submit', async (event) => {
             event.preventDefault();
             esconderMensagem();
@@ -305,8 +486,16 @@
             let blocoCriado = false;
 
             try {
-                const funcionarioId =
-                    document.getElementById('funcionarioId').value.trim();
+                const ehAdministrador = contaLogada?.papel === 'ADMINISTRADOR';
+                const ehFuncionario = contaLogada?.papel === 'FUNCIONARIO';
+                const funcionarioId = selectFuncionario.value.trim();
+                if (!ehAdministrador && !funcionarioId) {
+                    mostrarMensagem(
+                        'Selecione um funcionário responsável válido.',
+                        'danger'
+                    );
+                    return;
+                }
 
                 const codigo =
                     document.getElementById('codigo').value.trim();
@@ -343,7 +532,6 @@
 
 
                 const novoBloco = {
-                    funcionarioId,
                     codigo,
                     numero,
                     altura,
@@ -353,6 +541,21 @@
                     ano,
                     frente
                 };
+
+                if (ehAdministrador || ehFuncionario) {
+                    if (!campoClienteId.value) {
+                        mostrarMensagem(
+                            'Busque e selecione um cliente antes de salvar.',
+                            'danger'
+                        );
+                        return;
+                    }
+                    novoBloco.clienteId = Number(campoClienteId.value);
+                }
+
+                if (!ehAdministrador) {
+                    novoBloco.funcionarioId = funcionarioId;
+                }
 
                 if (material) {
                     novoBloco.material = material;

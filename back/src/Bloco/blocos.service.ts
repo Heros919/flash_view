@@ -27,18 +27,20 @@ export class BlocosService {
     dados: CreateBlocos,
     usuario: FuncionarioAutenticado | UsuarioAutenticado,
   ) {
-    const funcionario = await obterFuncionarioResponsavel(
+    const responsavel = await obterFuncionarioResponsavel(
       this.prisma,
       usuario,
       dados.funcionarioId,
+      dados.clienteId,
     );
 
     try {
       return await this.prisma.bloco.create({
         data: {
           id: randomUUID(),
-          cliente_id: funcionario.cliente_id,
-          funcionario_id: funcionario.id,
+          cliente_id: responsavel.cliente_id,
+          funcionario_id: responsavel.id,
+          usuario_id: responsavel.usuario_id,
           codigo: dados.codigo,
           numero: dados.numero,
           material: dados.material,

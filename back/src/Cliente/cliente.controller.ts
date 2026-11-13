@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { ClienteService } from './cliente.service';
 import { Papeis } from '../auth/decorators/roles.decorator';
 import { Papel } from '../usuario/usuario.service';
@@ -17,7 +17,14 @@ export class ClienteController {
     return this.clienteservice.criarCliente(body);
   }
 
-  @Papeis(Papel.Financeiro)
+  @Papeis(Papel.Administrador, Papel.Financeiro, Papel.Funcionario)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Get('buscar')
+  buscar(@Query('busca') busca?: string) {
+    return this.clienteservice.buscar(busca);
+  }
+
+  @Papeis(Papel.Administrador, Papel.Financeiro)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Get()
   listar() {

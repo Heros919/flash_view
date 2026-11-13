@@ -26,6 +26,8 @@ model usuario {
   papel        PapelConta @default(FUNCIONARIO)
   datacadastro DateTime   @default(now()) @db.Timestamp(6)
   venda        venda[]
+  bloco        bloco[]
+  chapa        chapa[]
 }
 
 model financeiro {
@@ -48,24 +50,26 @@ model admin {
 }
 
 model bloco {
-  id             String      @id @db.VarChar(100)
+  id             String       @id @db.VarChar(100)
   cliente_id     Int
-  funcionario_id String      @db.VarChar(100)
-  codigo         String      @unique @db.VarChar(50)
+  funcionario_id String?      @db.VarChar(100)
+  usuario_id     Int?
+  codigo         String       @unique @db.VarChar(50)
   numero         Int
-  material       String?     @db.VarChar(150)
-  cor            String?     @db.VarChar(160)
-  altura         Decimal?    @db.Decimal(10, 2)
-  largura        Decimal?    @db.Decimal(10, 2)
-  comprimento    Decimal?    @db.Decimal(10, 2)
-  peso           Decimal?    @db.Decimal(10, 2)
-  volume         Decimal?    @default(dbgenerated("((altura * largura) * comprimento)")) @db.Decimal(12, 3)
+  material       String?      @db.VarChar(150)
+  cor            String?      @db.VarChar(160)
+  altura         Decimal?     @db.Decimal(10, 2)
+  largura        Decimal?     @db.Decimal(10, 2)
+  comprimento    Decimal?     @db.Decimal(10, 2)
+  peso           Decimal?     @db.Decimal(10, 2)
+  volume         Decimal?     @default(dbgenerated("((altura * largura) * comprimento)")) @db.Decimal(12, 3)
   mes            Int
   ano            Int
-  frente         String      @db.VarChar(50)
-  datacadastro   DateTime    @default(dbgenerated("CURRENT_DATE")) @db.Date
-  cliente        cliente     @relation(fields: [cliente_id], references: [id], map: "fk_bloco_cliente")
-  funcionario    funcionario @relation(fields: [cliente_id, funcionario_id], references: [cliente_id, id], map: "fk_bloco_funcionario")
+  frente         String       @db.VarChar(50)
+  datacadastro   DateTime     @default(dbgenerated("CURRENT_DATE")) @db.Date
+  cliente        cliente      @relation(fields: [cliente_id], references: [id], map: "fk_bloco_cliente")
+  funcionario    funcionario? @relation(fields: [funcionario_id], references: [id], onDelete: Restrict, map: "fk_bloco_funcionario")
+  usuario        usuario?     @relation(fields: [usuario_id], references: [id], onDelete: Restrict, map: "fk_bloco_usuario")
   chapa          chapa[]
   midia          midia[]
 
@@ -74,31 +78,35 @@ model bloco {
   @@index([cor], map: "idx_bloco_cor")
   @@index([frente], map: "idx_bloco_frente")
   @@index([funcionario_id], map: "idx_bloco_funcionario_id")
+  @@index([usuario_id], map: "idx_bloco_usuario_id")
   @@index([material], map: "idx_bloco_material")
   @@index([mes], map: "idx_bloco_mes")
 }
 
 model chapa {
-  id             String      @id @db.VarChar(100)
+  id             String       @id @db.VarChar(100)
   cliente_id     Int
-  funcionario_id String      @db.VarChar(100)
-  codigo         String      @unique @db.VarChar(50)
-  blocoid        String      @db.VarChar(100)
-  espessura      Decimal?    @db.Decimal(10, 2)
-  altura         Decimal?    @db.Decimal(10, 2)
-  largura        Decimal?    @db.Decimal(10, 2)
-  acabamento     String?     @db.VarChar(150)
-  status         String      @default("DISPONIVEL") @db.VarChar(20)
-  datacadastro   DateTime    @default(dbgenerated("CURRENT_DATE")) @db.Date
-  bloco          bloco       @relation(fields: [blocoid], references: [id], map: "fk_chapa_bloco")
-  cliente        cliente     @relation(fields: [cliente_id], references: [id], map: "fk_chapa_cliente")
-  funcionario    funcionario @relation(fields: [cliente_id, funcionario_id], references: [cliente_id, id], map: "fk_chapa_funcionario")
+  funcionario_id String?      @db.VarChar(100)
+  usuario_id     Int?
+  codigo         String       @unique @db.VarChar(50)
+  blocoid        String       @db.VarChar(100)
+  espessura      Decimal?     @db.Decimal(10, 2)
+  altura         Decimal?     @db.Decimal(10, 2)
+  largura        Decimal?     @db.Decimal(10, 2)
+  acabamento     String?      @db.VarChar(150)
+  status         String       @default("DISPONIVEL") @db.VarChar(20)
+  datacadastro   DateTime     @default(dbgenerated("CURRENT_DATE")) @db.Date
+  bloco          bloco        @relation(fields: [blocoid], references: [id], map: "fk_chapa_bloco")
+  cliente        cliente      @relation(fields: [cliente_id], references: [id], map: "fk_chapa_cliente")
+  funcionario    funcionario? @relation(fields: [funcionario_id], references: [id], onDelete: Restrict, map: "fk_chapa_funcionario")
+  usuario        usuario?     @relation(fields: [usuario_id], references: [id], onDelete: Restrict, map: "fk_chapa_usuario")
   midia          midia[]
 
   @@index([acabamento], map: "idx_chapa_acabamento")
   @@index([blocoid], map: "idx_chapa_blocoid")
   @@index([cliente_id], map: "idx_chapa_cliente_id")
   @@index([funcionario_id], map: "idx_chapa_funcionario_id")
+  @@index([usuario_id], map: "idx_chapa_usuario_id")
   @@index([status], map: "idx_chapa_status")
 }
 
