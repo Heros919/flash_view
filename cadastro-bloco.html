@@ -6,8 +6,164 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Flash View - Novo Bloco</title>
-    <link rel="icon" href="assets/logo.ico" type="image/x-icon">
+    <link rel="icon" href="assets/logoFlashView.jpeg" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --bg-body: #0a111a;
+            --bg-sidebar: #0f1722;
+            --bg-card: #141d2b;
+            --bg-input: #1c2736;
+            --border-color: #233142;
+            --text-main: #e2e8f0;
+            --text-muted: #8b9eb0;
+            --brand-yellow: #ffc107;
+            --brand-cyan: #00d2ff;
+            
+            --status-disponivel: #10b981;
+            --status-reservado: #eab308;
+            --status-vendido: #ef4444;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            padding-bottom: 3rem;
+        }
+
+        .page-title {
+            font-family: Georgia, serif;
+            font-weight: 700;
+            color: #ffffff;
+            text-decoration: underline;
+            text-decoration-color: var(--brand-yellow);
+        }
+
+        hr {
+            border-color: var(--border-color);
+            opacity: 1;
+            margin-bottom: 2rem;
+        }
+
+        form#form-bloco {
+            background-color: var(--bg-card);
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-label {
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        /* CORREÇÃO DO FUNDO BRANCO NOS INPUTS E SELECTS */
+        .form-control, .form-select {
+            background-color: var(--bg-input) !important;
+            border: 1px solid var(--border-color);
+            color: #ffffff !important;
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        /* CORREÇÃO DA SETINHA DO SELECT (Para ficar visível no escuro) */
+        .form-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%238b9eb0' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 0.75rem center !important;
+            background-size: 16px 12px !important;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background-color: var(--bg-input) !important;
+            border-color: var(--brand-cyan);
+            color: #ffffff !important;
+            box-shadow: 0 0 0 3px rgba(0, 210, 255, 0.15);
+        }
+
+        .form-control::placeholder {
+            color: #4a627a;
+        }
+
+        /* CORREÇÃO DO FUNDO DAS OPÇÕES DO SELECT */
+        .form-select option {
+            background-color: var(--bg-body) !important;
+            color: #ffffff !important;
+        }
+
+        .form-text {
+            color: var(--text-muted) !important;
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .form-control[type="file"] {
+            padding: 0.5rem;
+        }
+
+        .form-control[type="file"]::file-selector-button {
+            background-color: var(--border-color);
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            margin-right: 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-control[type="file"]::file-selector-button:hover {
+            background-color: var(--brand-cyan);
+            color: #000;
+        }
+
+        .btn-success {
+            background-color: var(--brand-cyan);
+            border-color: var(--brand-cyan);
+            color: #000;
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+        }
+
+        .btn-success:hover {
+            background-color: #00b0d8;
+            border-color: #00b0d8;
+            color: #000;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border-color: var(--border-color);
+            color: var(--text-muted);
+            padding: 0.75rem 2rem;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--border-color);
+            color: #ffffff;
+        }
+
+        .alert-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #75b798;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .alert-danger {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ff6b6b;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+    </style>
+
 </head>
 
 <body class="container mt-5">
@@ -16,11 +172,11 @@
 
         <a href="dashboard.html" aria-label="Voltar para dashboard" class="d-inline-flex align-items-center">
 
-            <img src="assets/logo.ico" alt="Flash View" style="width: 48px; height: 48px; object-fit: contain;">
+            <img src="assets/logoFlashViewRecortada.png" alt="Flash View" style="width: 48px; height: 48px; object-fit: contain;">
 
         </a>
 
-        <h1 class="mb-0">
+        <h1 class="mb-0 page-title">
             Cadastrar Novo Bloco
         </h1>
 
@@ -28,13 +184,12 @@
 
     <hr>
 
-
     <form id="form-bloco" class="row g-3">
 
         <div class="col-md-6">
 
             <div id="funcionario-container">
-                <label for="funcionarioId" class="form-label">Funcionário responsável</label>
+                <label for="funcionarioId" class="form-label stat-label">Funcionário responsável</label>
                 <select class="form-select" id="funcionarioId" required>
                     <option value="">Carregando funcionários...</option>
                 </select>
@@ -44,31 +199,20 @@
             </div>
 
             <div id="administrador-container" hidden>
-                <label for="administradorId" class="form-label">ID do Administrador responsável</label>
+                <label for="administradorId" class="form-label stat-label">ID do Administrador responsável</label>
                 <input class="form-control" id="administradorId" readonly>
                 <div class="form-text">O cadastro será associado à sua conta.</div>
             </div>
 
             <div id="cliente-container" hidden>
-                <label for="clienteBusca" class="form-label">Buscar cliente</label>
+                <label for="clienteBusca" class="form-label stat-label">Buscar cliente</label>
                 <div class="position-relative">
-                    <input
-                        class="form-control"
-                        id="clienteBusca"
-                        type="search"
-                        autocomplete="off"
-                        placeholder="Digite o nome, CPF ou ID do cliente"
-                        role="combobox"
-                        aria-autocomplete="list"
-                        aria-expanded="false"
-                        aria-controls="clientes-resultados">
+                    <input class="form-control" id="clienteBusca" type="search" autocomplete="off"
+                        placeholder="Digite o nome, CPF ou ID do cliente" role="combobox" aria-autocomplete="list"
+                        aria-expanded="false" aria-controls="clientes-resultados">
                     <input type="hidden" id="clienteId">
-                    <div
-                        id="clientes-resultados"
-                        class="list-group position-absolute w-100 shadow"
-                        role="listbox"
-                        hidden
-                        style="z-index: 1050;"></div>
+                    <div id="clientes-resultados" class="list-group position-absolute w-100 shadow" role="listbox"
+                        hidden style="z-index: 1050;"></div>
                 </div>
                 <div id="ajuda-cliente" class="form-text">
                     Digite pelo menos 2 caracteres para buscar. IDs também podem ser pesquisados diretamente.
@@ -78,11 +222,9 @@
 
         </div>
 
-
         <div class="col-md-6">
 
             <label for="codigo" class="form-label">
-
                 Código
             </label>
 
@@ -90,107 +232,45 @@
 
         </div>
 
-
         <div class="col-md-4">
-
-            <label for="numero" class="form-label">
-
-                Número
-            </label>
-
+            <label for="numero" class="form-label">Número</label>
             <input type="number" class="form-control" id="numero" min="0" max="99" value="1" required>
-
         </div>
 
-
         <div class="col-md-4">
-
-            <label for="material" class="form-label">
-
-                Material
-            </label>
-
+            <label for="material" class="form-label">Material</label>
             <input type="text" class="form-control" id="material" maxlength="150" placeholder="Ex.: Granito">
-
         </div>
 
-
         <div class="col-md-4">
-
-            <label for="cor" class="form-label">
-
-                Cor
-            </label>
-
+            <label for="cor" class="form-label">Cor</label>
             <input type="text" class="form-control" id="cor" maxlength="160" placeholder="Ex.: Branco">
-
         </div>
 
-
         <div class="col-md-4">
-
-            <label for="comprimento" class="form-label">
-
-                Comprimento
-            </label>
-
-            <input type="number" class="form-control" id="comprimento" min="0.01" step="0.01" placeholder="Ex.: 3.20"
-                required>
-
+            <label for="comprimento" class="form-label">Comprimento</label>
+            <input type="number" class="form-control" id="comprimento" min="0.01" step="0.01" placeholder="Ex.: 3.20" required>
         </div>
 
-
         <div class="col-md-4">
-
-            <label for="largura" class="form-label">
-
-                Largura
-            </label>
-
-            <input type="number" class="form-control" id="largura" min="0.01" step="0.01" placeholder="Ex.: 1.80"
-                required>
-
+            <label for="largura" class="form-label">Largura</label>
+            <input type="number" class="form-control" id="largura" min="0.01" step="0.01" placeholder="Ex.: 1.80" required>
         </div>
 
-
         <div class="col-md-4">
-
-            <label for="altura" class="form-label">
-
-                Altura
-            </label>
-
-            <input type="number" class="form-control" id="altura" min="0.01" step="0.01" placeholder="Ex.: 1.70"
-                required>
-
+            <label for="altura" class="form-label">Altura</label>
+            <input type="number" class="form-control" id="altura" min="0.01" step="0.01" placeholder="Ex.: 1.70" required>
         </div>
 
-
         <div class="col-md-4">
-
-            <label for="peso" class="form-label">
-
-                Peso (kg)
-            </label>
-
+            <label for="peso" class="form-label">Peso (kg)</label>
             <input type="number" class="form-control" id="peso" min="0.01" step="0.01" placeholder="Ex.: 8500">
-
         </div>
 
-
         <div class="col-md-4">
-
-            <label for="mes" class="form-label">
-
-                Mês
-            </label>
-
+            <label for="mes" class="form-label">Mês</label>
             <select class="form-select" id="mes" required>
-
-                <option value="">
-                    Selecione
-                </option>
-
+                <option value="">Selecione</option>
                 <option value="1">Janeiro</option>
                 <option value="2">Fevereiro</option>
                 <option value="3">Março</option>
@@ -203,102 +283,59 @@
                 <option value="10">Outubro</option>
                 <option value="11">Novembro</option>
                 <option value="12">Dezembro</option>
-
             </select>
-
         </div>
 
-
         <div class="col-md-4">
-
-            <label for="ano" class="form-label">
-
-                Ano
-            </label>
-
+            <label for="ano" class="form-label">Ano</label>
             <input type="number" class="form-control" id="ano" min="2000" value="2026" required>
-
         </div>
 
-
         <div class="col-md-4">
-
-            <label for="frente" class="form-label">
-
-                Frente
-            </label>
-
+            <label for="frente" class="form-label">Frente</label>
             <select class="form-select" id="frente" required>
-
-                <option value="">
-                    Selecione
-                </option>
-
+                <option value="">Selecione</option>
                 <option value="A">A</option>
                 <option value="B">B</option>
                 <option value="C">C</option>
                 <option value="D">D</option>
                 <option value="BARRAGEM">BARRAGEM</option>
                 <option value="BARREIRO">BARREIRO</option>
-
             </select>
-
         </div>
-
 
         <div class="col-md-6">
-
-            <label for="imagem" class="form-label">
-
+            <label for="imagem" class="form-label img-blocotxt">
                 Imagens do bloco (até 5)
             </label>
-
             <input type="file" class="form-control" id="imagem" name="imagens" accept="image/*" multiple>
-
         </div>
 
-
         <div class="col-12">
-
             <div id="contador-imagens" class="form-text">0/5 imagens</div>
             <div id="galeria-imagens" class="d-flex flex-wrap gap-3"></div>
-
         </div>
-
 
         <div class="col-12">
-
             <div id="mensagem" class="alert d-none" role="alert">
             </div>
-
         </div>
 
-
         <div class="col-12 mt-4">
-
             <button type="submit" id="btn-salvar" class="btn btn-success">
-
                 Salvar Bloco
-
             </button>
-
             <a href="historicoBlocosChapas.html" class="btn btn-secondary">
-
                 Cancelar
-
             </a>
-
         </div>
 
     </form>
 
-
     <script src="js/api.js"></script>
     <script src="js/multiplas-imagens.js"></script>
 
-
     <script>
-
         const formulario = document.getElementById('form-bloco');
         const mensagem = document.getElementById('mensagem');
         const botaoSalvar = document.getElementById('btn-salvar');
