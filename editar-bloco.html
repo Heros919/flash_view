@@ -8,6 +8,53 @@
     <title>Flash View - Editar Bloco</title>
     <link rel="icon" href="assets/logo.ico" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-body: #0a111a;
+            --bg-sidebar: #0f1722;
+            --bg-card: #141d2b;
+            --bg-input: #1c2736;
+            --border-color: #233142;
+            --text-main: #e2e8f0;
+            --text-muted: #8b9eb0;
+            --brand-yellow: #ffc107;
+            --brand-cyan: #00d2ff;
+            
+            --status-disponivel: #10b981;
+            --status-reservado: #eab308;
+            --status-vendido: #ef4444;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+
+        }
+        .page-title {
+            font-family: Georgia, serif; 
+            font-weight: 700;
+            color: #ffffff;
+            text-decoration: underline;
+            text-decoration-color: var(--brand-yellow);
+        }
+        .page-subtitle {
+            color: gray;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .card-body{
+            background-color: var(--bg-card);
+            border: 1px ridge yellow;
+            border-color: var(--border-color);
+        }
+
+        
+    </style>
+
+
 </head>
 
 <body class="container mt-5">
@@ -19,8 +66,8 @@
         </a>
 
         <div>
-            <h1 class="mb-0">Editar Bloco</h1>
-            <small class="text-muted">
+            <h1 class="mb-0 page-title">Editar Bloco</h1>
+            <small class="page-subtitle">
                 Altere somente o que precisar.
             </small>
         </div>
@@ -264,6 +311,40 @@
             contador: document.getElementById('contador-imagens'),
             aoErro: (texto) => mostrarMensagem(texto),
         });
+
+        const inputImagens = document.getElementById('imagem');
+        const galeriaElement = document.getElementById('galeria-imagens');
+        const contadorImagens = document.getElementById('contador-imagens');
+
+        function atualizarContadorImagens() {
+            const quantidade = Math.min(
+                galeriaElement.querySelectorAll('img').length,
+                5
+            );
+            contadorImagens.textContent = `${quantidade}/5 imagens`;
+        }
+
+        inputImagens.addEventListener('change', event => {
+            const quantidadeAtual = galeriaElement.querySelectorAll('img').length;
+            const limiteRestante = Math.max(0, 5 - quantidadeAtual);
+            const arquivos = Array.from(event.target.files || []);
+
+            if (arquivos.length > limiteRestante) {
+                const arquivosPermitidos = arquivos.slice(0, limiteRestante);
+                const transferencia = new DataTransfer();
+                arquivosPermitidos.forEach(arquivo => transferencia.items.add(arquivo));
+                event.target.files = transferencia.files;
+                mostrarMensagem('É possível adicionar no máximo 5 imagens.', 'warning');
+            }
+
+            atualizarContadorImagens();
+        }, true);
+
+        new MutationObserver(atualizarContadorImagens).observe(galeriaElement, {
+            childList: true,
+            subtree: true
+        });
+        atualizarContadorImagens();
 
 
         function mostrarMensagem(
