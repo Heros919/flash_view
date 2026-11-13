@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000';
+const API_URL = 'https://flash-view-1.onrender.com:3000';
 
 async function api(endpoint, options = {}) {
     const token = localStorage.getItem('token');
