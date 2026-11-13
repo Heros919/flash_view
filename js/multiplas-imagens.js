@@ -1,5 +1,5 @@
 (() => {
-    const API_URL = 'http://localhost:3000';
+    const API_URL = 'https://flash-view-1.onrender.com';
     const MAX_IMAGENS = 5;
     const TAMANHO_MAXIMO = 10 * 1024 * 1024;
 
