@@ -50,6 +50,7 @@ export const AnyNull = runtime.objectEnumValues.instances.AnyNull
 
 export const ModelName = {
   usuario: 'usuario',
+  financeiro: 'financeiro',
   admin: 'admin',
   bloco: 'bloco',
   chapa: 'chapa',
@@ -93,6 +94,19 @@ export const UsuarioScalarFieldEnum = {
 export type UsuarioScalarFieldEnum = (typeof UsuarioScalarFieldEnum)[keyof typeof UsuarioScalarFieldEnum]
 
 
+export const FinanceiroScalarFieldEnum = {
+  id: 'id',
+  cpf: 'cpf',
+  nome: 'nome',
+  email: 'email',
+  senha_hash: 'senha_hash',
+  ativo: 'ativo',
+  datacadastro: 'datacadastro'
+} as const
+
+export type FinanceiroScalarFieldEnum = (typeof FinanceiroScalarFieldEnum)[keyof typeof FinanceiroScalarFieldEnum]
+
+
 export const AdminScalarFieldEnum = {
   id: 'id',
   nome: 'nome',
@@ -107,6 +121,7 @@ export const BlocoScalarFieldEnum = {
   id: 'id',
   cliente_id: 'cliente_id',
   funcionario_id: 'funcionario_id',
+  usuario_id: 'usuario_id',
   codigo: 'codigo',
   numero: 'numero',
   material: 'material',
@@ -129,6 +144,7 @@ export const ChapaScalarFieldEnum = {
   id: 'id',
   cliente_id: 'cliente_id',
   funcionario_id: 'funcionario_id',
+  usuario_id: 'usuario_id',
   codigo: 'codigo',
   blocoid: 'blocoid',
   espessura: 'espessura',
@@ -217,6 +233,7 @@ export const VendaScalarFieldEnum = {
   cliente_id: 'cliente_id',
   funcionario_id: 'funcionario_id',
   usuario_id: 'usuario_id',
+  financeiro_id: 'financeiro_id',
   datavenda: 'datavenda',
   status: 'status',
   total: 'total'

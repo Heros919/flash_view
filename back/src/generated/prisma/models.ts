@@ -9,6 +9,7 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/usuario.js'
+export type * from './models/financeiro.js'
 export type * from './models/admin.js'
 export type * from './models/bloco.js'
 export type * from './models/chapa.js'

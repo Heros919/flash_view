@@ -391,6 +391,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   usuario: 'usuario',
+  financeiro: 'financeiro',
   admin: 'admin',
   bloco: 'bloco',
   chapa: 'chapa',
@@ -417,7 +418,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "usuario" | "admin" | "bloco" | "chapa" | "cliente" | "endereco" | "funcionario" | "midia" | "produto_servico" | "tipo_produto" | "venda" | "venda_item"
+    modelProps: "usuario" | "financeiro" | "admin" | "bloco" | "chapa" | "cliente" | "endereco" | "funcionario" | "midia" | "produto_servico" | "tipo_produto" | "venda" | "venda_item"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -492,6 +493,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.usuarioCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.UsuarioCountAggregateOutputType> | number
+        }
+      }
+    }
+    financeiro: {
+      payload: Prisma.$financeiroPayload<ExtArgs>
+      fields: Prisma.financeiroFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.financeiroFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$financeiroPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.financeiroFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$financeiroPayload>
+        }
+        findFirst: {
+          args: Prisma.financeiroFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$financeiroPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.financeiroFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$financeiroPayload>
+        }
+        findMany: {
+          args: Prisma.financeiroFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$financeiroPayload>[]
+        }
+        create: {
+          args: Prisma.financeiroCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$financeiroPayload>
+        }
+        createMany: {
+          args: Prisma.financeiroCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.financeiroCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$financeiroPayload>[]
+        }
+        delete: {
+          args: Prisma.financeiroDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$financeiroPayload>
+        }
+        update: {
+          args: Prisma.financeiroUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$financeiroPayload>
+        }
+        deleteMany: {
+          args: Prisma.financeiroDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.financeiroUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.financeiroUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$financeiroPayload>[]
+        }
+        upsert: {
+          args: Prisma.financeiroUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$financeiroPayload>
+        }
+        aggregate: {
+          args: Prisma.FinanceiroAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateFinanceiro>
+        }
+        groupBy: {
+          args: Prisma.financeiroGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FinanceiroGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.financeiroCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FinanceiroCountAggregateOutputType> | number
         }
       }
     }
@@ -1362,6 +1437,19 @@ export const UsuarioScalarFieldEnum = {
 export type UsuarioScalarFieldEnum = (typeof UsuarioScalarFieldEnum)[keyof typeof UsuarioScalarFieldEnum]
 
 
+export const FinanceiroScalarFieldEnum = {
+  id: 'id',
+  cpf: 'cpf',
+  nome: 'nome',
+  email: 'email',
+  senha_hash: 'senha_hash',
+  ativo: 'ativo',
+  datacadastro: 'datacadastro'
+} as const
+
+export type FinanceiroScalarFieldEnum = (typeof FinanceiroScalarFieldEnum)[keyof typeof FinanceiroScalarFieldEnum]
+
+
 export const AdminScalarFieldEnum = {
   id: 'id',
   nome: 'nome',
@@ -1376,6 +1464,7 @@ export const BlocoScalarFieldEnum = {
   id: 'id',
   cliente_id: 'cliente_id',
   funcionario_id: 'funcionario_id',
+  usuario_id: 'usuario_id',
   codigo: 'codigo',
   numero: 'numero',
   material: 'material',
@@ -1398,6 +1487,7 @@ export const ChapaScalarFieldEnum = {
   id: 'id',
   cliente_id: 'cliente_id',
   funcionario_id: 'funcionario_id',
+  usuario_id: 'usuario_id',
   codigo: 'codigo',
   blocoid: 'blocoid',
   espessura: 'espessura',
@@ -1486,6 +1576,7 @@ export const VendaScalarFieldEnum = {
   cliente_id: 'cliente_id',
   funcionario_id: 'funcionario_id',
   usuario_id: 'usuario_id',
+  financeiro_id: 'financeiro_id',
   datavenda: 'datavenda',
   status: 'status',
   total: 'total'
@@ -1729,6 +1820,7 @@ export interface PrismaClientOptions {
 }
 export type GlobalOmitConfig = {
   usuario?: Prisma.usuarioOmit
+  financeiro?: Prisma.financeiroOmit
   admin?: Prisma.adminOmit
   bloco?: Prisma.blocoOmit
   chapa?: Prisma.chapaOmit

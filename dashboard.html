@@ -264,7 +264,7 @@
                     Usuário
                 </div>
                 <div id="id-usuario" class="text-muted small mb-2"></div>
-                <div class="profile-badge mb-3">ADMINISTRADOR</div>
+                <div id="papel-usuario" class="profile-badge mb-3">USUÁRIO</div>
                 
                 <button id="btn-sair" type="button" class="btn btn-logout btn-sm w-100 d-flex justify-content-between align-items-center">
                     <span>SAIR</span>
@@ -283,12 +283,15 @@
                     <div id="data-atual" class="page-subtitle"></div>
                 </div>
 
-                <div class="d-flex gap-2 mt-3 mt-md-0">
+                <div class="d-flex gap-2 flex-wrap mt-3 mt-md-0">
                     <a href="historicoBlocosChapas.html" class="btn btn-cyan-outline px-4 py-2">
                         Histórico
                     </a>
                     <a href="cadastro-bloco.html" class="btn btn-cyan-solid px-4 py-2">
                         <i class="bi bi-plus-lg me-1"></i> Novo
+                    </a>
+                    <a href="cadastro-chapa.html" class="btn btn-cyan-outline px-4 py-2">
+                        <i class="bi bi-plus-lg me-1"></i> Nova chapa
                     </a>
                 </div>
             </div>
@@ -532,6 +535,7 @@
             if (usuarioSalvo) {
                 const usuario = JSON.parse(usuarioSalvo);
                 nomeUsuario.textContent = usuario.nome || usuario.name || usuario.email || nomeSalvo || 'Usuário';
+                document.getElementById('papel-usuario').textContent = usuario.papel || 'USUÁRIO';
                 if (usuario.id !== undefined) {
                     document.getElementById('id-usuario').textContent = `ID: ${usuario.id}`;
                 }

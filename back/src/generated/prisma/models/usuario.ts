@@ -241,6 +241,8 @@ export type usuarioWhereInput = {
   papel?: Prisma.EnumPapelContaFilter<"usuario"> | $Enums.PapelConta
   datacadastro?: Prisma.DateTimeFilter<"usuario"> | Date | string
   venda?: Prisma.VendaListRelationFilter
+  bloco?: Prisma.BlocoListRelationFilter
+  chapa?: Prisma.ChapaListRelationFilter
 }
 
 export type usuarioOrderByWithRelationInput = {
@@ -253,6 +255,8 @@ export type usuarioOrderByWithRelationInput = {
   papel?: Prisma.SortOrder
   datacadastro?: Prisma.SortOrder
   venda?: Prisma.vendaOrderByRelationAggregateInput
+  bloco?: Prisma.blocoOrderByRelationAggregateInput
+  chapa?: Prisma.chapaOrderByRelationAggregateInput
 }
 
 export type usuarioWhereUniqueInput = Prisma.AtLeast<{
@@ -268,6 +272,8 @@ export type usuarioWhereUniqueInput = Prisma.AtLeast<{
   papel?: Prisma.EnumPapelContaFilter<"usuario"> | $Enums.PapelConta
   datacadastro?: Prisma.DateTimeFilter<"usuario"> | Date | string
   venda?: Prisma.VendaListRelationFilter
+  bloco?: Prisma.BlocoListRelationFilter
+  chapa?: Prisma.ChapaListRelationFilter
 }, "cpf" | "id" | "email">
 
 export type usuarioOrderByWithAggregationInput = {
@@ -310,6 +316,8 @@ export type usuarioCreateInput = {
   papel?: $Enums.PapelConta
   datacadastro?: Date | string
   venda?: Prisma.vendaCreateNestedManyWithoutUsuarioInput
+  bloco?: Prisma.blocoCreateNestedManyWithoutUsuarioInput
+  chapa?: Prisma.chapaCreateNestedManyWithoutUsuarioInput
 }
 
 export type usuarioUncheckedCreateInput = {
@@ -322,6 +330,8 @@ export type usuarioUncheckedCreateInput = {
   papel?: $Enums.PapelConta
   datacadastro?: Date | string
   venda?: Prisma.vendaUncheckedCreateNestedManyWithoutUsuarioInput
+  bloco?: Prisma.blocoUncheckedCreateNestedManyWithoutUsuarioInput
+  chapa?: Prisma.chapaUncheckedCreateNestedManyWithoutUsuarioInput
 }
 
 export type usuarioUpdateInput = {
@@ -333,6 +343,8 @@ export type usuarioUpdateInput = {
   papel?: Prisma.EnumPapelContaFieldUpdateOperationsInput | $Enums.PapelConta
   datacadastro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   venda?: Prisma.vendaUpdateManyWithoutUsuarioNestedInput
+  bloco?: Prisma.blocoUpdateManyWithoutUsuarioNestedInput
+  chapa?: Prisma.chapaUpdateManyWithoutUsuarioNestedInput
 }
 
 export type usuarioUncheckedUpdateInput = {
@@ -345,6 +357,8 @@ export type usuarioUncheckedUpdateInput = {
   papel?: Prisma.EnumPapelContaFieldUpdateOperationsInput | $Enums.PapelConta
   datacadastro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   venda?: Prisma.vendaUncheckedUpdateManyWithoutUsuarioNestedInput
+  bloco?: Prisma.blocoUncheckedUpdateManyWithoutUsuarioNestedInput
+  chapa?: Prisma.chapaUncheckedUpdateManyWithoutUsuarioNestedInput
 }
 
 export type usuarioCreateManyInput = {
@@ -449,6 +463,38 @@ export type IntFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type usuarioCreateNestedOneWithoutBlocoInput = {
+  create?: Prisma.XOR<Prisma.usuarioCreateWithoutBlocoInput, Prisma.usuarioUncheckedCreateWithoutBlocoInput>
+  connectOrCreate?: Prisma.usuarioCreateOrConnectWithoutBlocoInput
+  connect?: Prisma.usuarioWhereUniqueInput
+}
+
+export type usuarioUpdateOneWithoutBlocoNestedInput = {
+  create?: Prisma.XOR<Prisma.usuarioCreateWithoutBlocoInput, Prisma.usuarioUncheckedCreateWithoutBlocoInput>
+  connectOrCreate?: Prisma.usuarioCreateOrConnectWithoutBlocoInput
+  upsert?: Prisma.usuarioUpsertWithoutBlocoInput
+  disconnect?: Prisma.usuarioWhereInput | boolean
+  delete?: Prisma.usuarioWhereInput | boolean
+  connect?: Prisma.usuarioWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usuarioUpdateToOneWithWhereWithoutBlocoInput, Prisma.usuarioUpdateWithoutBlocoInput>, Prisma.usuarioUncheckedUpdateWithoutBlocoInput>
+}
+
+export type usuarioCreateNestedOneWithoutChapaInput = {
+  create?: Prisma.XOR<Prisma.usuarioCreateWithoutChapaInput, Prisma.usuarioUncheckedCreateWithoutChapaInput>
+  connectOrCreate?: Prisma.usuarioCreateOrConnectWithoutChapaInput
+  connect?: Prisma.usuarioWhereUniqueInput
+}
+
+export type usuarioUpdateOneWithoutChapaNestedInput = {
+  create?: Prisma.XOR<Prisma.usuarioCreateWithoutChapaInput, Prisma.usuarioUncheckedCreateWithoutChapaInput>
+  connectOrCreate?: Prisma.usuarioCreateOrConnectWithoutChapaInput
+  upsert?: Prisma.usuarioUpsertWithoutChapaInput
+  disconnect?: Prisma.usuarioWhereInput | boolean
+  delete?: Prisma.usuarioWhereInput | boolean
+  connect?: Prisma.usuarioWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usuarioUpdateToOneWithWhereWithoutChapaInput, Prisma.usuarioUpdateWithoutChapaInput>, Prisma.usuarioUncheckedUpdateWithoutChapaInput>
+}
+
 export type usuarioCreateNestedOneWithoutVendaInput = {
   create?: Prisma.XOR<Prisma.usuarioCreateWithoutVendaInput, Prisma.usuarioUncheckedCreateWithoutVendaInput>
   connectOrCreate?: Prisma.usuarioCreateOrConnectWithoutVendaInput
@@ -465,6 +511,140 @@ export type usuarioUpdateOneWithoutVendaNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.usuarioUpdateToOneWithWhereWithoutVendaInput, Prisma.usuarioUpdateWithoutVendaInput>, Prisma.usuarioUncheckedUpdateWithoutVendaInput>
 }
 
+export type usuarioCreateWithoutBlocoInput = {
+  cpf: string
+  id?: number
+  nome: string
+  email: string
+  senha_hash: string
+  ativo?: boolean
+  papel?: $Enums.PapelConta
+  datacadastro?: Date | string
+  venda?: Prisma.vendaCreateNestedManyWithoutUsuarioInput
+  chapa?: Prisma.chapaCreateNestedManyWithoutUsuarioInput
+}
+
+export type usuarioUncheckedCreateWithoutBlocoInput = {
+  cpf: string
+  id?: number
+  nome: string
+  email: string
+  senha_hash: string
+  ativo?: boolean
+  papel?: $Enums.PapelConta
+  datacadastro?: Date | string
+  venda?: Prisma.vendaUncheckedCreateNestedManyWithoutUsuarioInput
+  chapa?: Prisma.chapaUncheckedCreateNestedManyWithoutUsuarioInput
+}
+
+export type usuarioCreateOrConnectWithoutBlocoInput = {
+  where: Prisma.usuarioWhereUniqueInput
+  create: Prisma.XOR<Prisma.usuarioCreateWithoutBlocoInput, Prisma.usuarioUncheckedCreateWithoutBlocoInput>
+}
+
+export type usuarioUpsertWithoutBlocoInput = {
+  update: Prisma.XOR<Prisma.usuarioUpdateWithoutBlocoInput, Prisma.usuarioUncheckedUpdateWithoutBlocoInput>
+  create: Prisma.XOR<Prisma.usuarioCreateWithoutBlocoInput, Prisma.usuarioUncheckedCreateWithoutBlocoInput>
+  where?: Prisma.usuarioWhereInput
+}
+
+export type usuarioUpdateToOneWithWhereWithoutBlocoInput = {
+  where?: Prisma.usuarioWhereInput
+  data: Prisma.XOR<Prisma.usuarioUpdateWithoutBlocoInput, Prisma.usuarioUncheckedUpdateWithoutBlocoInput>
+}
+
+export type usuarioUpdateWithoutBlocoInput = {
+  cpf?: Prisma.StringFieldUpdateOperationsInput | string
+  nome?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  senha_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  ativo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  papel?: Prisma.EnumPapelContaFieldUpdateOperationsInput | $Enums.PapelConta
+  datacadastro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  venda?: Prisma.vendaUpdateManyWithoutUsuarioNestedInput
+  chapa?: Prisma.chapaUpdateManyWithoutUsuarioNestedInput
+}
+
+export type usuarioUncheckedUpdateWithoutBlocoInput = {
+  cpf?: Prisma.StringFieldUpdateOperationsInput | string
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  nome?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  senha_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  ativo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  papel?: Prisma.EnumPapelContaFieldUpdateOperationsInput | $Enums.PapelConta
+  datacadastro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  venda?: Prisma.vendaUncheckedUpdateManyWithoutUsuarioNestedInput
+  chapa?: Prisma.chapaUncheckedUpdateManyWithoutUsuarioNestedInput
+}
+
+export type usuarioCreateWithoutChapaInput = {
+  cpf: string
+  id?: number
+  nome: string
+  email: string
+  senha_hash: string
+  ativo?: boolean
+  papel?: $Enums.PapelConta
+  datacadastro?: Date | string
+  venda?: Prisma.vendaCreateNestedManyWithoutUsuarioInput
+  bloco?: Prisma.blocoCreateNestedManyWithoutUsuarioInput
+}
+
+export type usuarioUncheckedCreateWithoutChapaInput = {
+  cpf: string
+  id?: number
+  nome: string
+  email: string
+  senha_hash: string
+  ativo?: boolean
+  papel?: $Enums.PapelConta
+  datacadastro?: Date | string
+  venda?: Prisma.vendaUncheckedCreateNestedManyWithoutUsuarioInput
+  bloco?: Prisma.blocoUncheckedCreateNestedManyWithoutUsuarioInput
+}
+
+export type usuarioCreateOrConnectWithoutChapaInput = {
+  where: Prisma.usuarioWhereUniqueInput
+  create: Prisma.XOR<Prisma.usuarioCreateWithoutChapaInput, Prisma.usuarioUncheckedCreateWithoutChapaInput>
+}
+
+export type usuarioUpsertWithoutChapaInput = {
+  update: Prisma.XOR<Prisma.usuarioUpdateWithoutChapaInput, Prisma.usuarioUncheckedUpdateWithoutChapaInput>
+  create: Prisma.XOR<Prisma.usuarioCreateWithoutChapaInput, Prisma.usuarioUncheckedCreateWithoutChapaInput>
+  where?: Prisma.usuarioWhereInput
+}
+
+export type usuarioUpdateToOneWithWhereWithoutChapaInput = {
+  where?: Prisma.usuarioWhereInput
+  data: Prisma.XOR<Prisma.usuarioUpdateWithoutChapaInput, Prisma.usuarioUncheckedUpdateWithoutChapaInput>
+}
+
+export type usuarioUpdateWithoutChapaInput = {
+  cpf?: Prisma.StringFieldUpdateOperationsInput | string
+  nome?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  senha_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  ativo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  papel?: Prisma.EnumPapelContaFieldUpdateOperationsInput | $Enums.PapelConta
+  datacadastro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  venda?: Prisma.vendaUpdateManyWithoutUsuarioNestedInput
+  bloco?: Prisma.blocoUpdateManyWithoutUsuarioNestedInput
+}
+
+export type usuarioUncheckedUpdateWithoutChapaInput = {
+  cpf?: Prisma.StringFieldUpdateOperationsInput | string
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  nome?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  senha_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  ativo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  papel?: Prisma.EnumPapelContaFieldUpdateOperationsInput | $Enums.PapelConta
+  datacadastro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  venda?: Prisma.vendaUncheckedUpdateManyWithoutUsuarioNestedInput
+  bloco?: Prisma.blocoUncheckedUpdateManyWithoutUsuarioNestedInput
+}
+
 export type usuarioCreateWithoutVendaInput = {
   cpf: string
   id?: number
@@ -474,6 +654,8 @@ export type usuarioCreateWithoutVendaInput = {
   ativo?: boolean
   papel?: $Enums.PapelConta
   datacadastro?: Date | string
+  bloco?: Prisma.blocoCreateNestedManyWithoutUsuarioInput
+  chapa?: Prisma.chapaCreateNestedManyWithoutUsuarioInput
 }
 
 export type usuarioUncheckedCreateWithoutVendaInput = {
@@ -485,6 +667,8 @@ export type usuarioUncheckedCreateWithoutVendaInput = {
   ativo?: boolean
   papel?: $Enums.PapelConta
   datacadastro?: Date | string
+  bloco?: Prisma.blocoUncheckedCreateNestedManyWithoutUsuarioInput
+  chapa?: Prisma.chapaUncheckedCreateNestedManyWithoutUsuarioInput
 }
 
 export type usuarioCreateOrConnectWithoutVendaInput = {
@@ -511,6 +695,8 @@ export type usuarioUpdateWithoutVendaInput = {
   ativo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   papel?: Prisma.EnumPapelContaFieldUpdateOperationsInput | $Enums.PapelConta
   datacadastro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bloco?: Prisma.blocoUpdateManyWithoutUsuarioNestedInput
+  chapa?: Prisma.chapaUpdateManyWithoutUsuarioNestedInput
 }
 
 export type usuarioUncheckedUpdateWithoutVendaInput = {
@@ -522,6 +708,8 @@ export type usuarioUncheckedUpdateWithoutVendaInput = {
   ativo?: Prisma.BoolFieldUpdateOperationsInput | boolean
   papel?: Prisma.EnumPapelContaFieldUpdateOperationsInput | $Enums.PapelConta
   datacadastro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bloco?: Prisma.blocoUncheckedUpdateManyWithoutUsuarioNestedInput
+  chapa?: Prisma.chapaUncheckedUpdateManyWithoutUsuarioNestedInput
 }
 
 
@@ -531,10 +719,14 @@ export type usuarioUncheckedUpdateWithoutVendaInput = {
 
 export type UsuarioCountOutputType = {
   venda: number
+  bloco: number
+  chapa: number
 }
 
 export type UsuarioCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   venda?: boolean | UsuarioCountOutputTypeCountVendaArgs
+  bloco?: boolean | UsuarioCountOutputTypeCountBlocoArgs
+  chapa?: boolean | UsuarioCountOutputTypeCountChapaArgs
 }
 
 /**
@@ -554,6 +746,20 @@ export type UsuarioCountOutputTypeCountVendaArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.vendaWhereInput
 }
 
+/**
+ * UsuarioCountOutputType without action
+ */
+export type UsuarioCountOutputTypeCountBlocoArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.blocoWhereInput
+}
+
+/**
+ * UsuarioCountOutputType without action
+ */
+export type UsuarioCountOutputTypeCountChapaArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.chapaWhereInput
+}
+
 
 export type usuarioSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   cpf?: boolean
@@ -565,6 +771,8 @@ export type usuarioSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   papel?: boolean
   datacadastro?: boolean
   venda?: boolean | Prisma.usuario$vendaArgs<ExtArgs>
+  bloco?: boolean | Prisma.usuario$blocoArgs<ExtArgs>
+  chapa?: boolean | Prisma.usuario$chapaArgs<ExtArgs>
   _count?: boolean | Prisma.UsuarioCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["usuario"]>
 
@@ -604,6 +812,8 @@ export type usuarioSelectScalar = {
 export type usuarioOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"cpf" | "id" | "nome" | "email" | "senha_hash" | "ativo" | "papel" | "datacadastro", ExtArgs["result"]["usuario"]>
 export type usuarioInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   venda?: boolean | Prisma.usuario$vendaArgs<ExtArgs>
+  bloco?: boolean | Prisma.usuario$blocoArgs<ExtArgs>
+  chapa?: boolean | Prisma.usuario$chapaArgs<ExtArgs>
   _count?: boolean | Prisma.UsuarioCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type usuarioIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -613,6 +823,8 @@ export type $usuarioPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   name: "usuario"
   objects: {
     venda: Prisma.$vendaPayload<ExtArgs>[]
+    bloco: Prisma.$blocoPayload<ExtArgs>[]
+    chapa: Prisma.$chapaPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     cpf: string
@@ -1018,6 +1230,8 @@ readonly fields: usuarioFieldRefs;
 export interface Prisma__usuarioClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   venda<T extends Prisma.usuario$vendaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.usuario$vendaArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$vendaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  bloco<T extends Prisma.usuario$blocoArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.usuario$blocoArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$blocoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  chapa<T extends Prisma.usuario$chapaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.usuario$chapaArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$chapaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1464,6 +1678,54 @@ export type usuario$vendaArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.VendaScalarFieldEnum | Prisma.VendaScalarFieldEnum[]
+}
+
+/**
+ * usuario.bloco
+ */
+export type usuario$blocoArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the bloco
+   */
+  select?: Prisma.blocoSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the bloco
+   */
+  omit?: Prisma.blocoOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.blocoInclude<ExtArgs> | null
+  where?: Prisma.blocoWhereInput
+  orderBy?: Prisma.blocoOrderByWithRelationInput | Prisma.blocoOrderByWithRelationInput[]
+  cursor?: Prisma.blocoWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.BlocoScalarFieldEnum | Prisma.BlocoScalarFieldEnum[]
+}
+
+/**
+ * usuario.chapa
+ */
+export type usuario$chapaArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the chapa
+   */
+  select?: Prisma.chapaSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the chapa
+   */
+  omit?: Prisma.chapaOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.chapaInclude<ExtArgs> | null
+  where?: Prisma.chapaWhereInput
+  orderBy?: Prisma.chapaOrderByWithRelationInput | Prisma.chapaOrderByWithRelationInput[]
+  cursor?: Prisma.chapaWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ChapaScalarFieldEnum | Prisma.ChapaScalarFieldEnum[]
 }
 
 /**

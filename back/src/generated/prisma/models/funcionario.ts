@@ -395,9 +395,9 @@ export type funcionarioOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type FuncionarioScalarRelationFilter = {
-  is?: Prisma.funcionarioWhereInput
-  isNot?: Prisma.funcionarioWhereInput
+export type FuncionarioNullableScalarRelationFilter = {
+  is?: Prisma.funcionarioWhereInput | null
+  isNot?: Prisma.funcionarioWhereInput | null
 }
 
 export type funcionarioCliente_idIdCompoundUniqueInput = {
@@ -443,11 +443,6 @@ export type funcionarioMinOrderByAggregateInput = {
 export type funcionarioSumOrderByAggregateInput = {
   cliente_id?: Prisma.SortOrder
   admin_id?: Prisma.SortOrder
-}
-
-export type FuncionarioNullableScalarRelationFilter = {
-  is?: Prisma.funcionarioWhereInput | null
-  isNot?: Prisma.funcionarioWhereInput | null
 }
 
 export type funcionarioCreateNestedManyWithoutAdminInput = {
@@ -498,10 +493,12 @@ export type funcionarioCreateNestedOneWithoutBlocoInput = {
   connect?: Prisma.funcionarioWhereUniqueInput
 }
 
-export type funcionarioUpdateOneRequiredWithoutBlocoNestedInput = {
+export type funcionarioUpdateOneWithoutBlocoNestedInput = {
   create?: Prisma.XOR<Prisma.funcionarioCreateWithoutBlocoInput, Prisma.funcionarioUncheckedCreateWithoutBlocoInput>
   connectOrCreate?: Prisma.funcionarioCreateOrConnectWithoutBlocoInput
   upsert?: Prisma.funcionarioUpsertWithoutBlocoInput
+  disconnect?: Prisma.funcionarioWhereInput | boolean
+  delete?: Prisma.funcionarioWhereInput | boolean
   connect?: Prisma.funcionarioWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.funcionarioUpdateToOneWithWhereWithoutBlocoInput, Prisma.funcionarioUpdateWithoutBlocoInput>, Prisma.funcionarioUncheckedUpdateWithoutBlocoInput>
 }
@@ -512,10 +509,12 @@ export type funcionarioCreateNestedOneWithoutChapaInput = {
   connect?: Prisma.funcionarioWhereUniqueInput
 }
 
-export type funcionarioUpdateOneRequiredWithoutChapaNestedInput = {
+export type funcionarioUpdateOneWithoutChapaNestedInput = {
   create?: Prisma.XOR<Prisma.funcionarioCreateWithoutChapaInput, Prisma.funcionarioUncheckedCreateWithoutChapaInput>
   connectOrCreate?: Prisma.funcionarioCreateOrConnectWithoutChapaInput
   upsert?: Prisma.funcionarioUpsertWithoutChapaInput
+  disconnect?: Prisma.funcionarioWhereInput | boolean
+  delete?: Prisma.funcionarioWhereInput | boolean
   connect?: Prisma.funcionarioWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.funcionarioUpdateToOneWithWhereWithoutChapaInput, Prisma.funcionarioUpdateWithoutChapaInput>, Prisma.funcionarioUncheckedUpdateWithoutChapaInput>
 }

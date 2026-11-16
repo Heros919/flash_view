@@ -1,3 +1,4 @@
+
 import {
   ConflictException,
   ForbiddenException,
@@ -39,18 +40,21 @@ export class AuthService {
       throw new ConflictException("O CPF deve conter 11 números.");
     }
 
-    const [funcionarioExistente, usuarioExistente, financeiroExistente] =
-      await Promise.all([
-        this.prisma.funcionario.findFirst({
-          where: { OR: [{ email }, { cpf }] },
-        }),
-        this.prisma.usuario.findFirst({
-          where: { OR: [{ email }, { cpf }] },
-        }),
-        this.prisma.financeiro.findFirst({
-          where: { OR: [{ email }, { cpf }] },
-        }),
-      ]);
+    const [
+      funcionarioExistente,
+      usuarioExistente,
+      financeiroExistente,
+    ] = await Promise.all([
+      this.prisma.funcionario.findFirst({
+        where: { OR: [{ email }, { cpf }] },
+      }),
+      this.prisma.usuario.findFirst({
+        where: { OR: [{ email }, { cpf }] },
+      }),
+      this.prisma.financeiro.findFirst({
+        where: { OR: [{ email }, { cpf }] },
+      }),
+    ]);
 
     if (funcionarioExistente || usuarioExistente || financeiroExistente) {
       if (
@@ -116,7 +120,10 @@ export class AuthService {
     this.validarChaveBootstrap(chave);
 
     const contaExistente = await this.prisma.usuario.findFirst({
-      where: { papel: PapelConta.ADMINISTRADOR, ativo: true },
+      where: {
+        papel: PapelConta.ADMINISTRADOR,
+        ativo: true,
+      },
       orderBy: { id: "asc" },
     });
 
@@ -176,6 +183,7 @@ export class AuthService {
       papel: PapelConta.ADMINISTRADOR,
       ativo: true,
     };
+
     const usuario = contaExistente
       ? await this.prisma.usuario.update({
           where: { id: contaExistente.id },
@@ -196,6 +204,7 @@ export class AuthService {
       where: { ativo: true },
       orderBy: { id: "asc" },
     });
+
     const cpf = dto.cpf.replace(/\D/g, "");
     const nome = dto.nome.trim();
     const email = dto.email.trim().toLowerCase();
@@ -251,6 +260,7 @@ export class AuthService {
       senha_hash: await bcrypt.hash(dto.senha, 10),
       ativo: true,
     };
+
     const financeiro = contaExistente
       ? await this.prisma.financeiro.update({
           where: { id: contaExistente.id },
@@ -266,6 +276,7 @@ export class AuthService {
 
   private validarChaveBootstrap(chave: string) {
     const chaveConfigurada = process.env.ADMIN_BOOTSTRAP_KEY?.trim();
+
     if (!chaveConfigurada) {
       throw new ServiceUnavailableException(
         "ADMIN_BOOTSTRAP_KEY não foi configurada.",
@@ -274,11 +285,14 @@ export class AuthService {
 
     const chaveRecebida = Buffer.from(chave.trim());
     const chaveEsperada = Buffer.from(chaveConfigurada);
+
     if (
       chaveRecebida.length !== chaveEsperada.length ||
       !timingSafeEqual(chaveRecebida, chaveEsperada)
     ) {
-      throw new UnauthorizedException("Chave de configuração inválida.");
+      throw new UnauthorizedException(
+        "Chave de configuração inválida.",
+      );
     }
   }
 
@@ -290,7 +304,10 @@ export class AuthService {
     });
 
     if (funcionario) {
-      const senhaValida = await bcrypt.compare(dto.senha, funcionario.senha);
+      const senhaValida = await bcrypt.compare(
+        dto.senha,
+        funcionario.senha,
+      );
 
       if (!senhaValida) {
         throw new UnauthorizedException("E-mail ou senha inválidos.");
@@ -341,12 +358,17 @@ export class AuthService {
       };
 
       return {
-        access_token: await this.jwtService.signAsync(payloadFinanceiro),
+        access_token: await this.jwtService.signAsync(
+          payloadFinanceiro,
+        ),
         financeiro: this.dadosPublicosFinanceiro(financeiro),
       };
     }
 
-    const senhaValida = await bcrypt.compare(dto.senha, usuario.senha_hash);
+    const senhaValida = await bcrypt.compare(
+      dto.senha,
+      usuario.senha_hash,
+    );
 
     if (!senhaValida) {
       throw new UnauthorizedException("E-mail ou senha inválidos.");
@@ -376,7 +398,10 @@ export class AuthService {
       return null;
     }
 
-    const senhaValida = await bcrypt.compare(senha, funcionario.senha);
+    const senhaValida = await bcrypt.compare(
+      senha,
+      funcionario.senha,
+    );
 
     if (!senhaValida) {
       return null;

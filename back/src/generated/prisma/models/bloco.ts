@@ -28,6 +28,7 @@ export type AggregateBloco = {
 
 export type BlocoAvgAggregateOutputType = {
   cliente_id: number | null
+  usuario_id: number | null
   numero: number | null
   altura: runtime.Decimal | null
   largura: runtime.Decimal | null
@@ -40,6 +41,7 @@ export type BlocoAvgAggregateOutputType = {
 
 export type BlocoSumAggregateOutputType = {
   cliente_id: number | null
+  usuario_id: number | null
   numero: number | null
   altura: runtime.Decimal | null
   largura: runtime.Decimal | null
@@ -54,6 +56,7 @@ export type BlocoMinAggregateOutputType = {
   id: string | null
   cliente_id: number | null
   funcionario_id: string | null
+  usuario_id: number | null
   codigo: string | null
   numero: number | null
   material: string | null
@@ -73,6 +76,7 @@ export type BlocoMaxAggregateOutputType = {
   id: string | null
   cliente_id: number | null
   funcionario_id: string | null
+  usuario_id: number | null
   codigo: string | null
   numero: number | null
   material: string | null
@@ -92,6 +96,7 @@ export type BlocoCountAggregateOutputType = {
   id: number
   cliente_id: number
   funcionario_id: number
+  usuario_id: number
   codigo: number
   numero: number
   material: number
@@ -111,6 +116,7 @@ export type BlocoCountAggregateOutputType = {
 
 export type BlocoAvgAggregateInputType = {
   cliente_id?: true
+  usuario_id?: true
   numero?: true
   altura?: true
   largura?: true
@@ -123,6 +129,7 @@ export type BlocoAvgAggregateInputType = {
 
 export type BlocoSumAggregateInputType = {
   cliente_id?: true
+  usuario_id?: true
   numero?: true
   altura?: true
   largura?: true
@@ -137,6 +144,7 @@ export type BlocoMinAggregateInputType = {
   id?: true
   cliente_id?: true
   funcionario_id?: true
+  usuario_id?: true
   codigo?: true
   numero?: true
   material?: true
@@ -156,6 +164,7 @@ export type BlocoMaxAggregateInputType = {
   id?: true
   cliente_id?: true
   funcionario_id?: true
+  usuario_id?: true
   codigo?: true
   numero?: true
   material?: true
@@ -175,6 +184,7 @@ export type BlocoCountAggregateInputType = {
   id?: true
   cliente_id?: true
   funcionario_id?: true
+  usuario_id?: true
   codigo?: true
   numero?: true
   material?: true
@@ -280,7 +290,8 @@ export type blocoGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type BlocoGroupByOutputType = {
   id: string
   cliente_id: number
-  funcionario_id: string
+  funcionario_id: string | null
+  usuario_id: number | null
   codigo: string
   numero: number
   material: string | null
@@ -322,7 +333,8 @@ export type blocoWhereInput = {
   NOT?: Prisma.blocoWhereInput | Prisma.blocoWhereInput[]
   id?: Prisma.StringFilter<"bloco"> | string
   cliente_id?: Prisma.IntFilter<"bloco"> | number
-  funcionario_id?: Prisma.StringFilter<"bloco"> | string
+  funcionario_id?: Prisma.StringNullableFilter<"bloco"> | string | null
+  usuario_id?: Prisma.IntNullableFilter<"bloco"> | number | null
   codigo?: Prisma.StringFilter<"bloco"> | string
   numero?: Prisma.IntFilter<"bloco"> | number
   material?: Prisma.StringNullableFilter<"bloco"> | string | null
@@ -337,7 +349,8 @@ export type blocoWhereInput = {
   frente?: Prisma.StringFilter<"bloco"> | string
   datacadastro?: Prisma.DateTimeFilter<"bloco"> | Date | string
   cliente?: Prisma.XOR<Prisma.ClienteScalarRelationFilter, Prisma.clienteWhereInput>
-  funcionario?: Prisma.XOR<Prisma.FuncionarioScalarRelationFilter, Prisma.funcionarioWhereInput>
+  funcionario?: Prisma.XOR<Prisma.FuncionarioNullableScalarRelationFilter, Prisma.funcionarioWhereInput> | null
+  usuario?: Prisma.XOR<Prisma.UsuarioNullableScalarRelationFilter, Prisma.usuarioWhereInput> | null
   chapa?: Prisma.ChapaListRelationFilter
   midia?: Prisma.MidiaListRelationFilter
 }
@@ -345,7 +358,8 @@ export type blocoWhereInput = {
 export type blocoOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   cliente_id?: Prisma.SortOrder
-  funcionario_id?: Prisma.SortOrder
+  funcionario_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  usuario_id?: Prisma.SortOrderInput | Prisma.SortOrder
   codigo?: Prisma.SortOrder
   numero?: Prisma.SortOrder
   material?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -361,6 +375,7 @@ export type blocoOrderByWithRelationInput = {
   datacadastro?: Prisma.SortOrder
   cliente?: Prisma.clienteOrderByWithRelationInput
   funcionario?: Prisma.funcionarioOrderByWithRelationInput
+  usuario?: Prisma.usuarioOrderByWithRelationInput
   chapa?: Prisma.chapaOrderByRelationAggregateInput
   midia?: Prisma.midiaOrderByRelationAggregateInput
 }
@@ -372,7 +387,8 @@ export type blocoWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.blocoWhereInput[]
   NOT?: Prisma.blocoWhereInput | Prisma.blocoWhereInput[]
   cliente_id?: Prisma.IntFilter<"bloco"> | number
-  funcionario_id?: Prisma.StringFilter<"bloco"> | string
+  funcionario_id?: Prisma.StringNullableFilter<"bloco"> | string | null
+  usuario_id?: Prisma.IntNullableFilter<"bloco"> | number | null
   numero?: Prisma.IntFilter<"bloco"> | number
   material?: Prisma.StringNullableFilter<"bloco"> | string | null
   cor?: Prisma.StringNullableFilter<"bloco"> | string | null
@@ -386,7 +402,8 @@ export type blocoWhereUniqueInput = Prisma.AtLeast<{
   frente?: Prisma.StringFilter<"bloco"> | string
   datacadastro?: Prisma.DateTimeFilter<"bloco"> | Date | string
   cliente?: Prisma.XOR<Prisma.ClienteScalarRelationFilter, Prisma.clienteWhereInput>
-  funcionario?: Prisma.XOR<Prisma.FuncionarioScalarRelationFilter, Prisma.funcionarioWhereInput>
+  funcionario?: Prisma.XOR<Prisma.FuncionarioNullableScalarRelationFilter, Prisma.funcionarioWhereInput> | null
+  usuario?: Prisma.XOR<Prisma.UsuarioNullableScalarRelationFilter, Prisma.usuarioWhereInput> | null
   chapa?: Prisma.ChapaListRelationFilter
   midia?: Prisma.MidiaListRelationFilter
 }, "id" | "codigo">
@@ -394,7 +411,8 @@ export type blocoWhereUniqueInput = Prisma.AtLeast<{
 export type blocoOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   cliente_id?: Prisma.SortOrder
-  funcionario_id?: Prisma.SortOrder
+  funcionario_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  usuario_id?: Prisma.SortOrderInput | Prisma.SortOrder
   codigo?: Prisma.SortOrder
   numero?: Prisma.SortOrder
   material?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -421,7 +439,8 @@ export type blocoScalarWhereWithAggregatesInput = {
   NOT?: Prisma.blocoScalarWhereWithAggregatesInput | Prisma.blocoScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"bloco"> | string
   cliente_id?: Prisma.IntWithAggregatesFilter<"bloco"> | number
-  funcionario_id?: Prisma.StringWithAggregatesFilter<"bloco"> | string
+  funcionario_id?: Prisma.StringNullableWithAggregatesFilter<"bloco"> | string | null
+  usuario_id?: Prisma.IntNullableWithAggregatesFilter<"bloco"> | number | null
   codigo?: Prisma.StringWithAggregatesFilter<"bloco"> | string
   numero?: Prisma.IntWithAggregatesFilter<"bloco"> | number
   material?: Prisma.StringNullableWithAggregatesFilter<"bloco"> | string | null
@@ -453,7 +472,8 @@ export type blocoCreateInput = {
   frente: string
   datacadastro?: Date | string
   cliente: Prisma.clienteCreateNestedOneWithoutBlocoInput
-  funcionario: Prisma.funcionarioCreateNestedOneWithoutBlocoInput
+  funcionario?: Prisma.funcionarioCreateNestedOneWithoutBlocoInput
+  usuario?: Prisma.usuarioCreateNestedOneWithoutBlocoInput
   chapa?: Prisma.chapaCreateNestedManyWithoutBlocoInput
   midia?: Prisma.midiaCreateNestedManyWithoutBlocoInput
 }
@@ -461,7 +481,8 @@ export type blocoCreateInput = {
 export type blocoUncheckedCreateInput = {
   id: string
   cliente_id: number
-  funcionario_id: string
+  funcionario_id?: string | null
+  usuario_id?: number | null
   codigo: string
   numero: number
   material?: string | null
@@ -495,7 +516,8 @@ export type blocoUpdateInput = {
   frente?: Prisma.StringFieldUpdateOperationsInput | string
   datacadastro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   cliente?: Prisma.clienteUpdateOneRequiredWithoutBlocoNestedInput
-  funcionario?: Prisma.funcionarioUpdateOneRequiredWithoutBlocoNestedInput
+  funcionario?: Prisma.funcionarioUpdateOneWithoutBlocoNestedInput
+  usuario?: Prisma.usuarioUpdateOneWithoutBlocoNestedInput
   chapa?: Prisma.chapaUpdateManyWithoutBlocoNestedInput
   midia?: Prisma.midiaUpdateManyWithoutBlocoNestedInput
 }
@@ -503,7 +525,8 @@ export type blocoUpdateInput = {
 export type blocoUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   cliente_id?: Prisma.IntFieldUpdateOperationsInput | number
-  funcionario_id?: Prisma.StringFieldUpdateOperationsInput | string
+  funcionario_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usuario_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   codigo?: Prisma.StringFieldUpdateOperationsInput | string
   numero?: Prisma.IntFieldUpdateOperationsInput | number
   material?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -524,7 +547,8 @@ export type blocoUncheckedUpdateInput = {
 export type blocoCreateManyInput = {
   id: string
   cliente_id: number
-  funcionario_id: string
+  funcionario_id?: string | null
+  usuario_id?: number | null
   codigo: string
   numero: number
   material?: string | null
@@ -560,7 +584,8 @@ export type blocoUpdateManyMutationInput = {
 export type blocoUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   cliente_id?: Prisma.IntFieldUpdateOperationsInput | number
-  funcionario_id?: Prisma.StringFieldUpdateOperationsInput | string
+  funcionario_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usuario_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   codigo?: Prisma.StringFieldUpdateOperationsInput | string
   numero?: Prisma.IntFieldUpdateOperationsInput | number
   material?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -576,10 +601,21 @@ export type blocoUncheckedUpdateManyInput = {
   datacadastro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type BlocoListRelationFilter = {
+  every?: Prisma.blocoWhereInput
+  some?: Prisma.blocoWhereInput
+  none?: Prisma.blocoWhereInput
+}
+
+export type blocoOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
 export type blocoCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   cliente_id?: Prisma.SortOrder
   funcionario_id?: Prisma.SortOrder
+  usuario_id?: Prisma.SortOrder
   codigo?: Prisma.SortOrder
   numero?: Prisma.SortOrder
   material?: Prisma.SortOrder
@@ -597,6 +633,7 @@ export type blocoCountOrderByAggregateInput = {
 
 export type blocoAvgOrderByAggregateInput = {
   cliente_id?: Prisma.SortOrder
+  usuario_id?: Prisma.SortOrder
   numero?: Prisma.SortOrder
   altura?: Prisma.SortOrder
   largura?: Prisma.SortOrder
@@ -611,6 +648,7 @@ export type blocoMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   cliente_id?: Prisma.SortOrder
   funcionario_id?: Prisma.SortOrder
+  usuario_id?: Prisma.SortOrder
   codigo?: Prisma.SortOrder
   numero?: Prisma.SortOrder
   material?: Prisma.SortOrder
@@ -630,6 +668,7 @@ export type blocoMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   cliente_id?: Prisma.SortOrder
   funcionario_id?: Prisma.SortOrder
+  usuario_id?: Prisma.SortOrder
   codigo?: Prisma.SortOrder
   numero?: Prisma.SortOrder
   material?: Prisma.SortOrder
@@ -647,6 +686,7 @@ export type blocoMinOrderByAggregateInput = {
 
 export type blocoSumOrderByAggregateInput = {
   cliente_id?: Prisma.SortOrder
+  usuario_id?: Prisma.SortOrder
   numero?: Prisma.SortOrder
   altura?: Prisma.SortOrder
   largura?: Prisma.SortOrder
@@ -662,19 +702,51 @@ export type BlocoScalarRelationFilter = {
   isNot?: Prisma.blocoWhereInput
 }
 
-export type BlocoListRelationFilter = {
-  every?: Prisma.blocoWhereInput
-  some?: Prisma.blocoWhereInput
-  none?: Prisma.blocoWhereInput
-}
-
-export type blocoOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder
-}
-
 export type BlocoNullableScalarRelationFilter = {
   is?: Prisma.blocoWhereInput | null
   isNot?: Prisma.blocoWhereInput | null
+}
+
+export type blocoCreateNestedManyWithoutUsuarioInput = {
+  create?: Prisma.XOR<Prisma.blocoCreateWithoutUsuarioInput, Prisma.blocoUncheckedCreateWithoutUsuarioInput> | Prisma.blocoCreateWithoutUsuarioInput[] | Prisma.blocoUncheckedCreateWithoutUsuarioInput[]
+  connectOrCreate?: Prisma.blocoCreateOrConnectWithoutUsuarioInput | Prisma.blocoCreateOrConnectWithoutUsuarioInput[]
+  createMany?: Prisma.blocoCreateManyUsuarioInputEnvelope
+  connect?: Prisma.blocoWhereUniqueInput | Prisma.blocoWhereUniqueInput[]
+}
+
+export type blocoUncheckedCreateNestedManyWithoutUsuarioInput = {
+  create?: Prisma.XOR<Prisma.blocoCreateWithoutUsuarioInput, Prisma.blocoUncheckedCreateWithoutUsuarioInput> | Prisma.blocoCreateWithoutUsuarioInput[] | Prisma.blocoUncheckedCreateWithoutUsuarioInput[]
+  connectOrCreate?: Prisma.blocoCreateOrConnectWithoutUsuarioInput | Prisma.blocoCreateOrConnectWithoutUsuarioInput[]
+  createMany?: Prisma.blocoCreateManyUsuarioInputEnvelope
+  connect?: Prisma.blocoWhereUniqueInput | Prisma.blocoWhereUniqueInput[]
+}
+
+export type blocoUpdateManyWithoutUsuarioNestedInput = {
+  create?: Prisma.XOR<Prisma.blocoCreateWithoutUsuarioInput, Prisma.blocoUncheckedCreateWithoutUsuarioInput> | Prisma.blocoCreateWithoutUsuarioInput[] | Prisma.blocoUncheckedCreateWithoutUsuarioInput[]
+  connectOrCreate?: Prisma.blocoCreateOrConnectWithoutUsuarioInput | Prisma.blocoCreateOrConnectWithoutUsuarioInput[]
+  upsert?: Prisma.blocoUpsertWithWhereUniqueWithoutUsuarioInput | Prisma.blocoUpsertWithWhereUniqueWithoutUsuarioInput[]
+  createMany?: Prisma.blocoCreateManyUsuarioInputEnvelope
+  set?: Prisma.blocoWhereUniqueInput | Prisma.blocoWhereUniqueInput[]
+  disconnect?: Prisma.blocoWhereUniqueInput | Prisma.blocoWhereUniqueInput[]
+  delete?: Prisma.blocoWhereUniqueInput | Prisma.blocoWhereUniqueInput[]
+  connect?: Prisma.blocoWhereUniqueInput | Prisma.blocoWhereUniqueInput[]
+  update?: Prisma.blocoUpdateWithWhereUniqueWithoutUsuarioInput | Prisma.blocoUpdateWithWhereUniqueWithoutUsuarioInput[]
+  updateMany?: Prisma.blocoUpdateManyWithWhereWithoutUsuarioInput | Prisma.blocoUpdateManyWithWhereWithoutUsuarioInput[]
+  deleteMany?: Prisma.blocoScalarWhereInput | Prisma.blocoScalarWhereInput[]
+}
+
+export type blocoUncheckedUpdateManyWithoutUsuarioNestedInput = {
+  create?: Prisma.XOR<Prisma.blocoCreateWithoutUsuarioInput, Prisma.blocoUncheckedCreateWithoutUsuarioInput> | Prisma.blocoCreateWithoutUsuarioInput[] | Prisma.blocoUncheckedCreateWithoutUsuarioInput[]
+  connectOrCreate?: Prisma.blocoCreateOrConnectWithoutUsuarioInput | Prisma.blocoCreateOrConnectWithoutUsuarioInput[]
+  upsert?: Prisma.blocoUpsertWithWhereUniqueWithoutUsuarioInput | Prisma.blocoUpsertWithWhereUniqueWithoutUsuarioInput[]
+  createMany?: Prisma.blocoCreateManyUsuarioInputEnvelope
+  set?: Prisma.blocoWhereUniqueInput | Prisma.blocoWhereUniqueInput[]
+  disconnect?: Prisma.blocoWhereUniqueInput | Prisma.blocoWhereUniqueInput[]
+  delete?: Prisma.blocoWhereUniqueInput | Prisma.blocoWhereUniqueInput[]
+  connect?: Prisma.blocoWhereUniqueInput | Prisma.blocoWhereUniqueInput[]
+  update?: Prisma.blocoUpdateWithWhereUniqueWithoutUsuarioInput | Prisma.blocoUpdateWithWhereUniqueWithoutUsuarioInput[]
+  updateMany?: Prisma.blocoUpdateManyWithWhereWithoutUsuarioInput | Prisma.blocoUpdateManyWithWhereWithoutUsuarioInput[]
+  deleteMany?: Prisma.blocoScalarWhereInput | Prisma.blocoScalarWhereInput[]
 }
 
 export type NullableStringFieldUpdateOperationsInput = {
@@ -687,6 +759,14 @@ export type NullableDecimalFieldUpdateOperationsInput = {
   decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
   multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
   divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type blocoCreateNestedOneWithoutChapaInput = {
@@ -803,6 +883,97 @@ export type blocoUpdateOneWithoutMidiaNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.blocoUpdateToOneWithWhereWithoutMidiaInput, Prisma.blocoUpdateWithoutMidiaInput>, Prisma.blocoUncheckedUpdateWithoutMidiaInput>
 }
 
+export type blocoCreateWithoutUsuarioInput = {
+  id: string
+  codigo: string
+  numero: number
+  material?: string | null
+  cor?: string | null
+  altura?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  largura?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  comprimento?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  peso?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  volume?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  mes: number
+  ano: number
+  frente: string
+  datacadastro?: Date | string
+  cliente: Prisma.clienteCreateNestedOneWithoutBlocoInput
+  funcionario?: Prisma.funcionarioCreateNestedOneWithoutBlocoInput
+  chapa?: Prisma.chapaCreateNestedManyWithoutBlocoInput
+  midia?: Prisma.midiaCreateNestedManyWithoutBlocoInput
+}
+
+export type blocoUncheckedCreateWithoutUsuarioInput = {
+  id: string
+  cliente_id: number
+  funcionario_id?: string | null
+  codigo: string
+  numero: number
+  material?: string | null
+  cor?: string | null
+  altura?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  largura?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  comprimento?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  peso?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  volume?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  mes: number
+  ano: number
+  frente: string
+  datacadastro?: Date | string
+  chapa?: Prisma.chapaUncheckedCreateNestedManyWithoutBlocoInput
+  midia?: Prisma.midiaUncheckedCreateNestedManyWithoutBlocoInput
+}
+
+export type blocoCreateOrConnectWithoutUsuarioInput = {
+  where: Prisma.blocoWhereUniqueInput
+  create: Prisma.XOR<Prisma.blocoCreateWithoutUsuarioInput, Prisma.blocoUncheckedCreateWithoutUsuarioInput>
+}
+
+export type blocoCreateManyUsuarioInputEnvelope = {
+  data: Prisma.blocoCreateManyUsuarioInput | Prisma.blocoCreateManyUsuarioInput[]
+  skipDuplicates?: boolean
+}
+
+export type blocoUpsertWithWhereUniqueWithoutUsuarioInput = {
+  where: Prisma.blocoWhereUniqueInput
+  update: Prisma.XOR<Prisma.blocoUpdateWithoutUsuarioInput, Prisma.blocoUncheckedUpdateWithoutUsuarioInput>
+  create: Prisma.XOR<Prisma.blocoCreateWithoutUsuarioInput, Prisma.blocoUncheckedCreateWithoutUsuarioInput>
+}
+
+export type blocoUpdateWithWhereUniqueWithoutUsuarioInput = {
+  where: Prisma.blocoWhereUniqueInput
+  data: Prisma.XOR<Prisma.blocoUpdateWithoutUsuarioInput, Prisma.blocoUncheckedUpdateWithoutUsuarioInput>
+}
+
+export type blocoUpdateManyWithWhereWithoutUsuarioInput = {
+  where: Prisma.blocoScalarWhereInput
+  data: Prisma.XOR<Prisma.blocoUpdateManyMutationInput, Prisma.blocoUncheckedUpdateManyWithoutUsuarioInput>
+}
+
+export type blocoScalarWhereInput = {
+  AND?: Prisma.blocoScalarWhereInput | Prisma.blocoScalarWhereInput[]
+  OR?: Prisma.blocoScalarWhereInput[]
+  NOT?: Prisma.blocoScalarWhereInput | Prisma.blocoScalarWhereInput[]
+  id?: Prisma.StringFilter<"bloco"> | string
+  cliente_id?: Prisma.IntFilter<"bloco"> | number
+  funcionario_id?: Prisma.StringNullableFilter<"bloco"> | string | null
+  usuario_id?: Prisma.IntNullableFilter<"bloco"> | number | null
+  codigo?: Prisma.StringFilter<"bloco"> | string
+  numero?: Prisma.IntFilter<"bloco"> | number
+  material?: Prisma.StringNullableFilter<"bloco"> | string | null
+  cor?: Prisma.StringNullableFilter<"bloco"> | string | null
+  altura?: Prisma.DecimalNullableFilter<"bloco"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  largura?: Prisma.DecimalNullableFilter<"bloco"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  comprimento?: Prisma.DecimalNullableFilter<"bloco"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  peso?: Prisma.DecimalNullableFilter<"bloco"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  volume?: Prisma.DecimalNullableFilter<"bloco"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  mes?: Prisma.IntFilter<"bloco"> | number
+  ano?: Prisma.IntFilter<"bloco"> | number
+  frente?: Prisma.StringFilter<"bloco"> | string
+  datacadastro?: Prisma.DateTimeFilter<"bloco"> | Date | string
+}
+
 export type blocoCreateWithoutChapaInput = {
   id: string
   codigo: string
@@ -819,14 +990,16 @@ export type blocoCreateWithoutChapaInput = {
   frente: string
   datacadastro?: Date | string
   cliente: Prisma.clienteCreateNestedOneWithoutBlocoInput
-  funcionario: Prisma.funcionarioCreateNestedOneWithoutBlocoInput
+  funcionario?: Prisma.funcionarioCreateNestedOneWithoutBlocoInput
+  usuario?: Prisma.usuarioCreateNestedOneWithoutBlocoInput
   midia?: Prisma.midiaCreateNestedManyWithoutBlocoInput
 }
 
 export type blocoUncheckedCreateWithoutChapaInput = {
   id: string
   cliente_id: number
-  funcionario_id: string
+  funcionario_id?: string | null
+  usuario_id?: number | null
   codigo: string
   numero: number
   material?: string | null
@@ -875,14 +1048,16 @@ export type blocoUpdateWithoutChapaInput = {
   frente?: Prisma.StringFieldUpdateOperationsInput | string
   datacadastro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   cliente?: Prisma.clienteUpdateOneRequiredWithoutBlocoNestedInput
-  funcionario?: Prisma.funcionarioUpdateOneRequiredWithoutBlocoNestedInput
+  funcionario?: Prisma.funcionarioUpdateOneWithoutBlocoNestedInput
+  usuario?: Prisma.usuarioUpdateOneWithoutBlocoNestedInput
   midia?: Prisma.midiaUpdateManyWithoutBlocoNestedInput
 }
 
 export type blocoUncheckedUpdateWithoutChapaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   cliente_id?: Prisma.IntFieldUpdateOperationsInput | number
-  funcionario_id?: Prisma.StringFieldUpdateOperationsInput | string
+  funcionario_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usuario_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   codigo?: Prisma.StringFieldUpdateOperationsInput | string
   numero?: Prisma.IntFieldUpdateOperationsInput | number
   material?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -914,14 +1089,16 @@ export type blocoCreateWithoutClienteInput = {
   ano: number
   frente: string
   datacadastro?: Date | string
-  funcionario: Prisma.funcionarioCreateNestedOneWithoutBlocoInput
+  funcionario?: Prisma.funcionarioCreateNestedOneWithoutBlocoInput
+  usuario?: Prisma.usuarioCreateNestedOneWithoutBlocoInput
   chapa?: Prisma.chapaCreateNestedManyWithoutBlocoInput
   midia?: Prisma.midiaCreateNestedManyWithoutBlocoInput
 }
 
 export type blocoUncheckedCreateWithoutClienteInput = {
   id: string
-  funcionario_id: string
+  funcionario_id?: string | null
+  usuario_id?: number | null
   codigo: string
   numero: number
   material?: string | null
@@ -965,28 +1142,6 @@ export type blocoUpdateManyWithWhereWithoutClienteInput = {
   data: Prisma.XOR<Prisma.blocoUpdateManyMutationInput, Prisma.blocoUncheckedUpdateManyWithoutClienteInput>
 }
 
-export type blocoScalarWhereInput = {
-  AND?: Prisma.blocoScalarWhereInput | Prisma.blocoScalarWhereInput[]
-  OR?: Prisma.blocoScalarWhereInput[]
-  NOT?: Prisma.blocoScalarWhereInput | Prisma.blocoScalarWhereInput[]
-  id?: Prisma.StringFilter<"bloco"> | string
-  cliente_id?: Prisma.IntFilter<"bloco"> | number
-  funcionario_id?: Prisma.StringFilter<"bloco"> | string
-  codigo?: Prisma.StringFilter<"bloco"> | string
-  numero?: Prisma.IntFilter<"bloco"> | number
-  material?: Prisma.StringNullableFilter<"bloco"> | string | null
-  cor?: Prisma.StringNullableFilter<"bloco"> | string | null
-  altura?: Prisma.DecimalNullableFilter<"bloco"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  largura?: Prisma.DecimalNullableFilter<"bloco"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  comprimento?: Prisma.DecimalNullableFilter<"bloco"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  peso?: Prisma.DecimalNullableFilter<"bloco"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  volume?: Prisma.DecimalNullableFilter<"bloco"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  mes?: Prisma.IntFilter<"bloco"> | number
-  ano?: Prisma.IntFilter<"bloco"> | number
-  frente?: Prisma.StringFilter<"bloco"> | string
-  datacadastro?: Prisma.DateTimeFilter<"bloco"> | Date | string
-}
-
 export type blocoCreateWithoutFuncionarioInput = {
   id: string
   codigo: string
@@ -1003,12 +1158,15 @@ export type blocoCreateWithoutFuncionarioInput = {
   frente: string
   datacadastro?: Date | string
   cliente: Prisma.clienteCreateNestedOneWithoutBlocoInput
+  usuario?: Prisma.usuarioCreateNestedOneWithoutBlocoInput
   chapa?: Prisma.chapaCreateNestedManyWithoutBlocoInput
   midia?: Prisma.midiaCreateNestedManyWithoutBlocoInput
 }
 
 export type blocoUncheckedCreateWithoutFuncionarioInput = {
   id: string
+  cliente_id: number
+  usuario_id?: number | null
   codigo: string
   numero: number
   material?: string | null
@@ -1068,14 +1226,16 @@ export type blocoCreateWithoutMidiaInput = {
   frente: string
   datacadastro?: Date | string
   cliente: Prisma.clienteCreateNestedOneWithoutBlocoInput
-  funcionario: Prisma.funcionarioCreateNestedOneWithoutBlocoInput
+  funcionario?: Prisma.funcionarioCreateNestedOneWithoutBlocoInput
+  usuario?: Prisma.usuarioCreateNestedOneWithoutBlocoInput
   chapa?: Prisma.chapaCreateNestedManyWithoutBlocoInput
 }
 
 export type blocoUncheckedCreateWithoutMidiaInput = {
   id: string
   cliente_id: number
-  funcionario_id: string
+  funcionario_id?: string | null
+  usuario_id?: number | null
   codigo: string
   numero: number
   material?: string | null
@@ -1124,14 +1284,16 @@ export type blocoUpdateWithoutMidiaInput = {
   frente?: Prisma.StringFieldUpdateOperationsInput | string
   datacadastro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   cliente?: Prisma.clienteUpdateOneRequiredWithoutBlocoNestedInput
-  funcionario?: Prisma.funcionarioUpdateOneRequiredWithoutBlocoNestedInput
+  funcionario?: Prisma.funcionarioUpdateOneWithoutBlocoNestedInput
+  usuario?: Prisma.usuarioUpdateOneWithoutBlocoNestedInput
   chapa?: Prisma.chapaUpdateManyWithoutBlocoNestedInput
 }
 
 export type blocoUncheckedUpdateWithoutMidiaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   cliente_id?: Prisma.IntFieldUpdateOperationsInput | number
-  funcionario_id?: Prisma.StringFieldUpdateOperationsInput | string
+  funcionario_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usuario_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   codigo?: Prisma.StringFieldUpdateOperationsInput | string
   numero?: Prisma.IntFieldUpdateOperationsInput | number
   material?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1148,9 +1310,90 @@ export type blocoUncheckedUpdateWithoutMidiaInput = {
   chapa?: Prisma.chapaUncheckedUpdateManyWithoutBlocoNestedInput
 }
 
+export type blocoCreateManyUsuarioInput = {
+  id: string
+  cliente_id: number
+  funcionario_id?: string | null
+  codigo: string
+  numero: number
+  material?: string | null
+  cor?: string | null
+  altura?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  largura?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  comprimento?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  peso?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  volume?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  mes: number
+  ano: number
+  frente: string
+  datacadastro?: Date | string
+}
+
+export type blocoUpdateWithoutUsuarioInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  codigo?: Prisma.StringFieldUpdateOperationsInput | string
+  numero?: Prisma.IntFieldUpdateOperationsInput | number
+  material?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  altura?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  largura?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  comprimento?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  peso?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  volume?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  mes?: Prisma.IntFieldUpdateOperationsInput | number
+  ano?: Prisma.IntFieldUpdateOperationsInput | number
+  frente?: Prisma.StringFieldUpdateOperationsInput | string
+  datacadastro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  cliente?: Prisma.clienteUpdateOneRequiredWithoutBlocoNestedInput
+  funcionario?: Prisma.funcionarioUpdateOneWithoutBlocoNestedInput
+  chapa?: Prisma.chapaUpdateManyWithoutBlocoNestedInput
+  midia?: Prisma.midiaUpdateManyWithoutBlocoNestedInput
+}
+
+export type blocoUncheckedUpdateWithoutUsuarioInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  cliente_id?: Prisma.IntFieldUpdateOperationsInput | number
+  funcionario_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  codigo?: Prisma.StringFieldUpdateOperationsInput | string
+  numero?: Prisma.IntFieldUpdateOperationsInput | number
+  material?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  altura?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  largura?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  comprimento?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  peso?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  volume?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  mes?: Prisma.IntFieldUpdateOperationsInput | number
+  ano?: Prisma.IntFieldUpdateOperationsInput | number
+  frente?: Prisma.StringFieldUpdateOperationsInput | string
+  datacadastro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  chapa?: Prisma.chapaUncheckedUpdateManyWithoutBlocoNestedInput
+  midia?: Prisma.midiaUncheckedUpdateManyWithoutBlocoNestedInput
+}
+
+export type blocoUncheckedUpdateManyWithoutUsuarioInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  cliente_id?: Prisma.IntFieldUpdateOperationsInput | number
+  funcionario_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  codigo?: Prisma.StringFieldUpdateOperationsInput | string
+  numero?: Prisma.IntFieldUpdateOperationsInput | number
+  material?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  altura?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  largura?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  comprimento?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  peso?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  volume?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  mes?: Prisma.IntFieldUpdateOperationsInput | number
+  ano?: Prisma.IntFieldUpdateOperationsInput | number
+  frente?: Prisma.StringFieldUpdateOperationsInput | string
+  datacadastro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type blocoCreateManyClienteInput = {
   id: string
-  funcionario_id: string
+  funcionario_id?: string | null
+  usuario_id?: number | null
   codigo: string
   numero: number
   material?: string | null
@@ -1181,14 +1424,16 @@ export type blocoUpdateWithoutClienteInput = {
   ano?: Prisma.IntFieldUpdateOperationsInput | number
   frente?: Prisma.StringFieldUpdateOperationsInput | string
   datacadastro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  funcionario?: Prisma.funcionarioUpdateOneRequiredWithoutBlocoNestedInput
+  funcionario?: Prisma.funcionarioUpdateOneWithoutBlocoNestedInput
+  usuario?: Prisma.usuarioUpdateOneWithoutBlocoNestedInput
   chapa?: Prisma.chapaUpdateManyWithoutBlocoNestedInput
   midia?: Prisma.midiaUpdateManyWithoutBlocoNestedInput
 }
 
 export type blocoUncheckedUpdateWithoutClienteInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  funcionario_id?: Prisma.StringFieldUpdateOperationsInput | string
+  funcionario_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usuario_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   codigo?: Prisma.StringFieldUpdateOperationsInput | string
   numero?: Prisma.IntFieldUpdateOperationsInput | number
   material?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1208,7 +1453,8 @@ export type blocoUncheckedUpdateWithoutClienteInput = {
 
 export type blocoUncheckedUpdateManyWithoutClienteInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  funcionario_id?: Prisma.StringFieldUpdateOperationsInput | string
+  funcionario_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usuario_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   codigo?: Prisma.StringFieldUpdateOperationsInput | string
   numero?: Prisma.IntFieldUpdateOperationsInput | number
   material?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1226,6 +1472,8 @@ export type blocoUncheckedUpdateManyWithoutClienteInput = {
 
 export type blocoCreateManyFuncionarioInput = {
   id: string
+  cliente_id: number
+  usuario_id?: number | null
   codigo: string
   numero: number
   material?: string | null
@@ -1257,12 +1505,15 @@ export type blocoUpdateWithoutFuncionarioInput = {
   frente?: Prisma.StringFieldUpdateOperationsInput | string
   datacadastro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   cliente?: Prisma.clienteUpdateOneRequiredWithoutBlocoNestedInput
+  usuario?: Prisma.usuarioUpdateOneWithoutBlocoNestedInput
   chapa?: Prisma.chapaUpdateManyWithoutBlocoNestedInput
   midia?: Prisma.midiaUpdateManyWithoutBlocoNestedInput
 }
 
 export type blocoUncheckedUpdateWithoutFuncionarioInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  cliente_id?: Prisma.IntFieldUpdateOperationsInput | number
+  usuario_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   codigo?: Prisma.StringFieldUpdateOperationsInput | string
   numero?: Prisma.IntFieldUpdateOperationsInput | number
   material?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1282,6 +1533,8 @@ export type blocoUncheckedUpdateWithoutFuncionarioInput = {
 
 export type blocoUncheckedUpdateManyWithoutFuncionarioInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  cliente_id?: Prisma.IntFieldUpdateOperationsInput | number
+  usuario_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   codigo?: Prisma.StringFieldUpdateOperationsInput | string
   numero?: Prisma.IntFieldUpdateOperationsInput | number
   material?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1341,6 +1594,7 @@ export type blocoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   id?: boolean
   cliente_id?: boolean
   funcionario_id?: boolean
+  usuario_id?: boolean
   codigo?: boolean
   numero?: boolean
   material?: boolean
@@ -1355,7 +1609,8 @@ export type blocoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   frente?: boolean
   datacadastro?: boolean
   cliente?: boolean | Prisma.clienteDefaultArgs<ExtArgs>
-  funcionario?: boolean | Prisma.funcionarioDefaultArgs<ExtArgs>
+  funcionario?: boolean | Prisma.bloco$funcionarioArgs<ExtArgs>
+  usuario?: boolean | Prisma.bloco$usuarioArgs<ExtArgs>
   chapa?: boolean | Prisma.bloco$chapaArgs<ExtArgs>
   midia?: boolean | Prisma.bloco$midiaArgs<ExtArgs>
   _count?: boolean | Prisma.BlocoCountOutputTypeDefaultArgs<ExtArgs>
@@ -1365,6 +1620,7 @@ export type blocoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   id?: boolean
   cliente_id?: boolean
   funcionario_id?: boolean
+  usuario_id?: boolean
   codigo?: boolean
   numero?: boolean
   material?: boolean
@@ -1379,13 +1635,15 @@ export type blocoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   frente?: boolean
   datacadastro?: boolean
   cliente?: boolean | Prisma.clienteDefaultArgs<ExtArgs>
-  funcionario?: boolean | Prisma.funcionarioDefaultArgs<ExtArgs>
+  funcionario?: boolean | Prisma.bloco$funcionarioArgs<ExtArgs>
+  usuario?: boolean | Prisma.bloco$usuarioArgs<ExtArgs>
 }, ExtArgs["result"]["bloco"]>
 
 export type blocoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   cliente_id?: boolean
   funcionario_id?: boolean
+  usuario_id?: boolean
   codigo?: boolean
   numero?: boolean
   material?: boolean
@@ -1400,13 +1658,15 @@ export type blocoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   frente?: boolean
   datacadastro?: boolean
   cliente?: boolean | Prisma.clienteDefaultArgs<ExtArgs>
-  funcionario?: boolean | Prisma.funcionarioDefaultArgs<ExtArgs>
+  funcionario?: boolean | Prisma.bloco$funcionarioArgs<ExtArgs>
+  usuario?: boolean | Prisma.bloco$usuarioArgs<ExtArgs>
 }, ExtArgs["result"]["bloco"]>
 
 export type blocoSelectScalar = {
   id?: boolean
   cliente_id?: boolean
   funcionario_id?: boolean
+  usuario_id?: boolean
   codigo?: boolean
   numero?: boolean
   material?: boolean
@@ -1422,35 +1682,40 @@ export type blocoSelectScalar = {
   datacadastro?: boolean
 }
 
-export type blocoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "cliente_id" | "funcionario_id" | "codigo" | "numero" | "material" | "cor" | "altura" | "largura" | "comprimento" | "peso" | "volume" | "mes" | "ano" | "frente" | "datacadastro", ExtArgs["result"]["bloco"]>
+export type blocoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "cliente_id" | "funcionario_id" | "usuario_id" | "codigo" | "numero" | "material" | "cor" | "altura" | "largura" | "comprimento" | "peso" | "volume" | "mes" | "ano" | "frente" | "datacadastro", ExtArgs["result"]["bloco"]>
 export type blocoInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   cliente?: boolean | Prisma.clienteDefaultArgs<ExtArgs>
-  funcionario?: boolean | Prisma.funcionarioDefaultArgs<ExtArgs>
+  funcionario?: boolean | Prisma.bloco$funcionarioArgs<ExtArgs>
+  usuario?: boolean | Prisma.bloco$usuarioArgs<ExtArgs>
   chapa?: boolean | Prisma.bloco$chapaArgs<ExtArgs>
   midia?: boolean | Prisma.bloco$midiaArgs<ExtArgs>
   _count?: boolean | Prisma.BlocoCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type blocoIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   cliente?: boolean | Prisma.clienteDefaultArgs<ExtArgs>
-  funcionario?: boolean | Prisma.funcionarioDefaultArgs<ExtArgs>
+  funcionario?: boolean | Prisma.bloco$funcionarioArgs<ExtArgs>
+  usuario?: boolean | Prisma.bloco$usuarioArgs<ExtArgs>
 }
 export type blocoIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   cliente?: boolean | Prisma.clienteDefaultArgs<ExtArgs>
-  funcionario?: boolean | Prisma.funcionarioDefaultArgs<ExtArgs>
+  funcionario?: boolean | Prisma.bloco$funcionarioArgs<ExtArgs>
+  usuario?: boolean | Prisma.bloco$usuarioArgs<ExtArgs>
 }
 
 export type $blocoPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "bloco"
   objects: {
     cliente: Prisma.$clientePayload<ExtArgs>
-    funcionario: Prisma.$funcionarioPayload<ExtArgs>
+    funcionario: Prisma.$funcionarioPayload<ExtArgs> | null
+    usuario: Prisma.$usuarioPayload<ExtArgs> | null
     chapa: Prisma.$chapaPayload<ExtArgs>[]
     midia: Prisma.$midiaPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     cliente_id: number
-    funcionario_id: string
+    funcionario_id: string | null
+    usuario_id: number | null
     codigo: string
     numero: number
     material: string | null
@@ -1859,7 +2124,8 @@ readonly fields: blocoFieldRefs;
 export interface Prisma__blocoClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   cliente<T extends Prisma.clienteDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.clienteDefaultArgs<ExtArgs>>): Prisma.Prisma__clienteClient<runtime.Types.Result.GetResult<Prisma.$clientePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  funcionario<T extends Prisma.funcionarioDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.funcionarioDefaultArgs<ExtArgs>>): Prisma.Prisma__funcionarioClient<runtime.Types.Result.GetResult<Prisma.$funcionarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  funcionario<T extends Prisma.bloco$funcionarioArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.bloco$funcionarioArgs<ExtArgs>>): Prisma.Prisma__funcionarioClient<runtime.Types.Result.GetResult<Prisma.$funcionarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  usuario<T extends Prisma.bloco$usuarioArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.bloco$usuarioArgs<ExtArgs>>): Prisma.Prisma__usuarioClient<runtime.Types.Result.GetResult<Prisma.$usuarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   chapa<T extends Prisma.bloco$chapaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.bloco$chapaArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$chapaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   midia<T extends Prisma.bloco$midiaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.bloco$midiaArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$midiaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1894,6 +2160,7 @@ export interface blocoFieldRefs {
   readonly id: Prisma.FieldRef<"bloco", 'String'>
   readonly cliente_id: Prisma.FieldRef<"bloco", 'Int'>
   readonly funcionario_id: Prisma.FieldRef<"bloco", 'String'>
+  readonly usuario_id: Prisma.FieldRef<"bloco", 'Int'>
   readonly codigo: Prisma.FieldRef<"bloco", 'String'>
   readonly numero: Prisma.FieldRef<"bloco", 'Int'>
   readonly material: Prisma.FieldRef<"bloco", 'String'>
@@ -2300,6 +2567,44 @@ export type blocoDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Limit how many blocos to delete.
    */
   limit?: number
+}
+
+/**
+ * bloco.funcionario
+ */
+export type bloco$funcionarioArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the funcionario
+   */
+  select?: Prisma.funcionarioSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the funcionario
+   */
+  omit?: Prisma.funcionarioOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.funcionarioInclude<ExtArgs> | null
+  where?: Prisma.funcionarioWhereInput
+}
+
+/**
+ * bloco.usuario
+ */
+export type bloco$usuarioArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the usuario
+   */
+  select?: Prisma.usuarioSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the usuario
+   */
+  omit?: Prisma.usuarioOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.usuarioInclude<ExtArgs> | null
+  where?: Prisma.usuarioWhereInput
 }
 
 /**

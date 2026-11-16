@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flash View - Configurar acessos</title>
+    <title>Flash View - Acesso do Administrador</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -99,6 +99,37 @@
             background-color: transparent;
             box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
         }
+
+        .modo-selector .btn {
+            border-color: var(--input-border);
+            color: var(--text-muted);
+        }
+
+        .modo-selector .btn.active {
+            border-color: var(--brand-blue);
+            color: var(--brand-blue);
+            background: rgba(0, 176, 255, 0.08);
+        }
+
+        .botao-login {
+            background: linear-gradient(90deg, var(--brand-yellow) calc(100% - 60px), var(--brand-blue) calc(100% - 60px));
+            color: #000;
+            border: 0;
+            border-radius: 4px;
+            font-weight: 700;
+            padding: 0.8rem;
+            width: 100%;
+        }
+
+        .botao-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
         .form-label {
             font-size: 0.75rem;
             letter-spacing: 1px;
@@ -261,8 +292,8 @@
                     <header class="cabecalho">
                         <img src="assets/logoFlashViewRecortada.png" alt="Flash View Logo" style="width: 120px; margin-bottom: 1rem;">
                         <h1>Flash View</h1>
-                        <h2>Cadastro do Administrador</h2>
-                        <p>Informe os dados para criar ou atualizar o acesso do Administrador.</p>
+                        <h2>Acesso do Administrador</h2>
+                        <p>Entre na sua conta ou configure o acesso inicial do Administrador.</p>
                     </header>
 
                     <div class="mb-4">
@@ -274,6 +305,26 @@
                         </div>
                     </div>
 
+                    <div class="d-flex gap-2 modo-selector mb-4" role="tablist" aria-label="Ação da conta">
+                        <button type="button" class="btn flex-fill active" data-modo="login" role="tab" aria-selected="true">Entrar</button>
+                        <button type="button" class="btn flex-fill" data-modo="configurar" role="tab" aria-selected="false">Configurar acesso</button>
+                    </div>
+
+                    <section id="painel-login">
+                        <form id="form-login-admin" class="formulario">
+                            <div class="campo">
+                                <label for="admin-login-email">E-mail</label>
+                                <input id="admin-login-email" type="email" placeholder="Digite seu e-mail" autocomplete="username" required>
+                            </div>
+                            <div class="campo">
+                                <label for="admin-login-senha">Senha</label>
+                                <input id="admin-login-senha" type="password" placeholder="Digite sua senha" autocomplete="current-password" required>
+                            </div>
+                            <button type="submit" id="admin-login-botao" class="botao-login">Entrar como Administrador</button>
+                        </form>
+                    </section>
+
+                    <section id="painel-configurar" hidden>
                     <form id="form-admin" class="formulario">
                         <h3>Administrador</h3>
                         <div class="campo">
@@ -298,10 +349,11 @@
                         </div>
                         <button type="submit" id="admin-botao">Salvar acesso do Administrador</button>
                     </form>
+                    </section>
 
                     <p id="mensagem" class="mensagem" role="status" aria-live="polite"></p>
                     <p class="rodape">
-                        <a href="login.html">Voltar ao login</a>
+                        <a href="login.html">Acessar como Funcionário</a>
                     </p>
                 </main>
 
@@ -309,8 +361,63 @@
         </div>
     </div>
 
+    <script src="./js/api.js"></script>
     <script>
         const mensagem = document.getElementById('mensagem');
+        const painelLogin = document.getElementById('painel-login');
+        const painelConfigurar = document.getElementById('painel-configurar');
+
+        document.querySelectorAll('.modo-selector [data-modo]').forEach(botao => {
+            botao.addEventListener('click', () => {
+                const modo = botao.dataset.modo;
+                painelLogin.hidden = modo !== 'login';
+                painelConfigurar.hidden = modo !== 'configurar';
+                document.querySelectorAll('.modo-selector [data-modo]').forEach(opcao => {
+                    const ativo = opcao === botao;
+                    opcao.classList.toggle('active', ativo);
+                    opcao.setAttribute('aria-selected', String(ativo));
+                });
+                mensagem.textContent = '';
+                mensagem.className = 'mensagem';
+            });
+        });
+
+        document.getElementById('form-login-admin').addEventListener('submit', async event => {
+            event.preventDefault();
+            const botao = document.getElementById('admin-login-botao');
+            mensagem.textContent = '';
+            mensagem.className = 'mensagem';
+            botao.disabled = true;
+            botao.textContent = 'Entrando...';
+            try {
+                const resposta = await api('/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        email: document.getElementById('admin-login-email').value.trim().toLowerCase(),
+                        senha: document.getElementById('admin-login-senha').value
+                    })
+                });
+                const usuario = resposta.usuario || resposta.financeiro || resposta.funcionario;
+                if (!usuario || usuario.papel !== 'ADMINISTRADOR') {
+                    throw new Error('Esta conta não possui perfil de Administrador.');
+                }
+                const token = resposta.access_token || resposta.acesso;
+                if (!token) {
+                    throw new Error('O servidor não retornou o token de acesso.');
+                }
+                localStorage.setItem('token', token);
+                localStorage.setItem('usuario', JSON.stringify(usuario));
+                localStorage.setItem('usuarioId', String(usuario.id));
+                mensagem.textContent = 'Login realizado. Redirecionando...';
+                mensagem.className = 'mensagem sucesso';
+                window.setTimeout(() => window.location.href = 'dashboard.html', 500);
+            } catch (erro) {
+                mensagem.textContent = erro.message || 'Não foi possível realizar o login.';
+                mensagem.className = 'mensagem erro';
+                botao.disabled = false;
+                botao.textContent = 'Entrar como Administrador';
+            }
+        });
 
         function configurarFormulario(formId, prefixo, endpoint, rotuloBotao) {
             const form = document.getElementById(formId);
@@ -344,9 +451,10 @@
                     if (idAdministrador === undefined || idAdministrador === null) {
                         throw new Error('O servidor não retornou o ID do Administrador.');
                     }
+                    form.reset();
+                    document.querySelector('.modo-selector [data-modo="login"]').click();
                     mensagem.textContent = `${dados.mensagem} ID do Administrador: ${idAdministrador}. Agora você pode entrar com o e-mail e senha informados.`;
                     mensagem.className = 'mensagem sucesso';
-                    form.reset();
                 } catch (erro) {
                     mensagem.textContent = erro.message || 'Não foi possível salvar o acesso.';
                     mensagem.className = 'mensagem erro';

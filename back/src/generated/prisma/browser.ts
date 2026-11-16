@@ -23,6 +23,11 @@ export * from './enums.js';
  */
 export type usuario = Prisma.usuarioModel
 /**
+ * Model financeiro
+ * 
+ */
+export type financeiro = Prisma.financeiroModel
+/**
  * Model admin
  * 
  */

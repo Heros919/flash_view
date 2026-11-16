@@ -23,7 +23,7 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT ?? 3000);
 
-  console.log('Backend rodando em http://localhost:3000');
+  console.log('Backend rodando em https://flash-view-1.onrender.com');
 }
 
 bootstrap();

@@ -6,7 +6,7 @@ jest.mock("../prisma/prisma.service", () => ({
 }));
 
 import { Test, TestingModule } from "@nestjs/testing";
-import { ForbiddenException } from "@nestjs/common";
+import { ForbiddenException, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from "bcrypt";
 import { PapelConta } from "../generated/prisma/enums";
@@ -144,6 +144,34 @@ describe("AuthService privileged accounts", () => {
       expect(prisma.usuario.create.mock.calls[0][0].data).not.toHaveProperty(
         "id",
       );
+    } finally {
+      if (chaveAnterior === undefined) {
+        delete process.env.ADMIN_BOOTSTRAP_KEY;
+      } else {
+        process.env.ADMIN_BOOTSTRAP_KEY = chaveAnterior;
+      }
+    }
+  });
+
+  it("rejects an administrator setup with a different key", async () => {
+    const chaveAnterior = process.env.ADMIN_BOOTSTRAP_KEY;
+    process.env.ADMIN_BOOTSTRAP_KEY =
+      "chave-de-configuracao-segura-com-32-caracteres";
+
+    try {
+      await expect(
+        service.bootstrapAdministrador(
+          {
+            cpf: "12345678901",
+            nome: "Admin Inicial",
+            email: "admin@exemplo.com",
+            senha: "senha-segura",
+          },
+          "outra-chave-de-configuracao-invalida",
+        ),
+      ).rejects.toBeInstanceOf(UnauthorizedException);
+      expect(prisma.usuario.create).not.toHaveBeenCalled();
+      expect(prisma.usuario.update).not.toHaveBeenCalled();
     } finally {
       if (chaveAnterior === undefined) {
         delete process.env.ADMIN_BOOTSTRAP_KEY;

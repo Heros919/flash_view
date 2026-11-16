@@ -328,7 +328,7 @@ DELETE /usuarios/:id
 POST   /auth/bootstrap-admin
 ```
 
-O cadastro público cria apenas Funcionários. O acesso do Administrador é configurado separadamente em `/bootstrap-admin.html`, e o acesso Financeiro em `/bootstrap-financeiro.html`. Ambas as páginas usam a `ADMIN_BOOTSTRAP_KEY` configurada no `.env`; a tela do Administrador atualiza a conta ativa existente ou cria uma se ainda não existir, enquanto a tela Financeiro cria ou atualiza a conta Financeiro. Depois de confirmar os acessos, remova a chave do `.env` e reinicie o backend. A partir daí, o Administrador pode gerenciar outras contas na área de gestão.
+O cadastro público cria apenas Funcionários. O acesso do Administrador é configurado separadamente em `/bootstrap-admin.html`, e o acesso Financeiro em `/bootstrap-financeiro.html`. Ambas as páginas usam `ADMIN_BOOTSTRAP_KEY`, com pelo menos 32 caracteres. Em produção, configure essa variável nas variáveis de ambiente do serviço de backend (por exemplo, em Render: **Environment**); o `.env` local não é enviado automaticamente no deploy. A chave digitada na tela deve ser exatamente a mesma, sem aspas adicionadas. Se alterar a variável, salve e reinicie/reimplante o backend antes de tentar novamente. A tela do Administrador atualiza a conta ativa existente ou cria uma se ainda não existir, enquanto a tela Financeiro cria ou atualiza a conta Financeiro. Depois de confirmar os acessos, remova a chave da configuração do serviço e reinicie o backend. A partir daí, o Administrador pode gerenciar outras contas na área de gestão.
  
 
 ## Estrutura do Projeto NestJS

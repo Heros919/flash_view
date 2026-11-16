@@ -28,6 +28,7 @@ export type AggregateChapa = {
 
 export type ChapaAvgAggregateOutputType = {
   cliente_id: number | null
+  usuario_id: number | null
   espessura: runtime.Decimal | null
   altura: runtime.Decimal | null
   largura: runtime.Decimal | null
@@ -35,6 +36,7 @@ export type ChapaAvgAggregateOutputType = {
 
 export type ChapaSumAggregateOutputType = {
   cliente_id: number | null
+  usuario_id: number | null
   espessura: runtime.Decimal | null
   altura: runtime.Decimal | null
   largura: runtime.Decimal | null
@@ -44,6 +46,7 @@ export type ChapaMinAggregateOutputType = {
   id: string | null
   cliente_id: number | null
   funcionario_id: string | null
+  usuario_id: number | null
   codigo: string | null
   blocoid: string | null
   espessura: runtime.Decimal | null
@@ -58,6 +61,7 @@ export type ChapaMaxAggregateOutputType = {
   id: string | null
   cliente_id: number | null
   funcionario_id: string | null
+  usuario_id: number | null
   codigo: string | null
   blocoid: string | null
   espessura: runtime.Decimal | null
@@ -72,6 +76,7 @@ export type ChapaCountAggregateOutputType = {
   id: number
   cliente_id: number
   funcionario_id: number
+  usuario_id: number
   codigo: number
   blocoid: number
   espessura: number
@@ -86,6 +91,7 @@ export type ChapaCountAggregateOutputType = {
 
 export type ChapaAvgAggregateInputType = {
   cliente_id?: true
+  usuario_id?: true
   espessura?: true
   altura?: true
   largura?: true
@@ -93,6 +99,7 @@ export type ChapaAvgAggregateInputType = {
 
 export type ChapaSumAggregateInputType = {
   cliente_id?: true
+  usuario_id?: true
   espessura?: true
   altura?: true
   largura?: true
@@ -102,6 +109,7 @@ export type ChapaMinAggregateInputType = {
   id?: true
   cliente_id?: true
   funcionario_id?: true
+  usuario_id?: true
   codigo?: true
   blocoid?: true
   espessura?: true
@@ -116,6 +124,7 @@ export type ChapaMaxAggregateInputType = {
   id?: true
   cliente_id?: true
   funcionario_id?: true
+  usuario_id?: true
   codigo?: true
   blocoid?: true
   espessura?: true
@@ -130,6 +139,7 @@ export type ChapaCountAggregateInputType = {
   id?: true
   cliente_id?: true
   funcionario_id?: true
+  usuario_id?: true
   codigo?: true
   blocoid?: true
   espessura?: true
@@ -230,7 +240,8 @@ export type chapaGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type ChapaGroupByOutputType = {
   id: string
   cliente_id: number
-  funcionario_id: string
+  funcionario_id: string | null
+  usuario_id: number | null
   codigo: string
   blocoid: string
   espessura: runtime.Decimal | null
@@ -267,7 +278,8 @@ export type chapaWhereInput = {
   NOT?: Prisma.chapaWhereInput | Prisma.chapaWhereInput[]
   id?: Prisma.StringFilter<"chapa"> | string
   cliente_id?: Prisma.IntFilter<"chapa"> | number
-  funcionario_id?: Prisma.StringFilter<"chapa"> | string
+  funcionario_id?: Prisma.StringNullableFilter<"chapa"> | string | null
+  usuario_id?: Prisma.IntNullableFilter<"chapa"> | number | null
   codigo?: Prisma.StringFilter<"chapa"> | string
   blocoid?: Prisma.StringFilter<"chapa"> | string
   espessura?: Prisma.DecimalNullableFilter<"chapa"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -278,14 +290,16 @@ export type chapaWhereInput = {
   datacadastro?: Prisma.DateTimeFilter<"chapa"> | Date | string
   bloco?: Prisma.XOR<Prisma.BlocoScalarRelationFilter, Prisma.blocoWhereInput>
   cliente?: Prisma.XOR<Prisma.ClienteScalarRelationFilter, Prisma.clienteWhereInput>
-  funcionario?: Prisma.XOR<Prisma.FuncionarioScalarRelationFilter, Prisma.funcionarioWhereInput>
+  funcionario?: Prisma.XOR<Prisma.FuncionarioNullableScalarRelationFilter, Prisma.funcionarioWhereInput> | null
+  usuario?: Prisma.XOR<Prisma.UsuarioNullableScalarRelationFilter, Prisma.usuarioWhereInput> | null
   midia?: Prisma.MidiaListRelationFilter
 }
 
 export type chapaOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   cliente_id?: Prisma.SortOrder
-  funcionario_id?: Prisma.SortOrder
+  funcionario_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  usuario_id?: Prisma.SortOrderInput | Prisma.SortOrder
   codigo?: Prisma.SortOrder
   blocoid?: Prisma.SortOrder
   espessura?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -297,6 +311,7 @@ export type chapaOrderByWithRelationInput = {
   bloco?: Prisma.blocoOrderByWithRelationInput
   cliente?: Prisma.clienteOrderByWithRelationInput
   funcionario?: Prisma.funcionarioOrderByWithRelationInput
+  usuario?: Prisma.usuarioOrderByWithRelationInput
   midia?: Prisma.midiaOrderByRelationAggregateInput
 }
 
@@ -307,7 +322,8 @@ export type chapaWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.chapaWhereInput[]
   NOT?: Prisma.chapaWhereInput | Prisma.chapaWhereInput[]
   cliente_id?: Prisma.IntFilter<"chapa"> | number
-  funcionario_id?: Prisma.StringFilter<"chapa"> | string
+  funcionario_id?: Prisma.StringNullableFilter<"chapa"> | string | null
+  usuario_id?: Prisma.IntNullableFilter<"chapa"> | number | null
   blocoid?: Prisma.StringFilter<"chapa"> | string
   espessura?: Prisma.DecimalNullableFilter<"chapa"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   altura?: Prisma.DecimalNullableFilter<"chapa"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -317,14 +333,16 @@ export type chapaWhereUniqueInput = Prisma.AtLeast<{
   datacadastro?: Prisma.DateTimeFilter<"chapa"> | Date | string
   bloco?: Prisma.XOR<Prisma.BlocoScalarRelationFilter, Prisma.blocoWhereInput>
   cliente?: Prisma.XOR<Prisma.ClienteScalarRelationFilter, Prisma.clienteWhereInput>
-  funcionario?: Prisma.XOR<Prisma.FuncionarioScalarRelationFilter, Prisma.funcionarioWhereInput>
+  funcionario?: Prisma.XOR<Prisma.FuncionarioNullableScalarRelationFilter, Prisma.funcionarioWhereInput> | null
+  usuario?: Prisma.XOR<Prisma.UsuarioNullableScalarRelationFilter, Prisma.usuarioWhereInput> | null
   midia?: Prisma.MidiaListRelationFilter
 }, "id" | "codigo">
 
 export type chapaOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   cliente_id?: Prisma.SortOrder
-  funcionario_id?: Prisma.SortOrder
+  funcionario_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  usuario_id?: Prisma.SortOrderInput | Prisma.SortOrder
   codigo?: Prisma.SortOrder
   blocoid?: Prisma.SortOrder
   espessura?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -346,7 +364,8 @@ export type chapaScalarWhereWithAggregatesInput = {
   NOT?: Prisma.chapaScalarWhereWithAggregatesInput | Prisma.chapaScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"chapa"> | string
   cliente_id?: Prisma.IntWithAggregatesFilter<"chapa"> | number
-  funcionario_id?: Prisma.StringWithAggregatesFilter<"chapa"> | string
+  funcionario_id?: Prisma.StringNullableWithAggregatesFilter<"chapa"> | string | null
+  usuario_id?: Prisma.IntNullableWithAggregatesFilter<"chapa"> | number | null
   codigo?: Prisma.StringWithAggregatesFilter<"chapa"> | string
   blocoid?: Prisma.StringWithAggregatesFilter<"chapa"> | string
   espessura?: Prisma.DecimalNullableWithAggregatesFilter<"chapa"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -368,14 +387,16 @@ export type chapaCreateInput = {
   datacadastro?: Date | string
   bloco: Prisma.blocoCreateNestedOneWithoutChapaInput
   cliente: Prisma.clienteCreateNestedOneWithoutChapaInput
-  funcionario: Prisma.funcionarioCreateNestedOneWithoutChapaInput
+  funcionario?: Prisma.funcionarioCreateNestedOneWithoutChapaInput
+  usuario?: Prisma.usuarioCreateNestedOneWithoutChapaInput
   midia?: Prisma.midiaCreateNestedManyWithoutChapaInput
 }
 
 export type chapaUncheckedCreateInput = {
   id: string
   cliente_id: number
-  funcionario_id: string
+  funcionario_id?: string | null
+  usuario_id?: number | null
   codigo: string
   blocoid: string
   espessura?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -398,14 +419,16 @@ export type chapaUpdateInput = {
   datacadastro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bloco?: Prisma.blocoUpdateOneRequiredWithoutChapaNestedInput
   cliente?: Prisma.clienteUpdateOneRequiredWithoutChapaNestedInput
-  funcionario?: Prisma.funcionarioUpdateOneRequiredWithoutChapaNestedInput
+  funcionario?: Prisma.funcionarioUpdateOneWithoutChapaNestedInput
+  usuario?: Prisma.usuarioUpdateOneWithoutChapaNestedInput
   midia?: Prisma.midiaUpdateManyWithoutChapaNestedInput
 }
 
 export type chapaUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   cliente_id?: Prisma.IntFieldUpdateOperationsInput | number
-  funcionario_id?: Prisma.StringFieldUpdateOperationsInput | string
+  funcionario_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usuario_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   codigo?: Prisma.StringFieldUpdateOperationsInput | string
   blocoid?: Prisma.StringFieldUpdateOperationsInput | string
   espessura?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -420,7 +443,8 @@ export type chapaUncheckedUpdateInput = {
 export type chapaCreateManyInput = {
   id: string
   cliente_id: number
-  funcionario_id: string
+  funcionario_id?: string | null
+  usuario_id?: number | null
   codigo: string
   blocoid: string
   espessura?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -445,7 +469,8 @@ export type chapaUpdateManyMutationInput = {
 export type chapaUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   cliente_id?: Prisma.IntFieldUpdateOperationsInput | number
-  funcionario_id?: Prisma.StringFieldUpdateOperationsInput | string
+  funcionario_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usuario_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   codigo?: Prisma.StringFieldUpdateOperationsInput | string
   blocoid?: Prisma.StringFieldUpdateOperationsInput | string
   espessura?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -470,6 +495,7 @@ export type chapaCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   cliente_id?: Prisma.SortOrder
   funcionario_id?: Prisma.SortOrder
+  usuario_id?: Prisma.SortOrder
   codigo?: Prisma.SortOrder
   blocoid?: Prisma.SortOrder
   espessura?: Prisma.SortOrder
@@ -482,6 +508,7 @@ export type chapaCountOrderByAggregateInput = {
 
 export type chapaAvgOrderByAggregateInput = {
   cliente_id?: Prisma.SortOrder
+  usuario_id?: Prisma.SortOrder
   espessura?: Prisma.SortOrder
   altura?: Prisma.SortOrder
   largura?: Prisma.SortOrder
@@ -491,6 +518,7 @@ export type chapaMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   cliente_id?: Prisma.SortOrder
   funcionario_id?: Prisma.SortOrder
+  usuario_id?: Prisma.SortOrder
   codigo?: Prisma.SortOrder
   blocoid?: Prisma.SortOrder
   espessura?: Prisma.SortOrder
@@ -505,6 +533,7 @@ export type chapaMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   cliente_id?: Prisma.SortOrder
   funcionario_id?: Prisma.SortOrder
+  usuario_id?: Prisma.SortOrder
   codigo?: Prisma.SortOrder
   blocoid?: Prisma.SortOrder
   espessura?: Prisma.SortOrder
@@ -517,6 +546,7 @@ export type chapaMinOrderByAggregateInput = {
 
 export type chapaSumOrderByAggregateInput = {
   cliente_id?: Prisma.SortOrder
+  usuario_id?: Prisma.SortOrder
   espessura?: Prisma.SortOrder
   altura?: Prisma.SortOrder
   largura?: Prisma.SortOrder
@@ -525,6 +555,48 @@ export type chapaSumOrderByAggregateInput = {
 export type ChapaNullableScalarRelationFilter = {
   is?: Prisma.chapaWhereInput | null
   isNot?: Prisma.chapaWhereInput | null
+}
+
+export type chapaCreateNestedManyWithoutUsuarioInput = {
+  create?: Prisma.XOR<Prisma.chapaCreateWithoutUsuarioInput, Prisma.chapaUncheckedCreateWithoutUsuarioInput> | Prisma.chapaCreateWithoutUsuarioInput[] | Prisma.chapaUncheckedCreateWithoutUsuarioInput[]
+  connectOrCreate?: Prisma.chapaCreateOrConnectWithoutUsuarioInput | Prisma.chapaCreateOrConnectWithoutUsuarioInput[]
+  createMany?: Prisma.chapaCreateManyUsuarioInputEnvelope
+  connect?: Prisma.chapaWhereUniqueInput | Prisma.chapaWhereUniqueInput[]
+}
+
+export type chapaUncheckedCreateNestedManyWithoutUsuarioInput = {
+  create?: Prisma.XOR<Prisma.chapaCreateWithoutUsuarioInput, Prisma.chapaUncheckedCreateWithoutUsuarioInput> | Prisma.chapaCreateWithoutUsuarioInput[] | Prisma.chapaUncheckedCreateWithoutUsuarioInput[]
+  connectOrCreate?: Prisma.chapaCreateOrConnectWithoutUsuarioInput | Prisma.chapaCreateOrConnectWithoutUsuarioInput[]
+  createMany?: Prisma.chapaCreateManyUsuarioInputEnvelope
+  connect?: Prisma.chapaWhereUniqueInput | Prisma.chapaWhereUniqueInput[]
+}
+
+export type chapaUpdateManyWithoutUsuarioNestedInput = {
+  create?: Prisma.XOR<Prisma.chapaCreateWithoutUsuarioInput, Prisma.chapaUncheckedCreateWithoutUsuarioInput> | Prisma.chapaCreateWithoutUsuarioInput[] | Prisma.chapaUncheckedCreateWithoutUsuarioInput[]
+  connectOrCreate?: Prisma.chapaCreateOrConnectWithoutUsuarioInput | Prisma.chapaCreateOrConnectWithoutUsuarioInput[]
+  upsert?: Prisma.chapaUpsertWithWhereUniqueWithoutUsuarioInput | Prisma.chapaUpsertWithWhereUniqueWithoutUsuarioInput[]
+  createMany?: Prisma.chapaCreateManyUsuarioInputEnvelope
+  set?: Prisma.chapaWhereUniqueInput | Prisma.chapaWhereUniqueInput[]
+  disconnect?: Prisma.chapaWhereUniqueInput | Prisma.chapaWhereUniqueInput[]
+  delete?: Prisma.chapaWhereUniqueInput | Prisma.chapaWhereUniqueInput[]
+  connect?: Prisma.chapaWhereUniqueInput | Prisma.chapaWhereUniqueInput[]
+  update?: Prisma.chapaUpdateWithWhereUniqueWithoutUsuarioInput | Prisma.chapaUpdateWithWhereUniqueWithoutUsuarioInput[]
+  updateMany?: Prisma.chapaUpdateManyWithWhereWithoutUsuarioInput | Prisma.chapaUpdateManyWithWhereWithoutUsuarioInput[]
+  deleteMany?: Prisma.chapaScalarWhereInput | Prisma.chapaScalarWhereInput[]
+}
+
+export type chapaUncheckedUpdateManyWithoutUsuarioNestedInput = {
+  create?: Prisma.XOR<Prisma.chapaCreateWithoutUsuarioInput, Prisma.chapaUncheckedCreateWithoutUsuarioInput> | Prisma.chapaCreateWithoutUsuarioInput[] | Prisma.chapaUncheckedCreateWithoutUsuarioInput[]
+  connectOrCreate?: Prisma.chapaCreateOrConnectWithoutUsuarioInput | Prisma.chapaCreateOrConnectWithoutUsuarioInput[]
+  upsert?: Prisma.chapaUpsertWithWhereUniqueWithoutUsuarioInput | Prisma.chapaUpsertWithWhereUniqueWithoutUsuarioInput[]
+  createMany?: Prisma.chapaCreateManyUsuarioInputEnvelope
+  set?: Prisma.chapaWhereUniqueInput | Prisma.chapaWhereUniqueInput[]
+  disconnect?: Prisma.chapaWhereUniqueInput | Prisma.chapaWhereUniqueInput[]
+  delete?: Prisma.chapaWhereUniqueInput | Prisma.chapaWhereUniqueInput[]
+  connect?: Prisma.chapaWhereUniqueInput | Prisma.chapaWhereUniqueInput[]
+  update?: Prisma.chapaUpdateWithWhereUniqueWithoutUsuarioInput | Prisma.chapaUpdateWithWhereUniqueWithoutUsuarioInput[]
+  updateMany?: Prisma.chapaUpdateManyWithWhereWithoutUsuarioInput | Prisma.chapaUpdateManyWithWhereWithoutUsuarioInput[]
+  deleteMany?: Prisma.chapaScalarWhereInput | Prisma.chapaScalarWhereInput[]
 }
 
 export type chapaCreateNestedManyWithoutBlocoInput = {
@@ -669,6 +741,80 @@ export type chapaUpdateOneWithoutMidiaNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.chapaUpdateToOneWithWhereWithoutMidiaInput, Prisma.chapaUpdateWithoutMidiaInput>, Prisma.chapaUncheckedUpdateWithoutMidiaInput>
 }
 
+export type chapaCreateWithoutUsuarioInput = {
+  id: string
+  codigo: string
+  espessura?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  altura?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  largura?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  acabamento?: string | null
+  status?: string
+  datacadastro?: Date | string
+  bloco: Prisma.blocoCreateNestedOneWithoutChapaInput
+  cliente: Prisma.clienteCreateNestedOneWithoutChapaInput
+  funcionario?: Prisma.funcionarioCreateNestedOneWithoutChapaInput
+  midia?: Prisma.midiaCreateNestedManyWithoutChapaInput
+}
+
+export type chapaUncheckedCreateWithoutUsuarioInput = {
+  id: string
+  cliente_id: number
+  funcionario_id?: string | null
+  codigo: string
+  blocoid: string
+  espessura?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  altura?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  largura?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  acabamento?: string | null
+  status?: string
+  datacadastro?: Date | string
+  midia?: Prisma.midiaUncheckedCreateNestedManyWithoutChapaInput
+}
+
+export type chapaCreateOrConnectWithoutUsuarioInput = {
+  where: Prisma.chapaWhereUniqueInput
+  create: Prisma.XOR<Prisma.chapaCreateWithoutUsuarioInput, Prisma.chapaUncheckedCreateWithoutUsuarioInput>
+}
+
+export type chapaCreateManyUsuarioInputEnvelope = {
+  data: Prisma.chapaCreateManyUsuarioInput | Prisma.chapaCreateManyUsuarioInput[]
+  skipDuplicates?: boolean
+}
+
+export type chapaUpsertWithWhereUniqueWithoutUsuarioInput = {
+  where: Prisma.chapaWhereUniqueInput
+  update: Prisma.XOR<Prisma.chapaUpdateWithoutUsuarioInput, Prisma.chapaUncheckedUpdateWithoutUsuarioInput>
+  create: Prisma.XOR<Prisma.chapaCreateWithoutUsuarioInput, Prisma.chapaUncheckedCreateWithoutUsuarioInput>
+}
+
+export type chapaUpdateWithWhereUniqueWithoutUsuarioInput = {
+  where: Prisma.chapaWhereUniqueInput
+  data: Prisma.XOR<Prisma.chapaUpdateWithoutUsuarioInput, Prisma.chapaUncheckedUpdateWithoutUsuarioInput>
+}
+
+export type chapaUpdateManyWithWhereWithoutUsuarioInput = {
+  where: Prisma.chapaScalarWhereInput
+  data: Prisma.XOR<Prisma.chapaUpdateManyMutationInput, Prisma.chapaUncheckedUpdateManyWithoutUsuarioInput>
+}
+
+export type chapaScalarWhereInput = {
+  AND?: Prisma.chapaScalarWhereInput | Prisma.chapaScalarWhereInput[]
+  OR?: Prisma.chapaScalarWhereInput[]
+  NOT?: Prisma.chapaScalarWhereInput | Prisma.chapaScalarWhereInput[]
+  id?: Prisma.StringFilter<"chapa"> | string
+  cliente_id?: Prisma.IntFilter<"chapa"> | number
+  funcionario_id?: Prisma.StringNullableFilter<"chapa"> | string | null
+  usuario_id?: Prisma.IntNullableFilter<"chapa"> | number | null
+  codigo?: Prisma.StringFilter<"chapa"> | string
+  blocoid?: Prisma.StringFilter<"chapa"> | string
+  espessura?: Prisma.DecimalNullableFilter<"chapa"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  altura?: Prisma.DecimalNullableFilter<"chapa"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  largura?: Prisma.DecimalNullableFilter<"chapa"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  acabamento?: Prisma.StringNullableFilter<"chapa"> | string | null
+  status?: Prisma.StringFilter<"chapa"> | string
+  datacadastro?: Prisma.DateTimeFilter<"chapa"> | Date | string
+}
+
 export type chapaCreateWithoutBlocoInput = {
   id: string
   codigo: string
@@ -679,14 +825,16 @@ export type chapaCreateWithoutBlocoInput = {
   status?: string
   datacadastro?: Date | string
   cliente: Prisma.clienteCreateNestedOneWithoutChapaInput
-  funcionario: Prisma.funcionarioCreateNestedOneWithoutChapaInput
+  funcionario?: Prisma.funcionarioCreateNestedOneWithoutChapaInput
+  usuario?: Prisma.usuarioCreateNestedOneWithoutChapaInput
   midia?: Prisma.midiaCreateNestedManyWithoutChapaInput
 }
 
 export type chapaUncheckedCreateWithoutBlocoInput = {
   id: string
   cliente_id: number
-  funcionario_id: string
+  funcionario_id?: string | null
+  usuario_id?: number | null
   codigo: string
   espessura?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   altura?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -723,23 +871,6 @@ export type chapaUpdateManyWithWhereWithoutBlocoInput = {
   data: Prisma.XOR<Prisma.chapaUpdateManyMutationInput, Prisma.chapaUncheckedUpdateManyWithoutBlocoInput>
 }
 
-export type chapaScalarWhereInput = {
-  AND?: Prisma.chapaScalarWhereInput | Prisma.chapaScalarWhereInput[]
-  OR?: Prisma.chapaScalarWhereInput[]
-  NOT?: Prisma.chapaScalarWhereInput | Prisma.chapaScalarWhereInput[]
-  id?: Prisma.StringFilter<"chapa"> | string
-  cliente_id?: Prisma.IntFilter<"chapa"> | number
-  funcionario_id?: Prisma.StringFilter<"chapa"> | string
-  codigo?: Prisma.StringFilter<"chapa"> | string
-  blocoid?: Prisma.StringFilter<"chapa"> | string
-  espessura?: Prisma.DecimalNullableFilter<"chapa"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  altura?: Prisma.DecimalNullableFilter<"chapa"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  largura?: Prisma.DecimalNullableFilter<"chapa"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  acabamento?: Prisma.StringNullableFilter<"chapa"> | string | null
-  status?: Prisma.StringFilter<"chapa"> | string
-  datacadastro?: Prisma.DateTimeFilter<"chapa"> | Date | string
-}
-
 export type chapaCreateWithoutClienteInput = {
   id: string
   codigo: string
@@ -750,13 +881,15 @@ export type chapaCreateWithoutClienteInput = {
   status?: string
   datacadastro?: Date | string
   bloco: Prisma.blocoCreateNestedOneWithoutChapaInput
-  funcionario: Prisma.funcionarioCreateNestedOneWithoutChapaInput
+  funcionario?: Prisma.funcionarioCreateNestedOneWithoutChapaInput
+  usuario?: Prisma.usuarioCreateNestedOneWithoutChapaInput
   midia?: Prisma.midiaCreateNestedManyWithoutChapaInput
 }
 
 export type chapaUncheckedCreateWithoutClienteInput = {
   id: string
-  funcionario_id: string
+  funcionario_id?: string | null
+  usuario_id?: number | null
   codigo: string
   blocoid: string
   espessura?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -805,11 +938,14 @@ export type chapaCreateWithoutFuncionarioInput = {
   datacadastro?: Date | string
   bloco: Prisma.blocoCreateNestedOneWithoutChapaInput
   cliente: Prisma.clienteCreateNestedOneWithoutChapaInput
+  usuario?: Prisma.usuarioCreateNestedOneWithoutChapaInput
   midia?: Prisma.midiaCreateNestedManyWithoutChapaInput
 }
 
 export type chapaUncheckedCreateWithoutFuncionarioInput = {
   id: string
+  cliente_id: number
+  usuario_id?: number | null
   codigo: string
   blocoid: string
   espessura?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -858,13 +994,15 @@ export type chapaCreateWithoutMidiaInput = {
   datacadastro?: Date | string
   bloco: Prisma.blocoCreateNestedOneWithoutChapaInput
   cliente: Prisma.clienteCreateNestedOneWithoutChapaInput
-  funcionario: Prisma.funcionarioCreateNestedOneWithoutChapaInput
+  funcionario?: Prisma.funcionarioCreateNestedOneWithoutChapaInput
+  usuario?: Prisma.usuarioCreateNestedOneWithoutChapaInput
 }
 
 export type chapaUncheckedCreateWithoutMidiaInput = {
   id: string
   cliente_id: number
-  funcionario_id: string
+  funcionario_id?: string | null
+  usuario_id?: number | null
   codigo: string
   blocoid: string
   espessura?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -902,13 +1040,73 @@ export type chapaUpdateWithoutMidiaInput = {
   datacadastro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bloco?: Prisma.blocoUpdateOneRequiredWithoutChapaNestedInput
   cliente?: Prisma.clienteUpdateOneRequiredWithoutChapaNestedInput
-  funcionario?: Prisma.funcionarioUpdateOneRequiredWithoutChapaNestedInput
+  funcionario?: Prisma.funcionarioUpdateOneWithoutChapaNestedInput
+  usuario?: Prisma.usuarioUpdateOneWithoutChapaNestedInput
 }
 
 export type chapaUncheckedUpdateWithoutMidiaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   cliente_id?: Prisma.IntFieldUpdateOperationsInput | number
-  funcionario_id?: Prisma.StringFieldUpdateOperationsInput | string
+  funcionario_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usuario_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  codigo?: Prisma.StringFieldUpdateOperationsInput | string
+  blocoid?: Prisma.StringFieldUpdateOperationsInput | string
+  espessura?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  altura?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  largura?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  acabamento?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  datacadastro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type chapaCreateManyUsuarioInput = {
+  id: string
+  cliente_id: number
+  funcionario_id?: string | null
+  codigo: string
+  blocoid: string
+  espessura?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  altura?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  largura?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  acabamento?: string | null
+  status?: string
+  datacadastro?: Date | string
+}
+
+export type chapaUpdateWithoutUsuarioInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  codigo?: Prisma.StringFieldUpdateOperationsInput | string
+  espessura?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  altura?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  largura?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  acabamento?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  datacadastro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bloco?: Prisma.blocoUpdateOneRequiredWithoutChapaNestedInput
+  cliente?: Prisma.clienteUpdateOneRequiredWithoutChapaNestedInput
+  funcionario?: Prisma.funcionarioUpdateOneWithoutChapaNestedInput
+  midia?: Prisma.midiaUpdateManyWithoutChapaNestedInput
+}
+
+export type chapaUncheckedUpdateWithoutUsuarioInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  cliente_id?: Prisma.IntFieldUpdateOperationsInput | number
+  funcionario_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  codigo?: Prisma.StringFieldUpdateOperationsInput | string
+  blocoid?: Prisma.StringFieldUpdateOperationsInput | string
+  espessura?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  altura?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  largura?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  acabamento?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  datacadastro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  midia?: Prisma.midiaUncheckedUpdateManyWithoutChapaNestedInput
+}
+
+export type chapaUncheckedUpdateManyWithoutUsuarioInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  cliente_id?: Prisma.IntFieldUpdateOperationsInput | number
+  funcionario_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   codigo?: Prisma.StringFieldUpdateOperationsInput | string
   blocoid?: Prisma.StringFieldUpdateOperationsInput | string
   espessura?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -922,7 +1120,8 @@ export type chapaUncheckedUpdateWithoutMidiaInput = {
 export type chapaCreateManyBlocoInput = {
   id: string
   cliente_id: number
-  funcionario_id: string
+  funcionario_id?: string | null
+  usuario_id?: number | null
   codigo: string
   espessura?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   altura?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -942,14 +1141,16 @@ export type chapaUpdateWithoutBlocoInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   datacadastro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   cliente?: Prisma.clienteUpdateOneRequiredWithoutChapaNestedInput
-  funcionario?: Prisma.funcionarioUpdateOneRequiredWithoutChapaNestedInput
+  funcionario?: Prisma.funcionarioUpdateOneWithoutChapaNestedInput
+  usuario?: Prisma.usuarioUpdateOneWithoutChapaNestedInput
   midia?: Prisma.midiaUpdateManyWithoutChapaNestedInput
 }
 
 export type chapaUncheckedUpdateWithoutBlocoInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   cliente_id?: Prisma.IntFieldUpdateOperationsInput | number
-  funcionario_id?: Prisma.StringFieldUpdateOperationsInput | string
+  funcionario_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usuario_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   codigo?: Prisma.StringFieldUpdateOperationsInput | string
   espessura?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   altura?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -963,7 +1164,8 @@ export type chapaUncheckedUpdateWithoutBlocoInput = {
 export type chapaUncheckedUpdateManyWithoutBlocoInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   cliente_id?: Prisma.IntFieldUpdateOperationsInput | number
-  funcionario_id?: Prisma.StringFieldUpdateOperationsInput | string
+  funcionario_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usuario_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   codigo?: Prisma.StringFieldUpdateOperationsInput | string
   espessura?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   altura?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -975,7 +1177,8 @@ export type chapaUncheckedUpdateManyWithoutBlocoInput = {
 
 export type chapaCreateManyClienteInput = {
   id: string
-  funcionario_id: string
+  funcionario_id?: string | null
+  usuario_id?: number | null
   codigo: string
   blocoid: string
   espessura?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -996,13 +1199,15 @@ export type chapaUpdateWithoutClienteInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   datacadastro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bloco?: Prisma.blocoUpdateOneRequiredWithoutChapaNestedInput
-  funcionario?: Prisma.funcionarioUpdateOneRequiredWithoutChapaNestedInput
+  funcionario?: Prisma.funcionarioUpdateOneWithoutChapaNestedInput
+  usuario?: Prisma.usuarioUpdateOneWithoutChapaNestedInput
   midia?: Prisma.midiaUpdateManyWithoutChapaNestedInput
 }
 
 export type chapaUncheckedUpdateWithoutClienteInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  funcionario_id?: Prisma.StringFieldUpdateOperationsInput | string
+  funcionario_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usuario_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   codigo?: Prisma.StringFieldUpdateOperationsInput | string
   blocoid?: Prisma.StringFieldUpdateOperationsInput | string
   espessura?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1016,7 +1221,8 @@ export type chapaUncheckedUpdateWithoutClienteInput = {
 
 export type chapaUncheckedUpdateManyWithoutClienteInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  funcionario_id?: Prisma.StringFieldUpdateOperationsInput | string
+  funcionario_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usuario_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   codigo?: Prisma.StringFieldUpdateOperationsInput | string
   blocoid?: Prisma.StringFieldUpdateOperationsInput | string
   espessura?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1029,6 +1235,8 @@ export type chapaUncheckedUpdateManyWithoutClienteInput = {
 
 export type chapaCreateManyFuncionarioInput = {
   id: string
+  cliente_id: number
+  usuario_id?: number | null
   codigo: string
   blocoid: string
   espessura?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1050,11 +1258,14 @@ export type chapaUpdateWithoutFuncionarioInput = {
   datacadastro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bloco?: Prisma.blocoUpdateOneRequiredWithoutChapaNestedInput
   cliente?: Prisma.clienteUpdateOneRequiredWithoutChapaNestedInput
+  usuario?: Prisma.usuarioUpdateOneWithoutChapaNestedInput
   midia?: Prisma.midiaUpdateManyWithoutChapaNestedInput
 }
 
 export type chapaUncheckedUpdateWithoutFuncionarioInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  cliente_id?: Prisma.IntFieldUpdateOperationsInput | number
+  usuario_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   codigo?: Prisma.StringFieldUpdateOperationsInput | string
   blocoid?: Prisma.StringFieldUpdateOperationsInput | string
   espessura?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1068,6 +1279,8 @@ export type chapaUncheckedUpdateWithoutFuncionarioInput = {
 
 export type chapaUncheckedUpdateManyWithoutFuncionarioInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  cliente_id?: Prisma.IntFieldUpdateOperationsInput | number
+  usuario_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   codigo?: Prisma.StringFieldUpdateOperationsInput | string
   blocoid?: Prisma.StringFieldUpdateOperationsInput | string
   espessura?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1113,6 +1326,7 @@ export type chapaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   id?: boolean
   cliente_id?: boolean
   funcionario_id?: boolean
+  usuario_id?: boolean
   codigo?: boolean
   blocoid?: boolean
   espessura?: boolean
@@ -1123,7 +1337,8 @@ export type chapaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   datacadastro?: boolean
   bloco?: boolean | Prisma.blocoDefaultArgs<ExtArgs>
   cliente?: boolean | Prisma.clienteDefaultArgs<ExtArgs>
-  funcionario?: boolean | Prisma.funcionarioDefaultArgs<ExtArgs>
+  funcionario?: boolean | Prisma.chapa$funcionarioArgs<ExtArgs>
+  usuario?: boolean | Prisma.chapa$usuarioArgs<ExtArgs>
   midia?: boolean | Prisma.chapa$midiaArgs<ExtArgs>
   _count?: boolean | Prisma.ChapaCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["chapa"]>
@@ -1132,6 +1347,7 @@ export type chapaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   id?: boolean
   cliente_id?: boolean
   funcionario_id?: boolean
+  usuario_id?: boolean
   codigo?: boolean
   blocoid?: boolean
   espessura?: boolean
@@ -1142,13 +1358,15 @@ export type chapaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   datacadastro?: boolean
   bloco?: boolean | Prisma.blocoDefaultArgs<ExtArgs>
   cliente?: boolean | Prisma.clienteDefaultArgs<ExtArgs>
-  funcionario?: boolean | Prisma.funcionarioDefaultArgs<ExtArgs>
+  funcionario?: boolean | Prisma.chapa$funcionarioArgs<ExtArgs>
+  usuario?: boolean | Prisma.chapa$usuarioArgs<ExtArgs>
 }, ExtArgs["result"]["chapa"]>
 
 export type chapaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   cliente_id?: boolean
   funcionario_id?: boolean
+  usuario_id?: boolean
   codigo?: boolean
   blocoid?: boolean
   espessura?: boolean
@@ -1159,13 +1377,15 @@ export type chapaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   datacadastro?: boolean
   bloco?: boolean | Prisma.blocoDefaultArgs<ExtArgs>
   cliente?: boolean | Prisma.clienteDefaultArgs<ExtArgs>
-  funcionario?: boolean | Prisma.funcionarioDefaultArgs<ExtArgs>
+  funcionario?: boolean | Prisma.chapa$funcionarioArgs<ExtArgs>
+  usuario?: boolean | Prisma.chapa$usuarioArgs<ExtArgs>
 }, ExtArgs["result"]["chapa"]>
 
 export type chapaSelectScalar = {
   id?: boolean
   cliente_id?: boolean
   funcionario_id?: boolean
+  usuario_id?: boolean
   codigo?: boolean
   blocoid?: boolean
   espessura?: boolean
@@ -1176,23 +1396,26 @@ export type chapaSelectScalar = {
   datacadastro?: boolean
 }
 
-export type chapaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "cliente_id" | "funcionario_id" | "codigo" | "blocoid" | "espessura" | "altura" | "largura" | "acabamento" | "status" | "datacadastro", ExtArgs["result"]["chapa"]>
+export type chapaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "cliente_id" | "funcionario_id" | "usuario_id" | "codigo" | "blocoid" | "espessura" | "altura" | "largura" | "acabamento" | "status" | "datacadastro", ExtArgs["result"]["chapa"]>
 export type chapaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   bloco?: boolean | Prisma.blocoDefaultArgs<ExtArgs>
   cliente?: boolean | Prisma.clienteDefaultArgs<ExtArgs>
-  funcionario?: boolean | Prisma.funcionarioDefaultArgs<ExtArgs>
+  funcionario?: boolean | Prisma.chapa$funcionarioArgs<ExtArgs>
+  usuario?: boolean | Prisma.chapa$usuarioArgs<ExtArgs>
   midia?: boolean | Prisma.chapa$midiaArgs<ExtArgs>
   _count?: boolean | Prisma.ChapaCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type chapaIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   bloco?: boolean | Prisma.blocoDefaultArgs<ExtArgs>
   cliente?: boolean | Prisma.clienteDefaultArgs<ExtArgs>
-  funcionario?: boolean | Prisma.funcionarioDefaultArgs<ExtArgs>
+  funcionario?: boolean | Prisma.chapa$funcionarioArgs<ExtArgs>
+  usuario?: boolean | Prisma.chapa$usuarioArgs<ExtArgs>
 }
 export type chapaIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   bloco?: boolean | Prisma.blocoDefaultArgs<ExtArgs>
   cliente?: boolean | Prisma.clienteDefaultArgs<ExtArgs>
-  funcionario?: boolean | Prisma.funcionarioDefaultArgs<ExtArgs>
+  funcionario?: boolean | Prisma.chapa$funcionarioArgs<ExtArgs>
+  usuario?: boolean | Prisma.chapa$usuarioArgs<ExtArgs>
 }
 
 export type $chapaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1200,13 +1423,15 @@ export type $chapaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   objects: {
     bloco: Prisma.$blocoPayload<ExtArgs>
     cliente: Prisma.$clientePayload<ExtArgs>
-    funcionario: Prisma.$funcionarioPayload<ExtArgs>
+    funcionario: Prisma.$funcionarioPayload<ExtArgs> | null
+    usuario: Prisma.$usuarioPayload<ExtArgs> | null
     midia: Prisma.$midiaPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     cliente_id: number
-    funcionario_id: string
+    funcionario_id: string | null
+    usuario_id: number | null
     codigo: string
     blocoid: string
     espessura: runtime.Decimal | null
@@ -1611,7 +1836,8 @@ export interface Prisma__chapaClient<T, Null = never, ExtArgs extends runtime.Ty
   readonly [Symbol.toStringTag]: "PrismaPromise"
   bloco<T extends Prisma.blocoDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.blocoDefaultArgs<ExtArgs>>): Prisma.Prisma__blocoClient<runtime.Types.Result.GetResult<Prisma.$blocoPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   cliente<T extends Prisma.clienteDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.clienteDefaultArgs<ExtArgs>>): Prisma.Prisma__clienteClient<runtime.Types.Result.GetResult<Prisma.$clientePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  funcionario<T extends Prisma.funcionarioDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.funcionarioDefaultArgs<ExtArgs>>): Prisma.Prisma__funcionarioClient<runtime.Types.Result.GetResult<Prisma.$funcionarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  funcionario<T extends Prisma.chapa$funcionarioArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.chapa$funcionarioArgs<ExtArgs>>): Prisma.Prisma__funcionarioClient<runtime.Types.Result.GetResult<Prisma.$funcionarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  usuario<T extends Prisma.chapa$usuarioArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.chapa$usuarioArgs<ExtArgs>>): Prisma.Prisma__usuarioClient<runtime.Types.Result.GetResult<Prisma.$usuarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   midia<T extends Prisma.chapa$midiaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.chapa$midiaArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$midiaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1645,6 +1871,7 @@ export interface chapaFieldRefs {
   readonly id: Prisma.FieldRef<"chapa", 'String'>
   readonly cliente_id: Prisma.FieldRef<"chapa", 'Int'>
   readonly funcionario_id: Prisma.FieldRef<"chapa", 'String'>
+  readonly usuario_id: Prisma.FieldRef<"chapa", 'Int'>
   readonly codigo: Prisma.FieldRef<"chapa", 'String'>
   readonly blocoid: Prisma.FieldRef<"chapa", 'String'>
   readonly espessura: Prisma.FieldRef<"chapa", 'Decimal'>
@@ -2046,6 +2273,44 @@ export type chapaDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Limit how many chapas to delete.
    */
   limit?: number
+}
+
+/**
+ * chapa.funcionario
+ */
+export type chapa$funcionarioArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the funcionario
+   */
+  select?: Prisma.funcionarioSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the funcionario
+   */
+  omit?: Prisma.funcionarioOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.funcionarioInclude<ExtArgs> | null
+  where?: Prisma.funcionarioWhereInput
+}
+
+/**
+ * chapa.usuario
+ */
+export type chapa$usuarioArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the usuario
+   */
+  select?: Prisma.usuarioSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the usuario
+   */
+  omit?: Prisma.usuarioOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.usuarioInclude<ExtArgs> | null
+  where?: Prisma.usuarioWhereInput
 }
 
 /**
