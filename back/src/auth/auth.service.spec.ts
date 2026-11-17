@@ -34,8 +34,8 @@ describe("AuthService privileged accounts", () => {
       create: jest.Mock;
       update: jest.Mock;
     };
-    cliente: { findFirst: jest.Mock };
-    admin: { findFirst: jest.Mock };
+    cliente: { findFirst: jest.Mock; findUnique: jest.Mock };
+    admin: { findFirst: jest.Mock; findUnique: jest.Mock; upsert: jest.Mock };
   };
   let signAsync: jest.Mock;
 
@@ -59,8 +59,8 @@ describe("AuthService privileged accounts", () => {
         create: jest.fn(),
         update: jest.fn(),
       },
-      cliente: { findFirst: jest.fn() },
-      admin: { findFirst: jest.fn() },
+      cliente: { findFirst: jest.fn(), findUnique: jest.fn() },
+      admin: { findFirst: jest.fn(), findUnique: jest.fn(), upsert: jest.fn() },
     };
     signAsync = jest.fn().mockResolvedValue("token");
 
@@ -92,6 +92,38 @@ describe("AuthService privileged accounts", () => {
       expect(prisma.funcionario.create).not.toHaveBeenCalled();
     },
   );
+
+  it("uses the selected client and admin when creating an employee", async () => {
+    prisma.cliente.findUnique.mockResolvedValue({ id: 7 });
+    prisma.admin.findUnique.mockResolvedValue({ id: 3 });
+    prisma.funcionario.create.mockResolvedValue({
+      id: "funcionario-1",
+      cpf: "12345678901",
+      nome: "Pessoa Teste",
+      email: "pessoa@exemplo.com",
+      cliente_id: 7,
+      admin_id: 3,
+    });
+
+    await expect(
+      service.registrar({
+        cpf: "12345678901",
+        nome: "Pessoa Teste",
+        email: "pessoa@exemplo.com",
+        senha: "senha-segura",
+        clienteId: 7,
+        adminId: 3,
+      }),
+    ).resolves.toMatchObject({
+      funcionario: {
+        cliente_id: 7,
+        admin_id: 3,
+      },
+    });
+
+    expect(prisma.cliente.findUnique).toHaveBeenCalledWith({ where: { id: 7 } });
+    expect(prisma.admin.findUnique).toHaveBeenCalledWith({ where: { id: 3 } });
+  });
 
   it("lists employee IDs and names for responsible selection", async () => {
     const funcionarios = [
@@ -172,6 +204,54 @@ describe("AuthService privileged accounts", () => {
       ).rejects.toBeInstanceOf(UnauthorizedException);
       expect(prisma.usuario.create).not.toHaveBeenCalled();
       expect(prisma.usuario.update).not.toHaveBeenCalled();
+    } finally {
+      if (chaveAnterior === undefined) {
+        delete process.env.ADMIN_BOOTSTRAP_KEY;
+      } else {
+        process.env.ADMIN_BOOTSTRAP_KEY = chaveAnterior;
+      }
+    }
+  });
+
+  it("creates the admin registry row used by employee links during bootstrap", async () => {
+    const chave = "chave-de-configuracao-segura-com-32-caracteres";
+    const chaveAnterior = process.env.ADMIN_BOOTSTRAP_KEY;
+    process.env.ADMIN_BOOTSTRAP_KEY = chave;
+    prisma.usuario.create.mockResolvedValue({
+      id: 15,
+      cpf: "12345678901",
+      nome: "Admin Inicial",
+      email: "admin@exemplo.com",
+      ativo: true,
+      papel: PapelConta.ADMINISTRADOR,
+    });
+    prisma.admin.upsert.mockResolvedValue({
+      id: 7,
+      nome: "Admin Inicial",
+      email: "admin@exemplo.com",
+      senha: "hash",
+    });
+
+    try {
+      await service.bootstrapAdministrador(
+        {
+          cpf: "12345678901",
+          nome: "Admin Inicial",
+          email: "admin@exemplo.com",
+          senha: "senha-segura",
+        },
+        chave,
+      );
+
+      expect(prisma.admin.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { email: "admin@exemplo.com" },
+          create: expect.objectContaining({
+            nome: "Admin Inicial",
+            email: "admin@exemplo.com",
+          }),
+        }),
+      );
     } finally {
       if (chaveAnterior === undefined) {
         delete process.env.ADMIN_BOOTSTRAP_KEY;

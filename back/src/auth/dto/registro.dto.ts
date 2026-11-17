@@ -1,12 +1,14 @@
 import {
   IsEnum,
   IsEmail,
+  IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
   Length,
   MinLength,
 } from "class-validator";
+import { Type } from "class-transformer";
 import { PapelConta } from "../../generated/prisma/enums";
 
 export class RegistroDto {
@@ -30,4 +32,14 @@ export class RegistroDto {
   @IsOptional()
   @IsEnum(PapelConta)
   papel?: PapelConta;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  clienteId?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  adminId?: number;
 }

@@ -71,12 +71,12 @@ export class AuthService {
     const senhaHash = await bcrypt.hash(dto.senha, 10);
 
     const [cliente, admin] = await Promise.all([
-      this.prisma.cliente.findFirst({
-        orderBy: { id: "asc" },
-      }),
-      this.prisma.admin.findFirst({
-        orderBy: { id: "asc" },
-      }),
+      dto.clienteId
+        ? this.prisma.cliente.findUnique({ where: { id: dto.clienteId } })
+        : this.prisma.cliente.findFirst({
+            orderBy: { id: "asc" },
+          }),
+      this.resolverAdminResponsavel(dto.adminId),
     ]);
 
     if (!cliente || !admin) {
@@ -191,6 +191,8 @@ export class AuthService {
         })
       : await this.prisma.usuario.create({ data });
 
+    await this.sincronizarAdminComUsuario(usuario);
+
     return {
       mensagem: "Acesso do Administrador configurado com sucesso.",
       usuario: this.dadosPublicosUsuario(usuario),
@@ -272,6 +274,64 @@ export class AuthService {
       mensagem: "Acesso do Financeiro configurado com sucesso.",
       financeiro: this.dadosPublicosFinanceiro(financeiro),
     };
+  }
+
+  private async sincronizarAdminComUsuario(usuario: {
+    id: number;
+    nome: string;
+    email: string;
+    cpf: string;
+  }) {
+    const senhaPadrao = await bcrypt.hash(`${usuario.email}:${usuario.id}`, 10);
+
+    await this.prisma.admin.upsert({
+      where: { email: usuario.email },
+      update: { nome: usuario.nome },
+      create: {
+        nome: usuario.nome,
+        email: usuario.email,
+        senha: senhaPadrao,
+      },
+    });
+  }
+
+  private async resolverAdminResponsavel(adminId?: number) {
+    if (adminId) {
+      return this.prisma.admin.findUnique({ where: { id: adminId } });
+    }
+
+    const adminExistente = await this.prisma.admin.findFirst({
+      orderBy: { id: "asc" },
+    });
+
+    if (adminExistente) {
+      return adminExistente;
+    }
+
+    const usuarioAdministrador = await this.prisma.usuario.findFirst({
+      where: {
+        papel: PapelConta.ADMINISTRADOR,
+        ativo: true,
+      },
+      orderBy: { id: "asc" },
+    });
+
+    if (!usuarioAdministrador) {
+      return null;
+    }
+
+    return this.prisma.admin.upsert({
+      where: { email: usuarioAdministrador.email },
+      update: { nome: usuarioAdministrador.nome },
+      create: {
+        nome: usuarioAdministrador.nome,
+        email: usuarioAdministrador.email,
+        senha: await bcrypt.hash(
+          `${usuarioAdministrador.email}:${usuarioAdministrador.id}`,
+          10,
+        ),
+      },
+    });
   }
 
   private validarChaveBootstrap(chave: string) {

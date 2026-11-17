@@ -172,6 +172,39 @@
                     <tbody id="financeiros-lista"></tbody>
                 </table>
             </div>
+
+            <h2 class="h4 mt-5">Contas de Funcionário</h2>
+            <form id="form-funcionario" class="card card-body mb-4">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label" for="funcionario-cpf">CPF</label>
+                        <input class="form-control" id="funcionario-cpf" inputmode="numeric" pattern="[0-9]{11}" maxlength="11" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label" for="funcionario-nome">Nome</label>
+                        <input class="form-control" id="funcionario-nome" maxlength="150" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label" for="funcionario-email">E-mail</label>
+                        <input class="form-control" id="funcionario-email" type="email" maxlength="255" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label" for="funcionario-senha">Senha</label>
+                        <input class="form-control" id="funcionario-senha" type="password" minlength="8" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" for="funcionario-cliente">Cliente</label>
+                        <select class="form-select" id="funcionario-cliente" required></select>
+                    </div>
+                </div>
+                <button class="btn btn-primary align-self-start mt-3" type="submit">Criar funcionário</button>
+            </form>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead><tr><th>Nome</th><th>Cliente</th><th>ID</th></tr></thead>
+                    <tbody id="funcionarios-lista"></tbody>
+                </table>
+            </div>
         </section>
     </main>
 
@@ -218,8 +251,9 @@
                 tbody.append(linha);
             });
 
-            for (const id of ['produto-cliente', 'pedido-cliente']) {
+            for (const id of ['produto-cliente', 'pedido-cliente', 'funcionario-cliente']) {
                 const seletor = document.getElementById(id);
+                if (!seletor) continue;
                 seletor.replaceChildren();
                 adicionarOpcao(seletor, '', 'Selecione um cliente');
                 clientes.forEach(cliente => adicionarOpcao(seletor, cliente.id, cliente.nome));
@@ -289,6 +323,20 @@
                     acoes.append(concluir);
                 }
                 linha.append(acoes);
+                tbody.append(linha);
+            });
+        }
+
+        async function carregarFuncionarios() {
+            const funcionarios = await api('/auth/funcionarios-responsaveis');
+            const tbody = document.getElementById('funcionarios-lista');
+            tbody.replaceChildren();
+            funcionarios.forEach(funcionario => {
+                const linha = document.createElement('tr');
+                adicionarCelula(linha, funcionario.nome);
+                const cliente = clientes.find(item => item.id === funcionario.cliente_id);
+                adicionarCelula(linha, cliente ? cliente.nome : 'Cliente não encontrado');
+                adicionarCelula(linha, funcionario.id);
                 tbody.append(linha);
             });
         }
@@ -504,6 +552,25 @@
             });
         });
 
+        document.getElementById('form-funcionario').addEventListener('submit', event => {
+            event.preventDefault();
+            executar(async () => {
+                const clienteId = Number(document.getElementById('funcionario-cliente').value);
+                await api('/auth/registrar', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        cpf: document.getElementById('funcionario-cpf').value,
+                        nome: document.getElementById('funcionario-nome').value.trim(),
+                        email: document.getElementById('funcionario-email').value.trim(),
+                        senha: document.getElementById('funcionario-senha').value,
+                        clienteId,
+                    })
+                });
+                event.target.reset();
+                await carregarFuncionarios();
+            });
+        });
+
         executar(async () => {
             if (financeiro) {
                 await carregarClientes();
@@ -511,7 +578,8 @@
                 await carregarProdutos();
                 await carregarPedidos();
             } else if (administrador) {
-                await Promise.all([carregarUsuarios(), carregarFinanceiros()]);
+                await carregarClientes();
+                await Promise.all([carregarUsuarios(), carregarFinanceiros(), carregarFuncionarios()]);
             }
         });
     </script>
