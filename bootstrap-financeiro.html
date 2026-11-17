@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="./css/cadastroUsuario.css">
     <link rel="icon" href="assets/logo.ico" type="image/x-icon">
 </head>
+
 <body>
     <main class="cadastro">
         <header class="cabecalho">
@@ -33,7 +35,7 @@
                 <input id="financeiro-senha" type="password" minlength="8" autocomplete="new-password" required>
             </div>
             <div class="campo">
-                <label for="financeiro-chave">Chave de configuração do servidor</label>
+                <label for="financeiro-chave">Chave de configuração do servidor (mínimo 32 caracteres)</label>
                 <input id="financeiro-chave" type="password" minlength="32" autocomplete="off" required>
             </div>
             <button type="submit" id="financeiro-botao">Salvar acesso do Financeiro</button>
@@ -46,6 +48,10 @@
             <a href="login.html">Voltar ao login</a>
         </p>
     </main>
+
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    
     <script>
         const form = document.getElementById('form-financeiro');
         const mensagem = document.getElementById('mensagem');
@@ -58,29 +64,58 @@
             botao.disabled = true;
             botao.textContent = 'Salvando...';
             try {
-                const resposta = await fetch('http://localhost:3000/auth/bootstrap-financeiro', {
+                const cpf = document.getElementById('financeiro-cpf').value.replace(/\D/g, '');
+                const nome = document.getElementById('financeiro-nome').value.trim();
+                const email = document.getElementById('financeiro-email').value.trim().toLowerCase();
+                const senha = document.getElementById('financeiro-senha').value;
+                const chave = document.getElementById('financeiro-chave').value.trim();
+
+                if (cpf.length !== 11) {
+                    throw new Error('Informe um CPF com 11 números.');
+                }
+
+                if (!nome) {
+                    throw new Error('Informe o nome.');
+                }
+
+                if (!email) {
+                    throw new Error('Informe o e-mail.');
+                }
+
+                if (senha.length < 8) {
+                    throw new Error('A senha deve ter pelo menos 8 caracteres.');
+                }
+
+                if (chave.length < 32) {
+                    throw new Error('A chave de configuração deve ter pelo menos 32 caracteres.');
+                }
+
+                const resposta = await fetch(`${API_URL}/auth/bootstrap-financeiro`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        cpf: document.getElementById('financeiro-cpf').value,
-                        nome: document.getElementById('financeiro-nome').value.trim(),
-                        email: document.getElementById('financeiro-email').value.trim().toLowerCase(),
-                        senha: document.getElementById('financeiro-senha').value,
-                        chave: document.getElementById('financeiro-chave').value
-                    })
+                    body: JSON.stringify({ cpf, nome, email, senha, chave })
                 });
-                const dados = await resposta.json().catch(() => ({}));
+
+                let dados = {};
+                try {
+                    dados = await resposta.json();
+                } catch {
+                    dados = {};
+                }
+
                 if (!resposta.ok) {
                     const detalhe = Array.isArray(dados.message)
                         ? dados.message.join(' ')
-                        : dados.message;
-                    throw new Error(detalhe || dados.mensagem || `Erro HTTP ${resposta.status}`);
+                        : dados.message || dados.mensagem;
+                    throw new Error(detalhe || `Erro HTTP ${resposta.status}`);
                 }
-                mensagem.textContent = `${dados.mensagem} Agora você pode entrar com o e-mail e senha informados.`;
+
+                mensagem.textContent = `${dados.mensagem || 'Acesso configurado com sucesso.'} Agora você pode entrar com o e-mail e senha informados.`;
                 mensagem.className = 'mensagem sucesso';
                 form.reset();
             } catch (erro) {
-                mensagem.textContent = erro.message || 'Não foi possível salvar o acesso.';
+                const mensagemErro = erro instanceof Error ? erro.message : 'Não foi possível salvar o acesso.';
+                mensagem.textContent = mensagemErro;
                 mensagem.className = 'mensagem erro';
             } finally {
                 botao.disabled = false;
@@ -89,4 +124,5 @@
         });
     </script>
 </body>
+
 </html>

@@ -1,14 +1,21 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.use(helmet());
 
-  // Em desenvolvimento aceita qualquer origem (Live Server em :5500).
-  // Em produção, defina FRONT_URL no .env com o endereço do front.
+  const frontUrl = process.env.FRONT_URL;
+  const isProduction = process.env.NODE_ENV === 'production';
+
+  if (isProduction && !frontUrl) {
+    throw new Error('FRONT_URL é obrigatória em produção');
+  }
+
   app.enableCors({
-    origin: process.env.FRONT_URL ?? true,
+    origin: frontUrl ?? true,
     credentials: true,
   });
 

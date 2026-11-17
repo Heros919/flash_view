@@ -23,7 +23,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
-        const secret = config.get<string>('JWT_SECRET');
+        const secret = config.get<string>('JWT_SECRET')?.trim();
 
         if (!secret) {
           throw new Error(
@@ -31,9 +31,18 @@ import { JwtStrategy } from './strategies/jwt.strategy';
           );
         }
 
+        if (secret.length < 32) {
+          throw new Error(
+            'JWT_SECRET deve ter pelo menos 32 caracteres.',
+          );
+        }
+
         return {
           secret,
-          signOptions: { expiresIn: '1d' },
+          signOptions: {
+            expiresIn: '8h',
+            algorithm: 'HS256',
+          },
         };
       },
     }),

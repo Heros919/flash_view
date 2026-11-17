@@ -1,3 +1,7 @@
+# Backups do banco (contêm hashes de senha)
+*.sql
+backup_banco_*
+
 # compiled output
 /dist
 /node_modules
@@ -54,5 +58,7 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+/src/generated/prisma
 
 /src/generated/prisma

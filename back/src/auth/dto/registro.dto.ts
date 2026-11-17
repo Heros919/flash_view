@@ -30,4 +30,5 @@ export class RegistroDto {
   @IsOptional()
   @IsEnum(PapelConta)
   papel?: PapelConta;
+
 }

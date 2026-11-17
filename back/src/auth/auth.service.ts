@@ -1,6 +1,5 @@
 import {
   ConflictException,
-  ForbiddenException,
   Injectable,
   NotFoundException,
   ServiceUnavailableException,
@@ -20,16 +19,9 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async registrar(dto: RegistroDto) {
-    const papel = dto.papel ?? PapelConta.FUNCIONARIO;
-
-    if (papel !== PapelConta.FUNCIONARIO) {
-      throw new ForbiddenException(
-        "Somente um administrador pode criar contas Financeiro ou Administrador.",
-      );
-    }
 
     const cpf = dto.cpf.replace(/\D/g, "");
     const nome = dto.nome.trim();
@@ -102,10 +94,15 @@ export class AuthService {
   async bootstrapAdministrador(dto: RegistroDto, chave: string) {
     this.validarChaveBootstrap(chave);
 
-    const contaExistente = await this.prisma.usuario.findFirst({
+    const administradorExistente = await this.prisma.usuario.findFirst({
       where: { papel: PapelConta.ADMINISTRADOR, ativo: true },
-      orderBy: { id: "asc" },
     });
+
+    if (administradorExistente) {
+      throw new ConflictException(
+        "Já existe um administrador ativo. Use o painel administrativo para gerenciar contas.",
+      );
+    }
 
     const cpf = dto.cpf.replace(/\D/g, "");
     const nome = dto.nome.trim();
@@ -135,21 +132,12 @@ export class AuthService {
       funcionarioComEmail ||
       funcionarioComCpf ||
       financeiroComEmail ||
-      financeiroComCpf
+      financeiroComCpf ||
+      usuarioComEmail ||
+      usuarioComCpf
     ) {
       throw new ConflictException(
-        funcionarioComEmail || financeiroComEmail
-          ? "Já existe uma conta com este e-mail."
-          : "Já existe uma conta com este CPF.",
-      );
-    }
-
-    if (
-      (usuarioComEmail && usuarioComEmail.id !== contaExistente?.id) ||
-      (usuarioComCpf && usuarioComCpf.id !== contaExistente?.id)
-    ) {
-      throw new ConflictException(
-        usuarioComEmail && usuarioComEmail.id !== contaExistente?.id
+        funcionarioComEmail || financeiroComEmail || usuarioComEmail
           ? "Já existe uma conta com este e-mail."
           : "Já existe uma conta com este CPF.",
       );
@@ -163,12 +151,8 @@ export class AuthService {
       papel: PapelConta.ADMINISTRADOR,
       ativo: true,
     };
-    const usuario = contaExistente
-      ? await this.prisma.usuario.update({
-          where: { id: contaExistente.id },
-          data,
-        })
-      : await this.prisma.usuario.create({ data });
+
+    const usuario = await this.prisma.usuario.create({ data });
 
     return {
       mensagem: "Acesso do Administrador configurado com sucesso.",
@@ -240,9 +224,9 @@ export class AuthService {
     };
     const financeiro = contaExistente
       ? await this.prisma.financeiro.update({
-          where: { id: contaExistente.id },
-          data,
-        })
+        where: { id: contaExistente.id },
+        data,
+      })
       : await this.prisma.financeiro.create({ data });
 
     return {

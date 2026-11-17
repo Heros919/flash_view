@@ -10,4 +10,4 @@ RUN DATABASE_URL="postgresql://user:pass@localhost:5432/db" npx prisma generate 
 RUN npm run build
 
 EXPOSE 3000
-CMD ["node", "dist/main"]
+CMD ["node", "dist/src/main.js"]

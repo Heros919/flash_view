@@ -1,4 +1,5 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
 
@@ -10,7 +11,7 @@ type JwtPayload = {
   sub: string;
   email: string;
   tipoConta?: "usuario" | "financeiro" | "funcionario";
-  papel?: string;
+  papel?: PapelConta;
   cliente_id?: number;
   admin_id?: number;
 };
@@ -27,17 +28,25 @@ export type FuncionarioAutenticado = {
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly prisma: PrismaService) {
-    const secret = process.env.JWT_SECRET;
+  constructor(
+    config: ConfigService,
+    private readonly prisma: PrismaService,
+  ) {
+    const secret = config.get<string>("JWT_SECRET")?.trim();
 
     if (!secret) {
       throw new Error("JWT_SECRET não foi definido no arquivo .env");
+    }
+
+    if (secret.length < 32) {
+      throw new Error("JWT_SECRET deve ter pelo menos 32 caracteres.");
     }
 
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: secret,
+      algorithms: ["HS256"], // 3.3
     });
   }
 
@@ -48,39 +57,72 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException("Token inválido.");
     }
 
-    if (payload.tipoConta === "usuario" || payload.tipoConta === "financeiro") {
-      const id = Number(payload.sub);
+    // 3.3: seleção estrita por tipoConta, SEM fallback entre tabelas
+    switch (payload.tipoConta) {
+      case "usuario":
+        return this.buscarUsuarioAutenticado(payload.sub);
 
-      if (!Number.isSafeInteger(id) || String(id) !== payload.sub) {
-        throw new UnauthorizedException("Token inválido.");
-      }
+      case "financeiro":
+        return this.buscarFinanceiroAutenticado(payload.sub);
 
-      if (payload.tipoConta === "financeiro") {
-        return this.buscarFinanceiroAutenticado(id);
-      }
+      case "funcionario":
+      default:
+        // Tokens legados sem tipoConta caem aqui (compatibilidade).
+        return this.buscarFuncionarioAutenticado(payload.sub);
+    }
+  }
 
-      const usuario = await this.prisma.usuario.findUnique({
-        where: { id },
-      });
+  private async buscarUsuarioAutenticado(
+    sub: string,
+  ): Promise<UsuarioAutenticado> {
+    const id = this.parseNumericId(sub);
 
-      if (usuario?.ativo) {
-        return {
-          id: usuario.id,
-          cpf: usuario.cpf,
-          nome: usuario.nome,
-          email: usuario.email,
-          ativo: usuario.ativo,
-          papel: usuario.papel,
-        };
-      }
+    const usuario = await this.prisma.usuario.findUnique({
+      where: { id },
+    });
 
-      return this.buscarFinanceiroAutenticado(id);
+    if (!usuario || !usuario.ativo) {
+      throw new UnauthorizedException("Conta não encontrada ou inativa.");
     }
 
+    return {
+      id: usuario.id,
+      cpf: usuario.cpf,
+      nome: usuario.nome,
+      email: usuario.email,
+      ativo: usuario.ativo,
+      papel: usuario.papel,
+    };
+  }
+
+  private async buscarFinanceiroAutenticado(
+    sub: string,
+  ): Promise<UsuarioAutenticado> {
+    const id = this.parseNumericId(sub);
+
+    const financeiro = await this.prisma.financeiro.findUnique({
+      where: { id },
+    });
+
+    if (!financeiro || !financeiro.ativo) {
+      throw new UnauthorizedException("Conta não encontrada ou inativa.");
+    }
+
+    return {
+      id: financeiro.id,
+      cpf: financeiro.cpf,
+      nome: financeiro.nome,
+      email: financeiro.email,
+      ativo: financeiro.ativo,
+      papel: PapelConta.FINANCEIRO,
+    };
+  }
+
+  private async buscarFuncionarioAutenticado(
+    sub: string,
+  ): Promise<FuncionarioAutenticado> {
     const funcionario = await this.prisma.funcionario.findUnique({
-      where: {
-        id: payload.sub,
-      },
+      where: { id: sub },
     });
 
     if (!funcionario) {
@@ -98,24 +140,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     };
   }
 
-  private async buscarFinanceiroAutenticado(
-    id: number,
-  ): Promise<UsuarioAutenticado> {
-    const financeiro = await this.prisma.financeiro.findUnique({
-      where: { id },
-    });
-
-    if (!financeiro || !financeiro.ativo) {
-      throw new UnauthorizedException("Conta Financeiro não encontrada.");
+  private parseNumericId(sub: string): number {
+    const id = Number(sub);
+    if (!Number.isSafeInteger(id) || String(id) !== sub) {
+      throw new UnauthorizedException("Token inválido.");
     }
-
-    return {
-      id: financeiro.id,
-      cpf: financeiro.cpf,
-      nome: financeiro.nome,
-      email: financeiro.email,
-      ativo: financeiro.ativo,
-      papel: PapelConta.FINANCEIRO,
-    };
+    return id;
   }
 }

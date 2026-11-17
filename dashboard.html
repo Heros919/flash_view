@@ -21,7 +21,7 @@
             --text-muted: #8b9eb0;
             --brand-yellow: #ffc107;
             --brand-cyan: #00d2ff;
-            
+
             --status-disponivel: #10b981;
             --status-reservado: #eab308;
             --status-vendido: #ef4444;
@@ -84,6 +84,7 @@
             color: var(--text-muted);
             transition: all 0.2s;
         }
+
         .btn-logout:hover {
             background-color: rgba(239, 68, 68, 0.1);
             color: #ef4444;
@@ -91,11 +92,11 @@
         }
 
         .page-title {
-            font-family: Georgia, serif; 
+            font-family: Georgia, serif;
             font-weight: 700;
             color: #ffffff;
         }
-        
+
         .page-subtitle {
             color: var(--text-muted);
             font-size: 0.75rem;
@@ -108,6 +109,7 @@
             border: 1px solid var(--brand-cyan);
             background: transparent;
         }
+
         .btn-cyan-outline:hover {
             background-color: rgba(0, 210, 255, 0.1);
             color: var(--brand-cyan);
@@ -119,6 +121,7 @@
             border: none;
             font-weight: 600;
         }
+
         .btn-cyan-solid:hover {
             background-color: #00b0d8;
             color: #000;
@@ -155,11 +158,26 @@
             font-weight: 600;
             text-transform: uppercase;
         }
-        
-        .badge-blocos { background: rgba(0, 210, 255, 0.1); color: var(--brand-cyan); }
-        .badge-chapas { background: rgba(255, 193, 7, 0.1); color: var(--brand-yellow); }
-        .badge-disp { background: rgba(16, 185, 129, 0.1); color: var(--status-disponivel); }
-        .badge-vend { background: rgba(239, 68, 68, 0.1); color: var(--status-vendido); }
+
+        .badge-blocos {
+            background: rgba(0, 210, 255, 0.1);
+            color: var(--brand-cyan);
+        }
+
+        .badge-chapas {
+            background: rgba(255, 193, 7, 0.1);
+            color: var(--brand-yellow);
+        }
+
+        .badge-disp {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--status-disponivel);
+        }
+
+        .badge-vend {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--status-vendido);
+        }
 
         .custom-table-container {
             background-color: var(--bg-card);
@@ -210,19 +228,21 @@
             border: 1px solid transparent;
             padding: 4px 10px;
         }
+
         .custom-table .badge.bg-success-subtle {
             color: var(--status-disponivel);
             border-color: rgba(16, 185, 129, 0.2);
         }
+
         .custom-table .badge.bg-danger-subtle {
             color: var(--status-vendido);
             border-color: rgba(239, 68, 68, 0.2);
         }
+
         .custom-table .badge.bg-warning-subtle {
             color: var(--status-reservado);
             border-color: rgba(234, 179, 8, 0.2);
         }
-
     </style>
 </head>
 
@@ -233,8 +253,10 @@
         <aside class="sidebar d-flex flex-column justify-content-between p-3" style="width: 260px; min-height: 100vh;">
             <div>
                 <div class="d-flex align-items-center gap-3 mb-5 mt-2 px-2">
-                    <a href="dashboard.html" aria-label="Voltar para dashboard" class="d-inline-flex align-items-center">
-                        <img src="assets/logoFlashViewRecortada.png" alt="Flash View" style="width: 120px; height: 60px; object-fit: contain;">
+                    <a href="dashboard.html" aria-label="Voltar para dashboard"
+                        class="d-inline-flex align-items-center">
+                        <img src="assets/logoFlashViewRecortada.png" alt="Flash View"
+                            style="width: 120px; height: 60px; object-fit: contain;">
                     </a>
                     <span class="brand-text fs-5">FLASH VIEW</span>
                 </div>
@@ -261,8 +283,9 @@
                 </div>
                 <div id="id-usuario" class="text-muted small mb-2"></div>
                 <div class="profile-badge mb-3">ADMINISTRADOR</div>
-                
-                <button id="btn-sair" type="button" class="btn btn-logout btn-sm w-100 d-flex justify-content-between align-items-center">
+
+                <button id="btn-sair" type="button"
+                    class="btn btn-logout btn-sm w-100 d-flex justify-content-between align-items-center">
                     <span>SAIR</span>
                     <i class="bi bi-box-arrow-right"></i>
                 </button>
@@ -351,7 +374,7 @@
                 <div class="custom-table-header">
                     <h3 class="fs-5 fw-bold mb-0 text-white">Últimos Itens Cadastrados</h3>
                 </div>
-                
+
                 <div class="table-responsive">
                     <table class="table custom-table">
                         <thead>
@@ -379,6 +402,7 @@
         </main>
 
     </div>
+    <script src="js/config.js"></script>
 
     <script src="js/api.js"></script>
 
@@ -551,4 +575,5 @@
     </script>
 
 </body>
+
 </html>
